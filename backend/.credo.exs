@@ -125,7 +125,7 @@ end
           {Check.Design.SkipTestWithoutComment, []},
           {Check.Readability.ImplTrue, []},
           {Check.Readability.MultiAlias, []},
-          {Check.Readability.NestedFunctionCalls, []},
+          {Credo.Check.Readability.NestedFunctionCalls, min_pipeline_length: 3},
           {Check.Readability.SeparateAliasRequire, []},
           {Check.Readability.SingleFunctionToBlockPipe, []},
           {Check.Readability.SinglePipe, []},
