@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" class="[scrollbar-gutter:stable]">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <.live_title suffix="vereis' site">
+      <%= assigns[:page_title] %>
+      <%= if assigns[:page_title], do: " · ", else: "" %>
+    </.live_title>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
+    </script>
+    <link rel="icon" href={~p"/images/favicon-32.png"} />
+  </head>
+  <body class="bg-black antialiased">
+    <div class="
+      bg-[url(https://cdna.artstation.com/p/assets/images/images/043/636/138/large/arseniy-chebynkin-kagome-room-night-minilamp.jpg?1637830925)]
+      bg-cover bg-center bg-black bg-fixed
+      blur-lg
+      brightness-[0.25]
+      min-h-screen
+      min-w-screen
+      fixed
+      inset-0
+      -z-10
+    ">
+    </div>
+    <%= @inner_content %>
+  </body>
+</html>
