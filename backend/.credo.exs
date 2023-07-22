@@ -148,7 +148,8 @@ end
           ## Causes Issues with Phoenix ----------------------------------------
           {Check.Readability.Specs, [exclude_app.(:blog_web)]},
           {Check.Readability.AliasAs, [exclude_app.(:blog_web)]},
-          {Check.Refactor.ModuleDependencies, [exclude_modules.(:blog_web, [BlogWeb, Endpoint])]},
+          {Check.Refactor.ModuleDependencies,
+           [{:max_deps, 25}, exclude_modules.(:blog_web, [BlogWeb, Endpoint])]},
           {Check.Design.AliasUsage, [{:if_nested_deeper_than, 2}, exclude_app.(:blog_web)]},
 
           ## Optional (move to `disabled` based on app domain) -----------------

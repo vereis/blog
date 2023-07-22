@@ -26,8 +26,36 @@ defmodule Blog.Posts.Post do
   def changeset(%Post{} = post, attrs) do
     post
     |> cast(attrs, fields())
+    |> generate_body()
+    |> generate_reading_time(attrs)
     |> validate_required([:title, :slug])
     |> preload_put_assoc(attrs, :tags, :tag_ids)
     |> unique_constraint(:slug)
+  end
+
+  # TODO: once this gets more complex, we'll split it into its own module
+  defp generate_body(changeset) do
+    changeset
+    |> Ecto.Changeset.get_field(:raw_body)
+    |> Md.generate()
+    |> then(&Ecto.Changeset.put_change(changeset, :body, &1))
+  end
+
+  defp generate_reading_time(changeset, attrs) when is_map_key(attrs, :reading_time_minutes) do
+    Ecto.Changeset.put_change(changeset, :reading_time_minutes, attrs.reading_time_minutes)
+  end
+
+  defp generate_reading_time(changeset, attrs) do
+    technical_words_per_minute = 75
+
+    words =
+      changeset
+      |> Ecto.Changeset.get_field(:body)
+      |> String.split(" ")
+      |> Enum.count()
+
+    reading_time_minutes = ceil(words / technical_words_per_minute)
+
+    Ecto.Changeset.put_change(changeset, :reading_time_minutes, reading_time_minutes)
   end
 end
