@@ -4,14 +4,23 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title suffix=" · Phoenix Framework">
-      <%= assigns[:page_title] || "Blog" %>
+    <.live_title suffix="vereis' site">
+      <%= assigns[:page_title] %>
+      <%= if assigns[:page_title], do: " · ", else: "" %>
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>
-  <body class="bg-white antialiased">
+  <body class="
+    bg-[url(https://cdna.artstation.com/p/assets/images/images/043/636/138/large/arseniy-chebynkin-kagome-room-night-minilamp.jpg?1637830925)]
+    bg-cover bg-center bg-black bg-fixed
+    backdrop-blur-lg
+    backdrop-brightness-[0.0985]
+    min-w-screen min-h-screen
+    antialiased
+    p-6
+  ">
     <%= @inner_content %>
   </body>
 </html>
