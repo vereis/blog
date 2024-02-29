@@ -125,6 +125,7 @@ defmodule BlogWeb.BlogLive do
           </div>
           <article class="
         prose prose-mono max-w-none leading-tight
+        selection:bg-pink-300 selection:text-pink-900
 
         --headings
         prose-headings:text-base prose-headings:mb-4 prose-headings:mt-0 prose-headings:text-blue-500 prose-headings:inline-block
