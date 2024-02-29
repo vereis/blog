@@ -38,6 +38,7 @@ defmodule Blog.Posts.Post do
     changeset
     |> Ecto.Changeset.get_field(:raw_body)
     |> Md.generate()
+    |> append_space_between_alphanum_and_pattern([~r/<\/a>/, ~r/<\/code>/])
     |> then(&Ecto.Changeset.put_change(changeset, :body, &1))
   end
 
@@ -57,5 +58,18 @@ defmodule Blog.Posts.Post do
     reading_time_minutes = ceil(words / technical_words_per_minute)
 
     Ecto.Changeset.put_change(changeset, :reading_time_minutes, reading_time_minutes)
+  end
+
+  defp append_space_between_alphanum_and_pattern(html, regexes) when is_list(regexes) do
+    Enum.reduce(regexes, html, &append_space_between_alphanum_and_pattern(&2, &1))
+  end
+
+  defp append_space_between_alphanum_and_pattern(html, %Regex{source: source}) do
+    "(#{source})"
+    |> List.wrap()
+    |> Enum.concat(["(\\s*[a-zA-Z0-9])"])
+    |> Enum.join("")
+    |> Regex.compile!()
+    |> then(&String.replace(html, &1, "\\1&nbsp;\\2"))
   end
 end
