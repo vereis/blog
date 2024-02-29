@@ -3,4 +3,10 @@
 @import "tailwindcss/utilities";
 @import "highlight.js/styles/tokyo-night-dark.css";
 
+/* Prevent hljs from overwriting tailwind padding on these pre/code elems */
+pre code.hljs {
+  padding: 0 8px;
+  color: #ffffff;
+}
+
 /* This file is for your main application CSS */

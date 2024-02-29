@@ -29,14 +29,21 @@ let liveSocket = new LiveSocket("/live", Socket, {
   params: { _csrf_token: csrfToken },
 });
 
-import hljs from "highlight.js/lib/common";
+import hljs from "highlight.js/lib/core";
+import hljsElixir from "highlight.js/lib/languages/elixir";
+hljs.registerLanguage("elixir", hljsElixir);
 
 // Show progress bar on live navigation and form submits
 topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" });
 window.addEventListener("phx:page-loading-start", (_info) => topbar.show(300));
 window.addEventListener("phx:page-loading-stop", (_info) => topbar.hide());
+
+// Highlight all code blocks on page load and live navigation
 window.addEventListener("phx:page-loading-stop", (_info) =>
-  hljs.highlightAll(),
+  setTimeout(() => hljs.highlightAll(), 200),
+);
+window.addEventListener("phx:navigate", (_info) =>
+  setTimeout(() => hljs.highlightAll(), 200),
 );
 
 // connect if there are any LiveViews on the page
