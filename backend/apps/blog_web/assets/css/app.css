@@ -1,5 +1,6 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+@import "highlight.js/styles/tokyo-night-dark.css";
 
 /* This file is for your main application CSS */

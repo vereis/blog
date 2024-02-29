@@ -142,7 +142,7 @@ defmodule BlogWeb.BlogLive do
         prose-code:bg-slate-800 prose-code:text-red-400 prose-code:font-normal
         prose-code:before:content-[''] prose-code:after:content-['']
 
-        prose-pre:bg-transparent prose-pre:block prose-pre:ml-4 prose-pre:-mb-4 prose-pre:p-0 prose-pre:mt-4
+        prose-pre:bg-transparent prose-pre:block prose-pre:ml-4 prose-pre:mb-4 prose-pre:p-0 prose-pre:mt-4
 
         --links
         prose-a:text-green-400 hover:prose-a:underline prose-a:-mr-2
