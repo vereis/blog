@@ -28,7 +28,9 @@ defmodule Blog.Posts.Importer do
       |> File.ls!()
       |> Task.async_stream(&parse_posts/1)
       |> Stream.map(fn {:ok, attrs} -> attrs end)
-      |> Enum.to_list()
+      |> Enum.sort_by(& &1.sort_key, &<=/2)
+      |> Enum.with_index(1)
+      |> Enum.map(fn {attrs, index} -> Map.put(attrs, :id, index) end)
 
     {_count, tags} =
       attrs
@@ -63,13 +65,19 @@ defmodule Blog.Posts.Importer do
     metadata = YamlElixir.read_from_string!(metadata_yaml)
 
     %{
+      id: nil,
       is_draft: metadata["is_draft"],
       published_at: metadata["published_at"],
       raw_body: String.trim(raw_body),
       reading_time_minutes: metadata["reading_time_minutes"],
       slug: metadata["slug"],
       tags: metadata["tags"],
-      title: metadata["title"]
+      title: metadata["title"],
+      sort_key:
+        metadata["published_at"]
+        |> String.replace(~r/[^0-9]/, "")
+        |> Integer.parse()
+        |> elem(0)
     }
   end
 end
