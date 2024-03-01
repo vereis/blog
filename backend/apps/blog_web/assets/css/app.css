@@ -5,7 +5,7 @@
 
 /* Prevent hljs from overwriting tailwind padding on these pre/code elems */
 pre code.hljs {
-  padding: 0 8px;
+  padding: 0 1ch;
   color: #ffffff;
 }
 
