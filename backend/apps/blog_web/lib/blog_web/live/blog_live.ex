@@ -8,7 +8,7 @@ defmodule BlogWeb.BlogLive do
     sibyl: "https://github.com/vetspire/sibyl",
     endo: "https://github.com/vetspire/endo",
     ecto_utils: "https://github.com/vereis/ecto_utils",
-    ecto_middleware: "https://github.com/vereis/ecto_hooks"
+    ecto_middleware: "https://github.com/vereis/ecto_middleware"
   ]
 
   @impl Phoenix.LiveView
@@ -60,7 +60,7 @@ defmodule BlogWeb.BlogLive do
         <span>
           <.button pink="true" phx-click="home">vereis</.button>
           <.button phx-click="posts">posts</.button>
-          <.button href="https://github.com/vereis/blog">source</.button>
+          <.button href="https://github.com/vereis/blog">&lt;/&gt;</.button>
         </span>
         <span>
           <%= for {label, link} <- @projects do %>
