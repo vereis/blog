@@ -30,8 +30,12 @@ let liveSocket = new LiveSocket("/live", Socket, {
 });
 
 import hljs from "highlight.js/lib/core";
+import hljsBash from "highlight.js/lib/languages/bash";
 import hljsElixir from "highlight.js/lib/languages/elixir";
+import hljsNix from "highlight.js/lib/languages/nix";
+hljs.registerLanguage("bash", hljsBash);
 hljs.registerLanguage("elixir", hljsElixir);
+hljs.registerLanguage("nix", hljsNix);
 
 // Show progress bar on live navigation and form submits
 topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" });
