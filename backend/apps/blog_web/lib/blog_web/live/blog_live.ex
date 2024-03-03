@@ -55,7 +55,7 @@ defmodule BlogWeb.BlogLive do
   @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
-    <div class="text-white max-w-2xl mx-auto space-y-8">
+    <div class="text-white max-w-3xl mx-auto space-y-8 p-6 border-x-[1px] border-white/25">
       <header class="flex justify-between font-mono">
         <span>
           <.button pink="true" phx-click="home">vereis</.button>
