@@ -118,10 +118,13 @@ defmodule BlogWeb.BlogLive do
               Tagged:&nbsp
             </div>
           </div>
-          <div class="flex flex-row-reverse mb-2 text-gray-400">
+          <div class="flex flex-row-reverse mt-1 text-gray-400">
             Published <%= DateTime.to_date(@post.published_at) %> @ <%= DateTime.to_time(
               @post.published_at
             ) %>
+          </div>
+          <div class="flex flex-row-reverse mb-2 text-gray-400">
+            Approx. <%= @post.reading_time_minutes %> minutes
           </div>
           <article class="
         prose prose-mono max-w-none leading-tight

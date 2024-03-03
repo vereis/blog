@@ -42,12 +42,9 @@ defmodule Blog.Posts.Post do
     |> then(&Ecto.Changeset.put_change(changeset, :body, &1))
   end
 
-  defp generate_reading_time(changeset, attrs) when is_map_key(attrs, :reading_time_minutes) do
-    Ecto.Changeset.put_change(changeset, :reading_time_minutes, attrs.reading_time_minutes)
-  end
-
-  defp generate_reading_time(changeset, attrs) do
-    technical_words_per_minute = 75
+  defp generate_reading_time(changeset, attrs)
+       when not is_map_key(attrs, :reading_time_minutes) or is_nil(attrs.reading_time_minutes) do
+    technical_words_per_minute = 260
 
     words =
       changeset
@@ -58,6 +55,10 @@ defmodule Blog.Posts.Post do
     reading_time_minutes = ceil(words / technical_words_per_minute)
 
     Ecto.Changeset.put_change(changeset, :reading_time_minutes, reading_time_minutes)
+  end
+
+  defp generate_reading_time(changeset, attrs) do
+    Ecto.Changeset.put_change(changeset, :reading_time_minutes, attrs.reading_time_minutes)
   end
 
   defp append_space_between_alphanum_and_pattern(html, regexes) when is_list(regexes) do
