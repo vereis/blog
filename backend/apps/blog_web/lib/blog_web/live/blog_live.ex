@@ -7,7 +7,7 @@ defmodule BlogWeb.BlogLive do
   @projects [
     sibyl: "https://github.com/vetspire/sibyl",
     endo: "https://github.com/vetspire/endo",
-    ecto_utils: "https://github.com/vereis/ecto_utils",
+    ecto_model: "https://github.com/vetspire/ecto_model",
     ecto_middleware: "https://github.com/vereis/ecto_middleware"
   ]
 
@@ -108,57 +108,76 @@ defmodule BlogWeb.BlogLive do
       <%= if @live_action in [:show_post, :home] do %>
         <main class="px-4 mx-auto">
           <div class="flex justify-between items-center">
-            <h1 class="px-2 bg-blue-700 inline-block"><%= @post.title %></h1>
-            <div class="flex flex-row-reverse items-center -mr-2">
-              <%= for tag <- @post.tags do %>
-                <.button class="px-2" phx-click="tag" phx-value-tag={tag.label}>
-                  <%= tag.label %>
-                </.button>
-              <% end %>
-              Tagged:&nbsp
+            <%= if is_nil(@post) do %>
+              <h1 class="px-2 bg-blue-700 inline-block">Oopsie woopsie!!</h1>
+            <% else %>
+              <h1 class="px-2 bg-blue-700 inline-block"><%= @post.title %></h1>
+              <div class="flex flex-row-reverse items-center -mr-2">
+                <%= for tag <- @post.tags do %>
+                  <.button class="px-2" phx-click="tag" phx-value-tag={tag.label}>
+                    <%= tag.label %>
+                  </.button>
+                <% end %>
+                Tagged:&nbsp
+              </div>
+            <% end %>
+
+          </div>
+
+          <%= unless is_nil(@post) do %>
+            <div class="flex flex-row-reverse mt-1 text-gray-400">
+              Published <%= DateTime.to_date(@post.published_at) %> @ <%= DateTime.to_time(
+                @post.published_at
+              ) %>
             </div>
-          </div>
-          <div class="flex flex-row-reverse mt-1 text-gray-400">
-            Published <%= DateTime.to_date(@post.published_at) %> @ <%= DateTime.to_time(
-              @post.published_at
-            ) %>
-          </div>
-          <div class="flex flex-row-reverse mb-2 text-gray-400">
-            Approx. <%= @post.reading_time_minutes %> minutes
-          </div>
+            <div class="flex flex-row-reverse text-gray-400">
+              Approx. <%= @post.reading_time_minutes %> minutes
+            </div>
+          <% end %>
+
           <article class="
-        prose prose-mono max-w-none leading-tight
-        selection:bg-pink-300 selection:text-pink-900
+            prose prose-mono max-w-none leading-tight
+            selection:bg-pink-300 selection:text-pink-900
+            my-4
 
-        --headings
-        prose-headings:text-base prose-headings:mb-4 prose-headings:mt-0 prose-headings:text-blue-500 prose-headings:inline-block
-        prose-h1:text-base prose-h1:px-2 prose-h1:bg-blue-700 prose-h1:text-white prose-h1:-mb-2
-        prose-h2:before:content-['##']
-        prose-h3:before:content-['###']
-        prose-h4:before:content-['####']
-        prose-h5:before:content-['#####']
-        prose-h6:before:content-['######']
+            --headings
+            prose-headings:text-base prose-headings:mb-4 prose-headings:mt-0 prose-headings:text-blue-500 prose-headings:inline-block
+            prose-h1:text-base prose-h1:px-2 prose-h1:bg-blue-700 prose-h1:text-white prose-h1:-mb-2
+            prose-h2:before:content-['##']
+            prose-h3:before:content-['###']
+            prose-h4:before:content-['####']
+            prose-h5:before:content-['#####']
+            prose-h6:before:content-['######']
 
-        --code-blocks
-        prose-code:text-base prose-code:inline-block
-        prose-code:-mr-2 prose-code:px-2
-        prose-code:bg-slate-800 prose-code:text-red-400 prose-code:font-normal
-        prose-code:before:content-[''] prose-code:after:content-['']
+            --code-blocks
+            prose-code:text-base prose-code:inline-block
+            prose-code:-mr-2 prose-code:px-2
+            prose-code:bg-slate-800 prose-code:text-red-400 prose-code:font-normal
+            prose-code:before:content-[''] prose-code:after:content-['']
 
-        prose-pre:bg-transparent prose-pre:block prose-pre:ml-4 prose-pre:mb-4 prose-pre:p-0 prose-pre:mt-4
+            prose-pre:bg-transparent prose-pre:block prose-pre:ml-4 prose-pre:mb-4 prose-pre:p-0 prose-pre:mt-4
 
-        --links
-        prose-a:text-green-400 hover:prose-a:underline prose-a:-mr-2
-        prose-a:no-underline prose-a:font-semibold prose-a:inline
-        prose-a:after:font-normal prose-a:after:underline prose-a:after:content-[attr(href)] prose-a:after:text-cyan-500
+            --links
+            prose-a:text-green-400 hover:prose-a:underline prose-a:-mr-2
+            prose-a:no-underline prose-a:font-semibold prose-a:inline
+            prose-a:after:font-normal prose-a:after:underline prose-a:after:content-[attr(href)] prose-a:after:text-cyan-500
 
-        --lists
-        prose-ul:-ml-2
+            --lists
+            prose-ul:-ml-2
 
-        --quotes
-        prose-blockquote:border-l-[1px]
-      ">
-            <%= {:safe, @post.body} %>
+            --quotes
+            prose-blockquote:border-l-[1px]
+          ">
+
+            <%= if is_nil(@post) do %>
+              <p> Something went <em>seriously</em> fuckie wuckie!! (｡•́︿•̀｡) </p>
+              <p> The post you looked for might have gotten lost, we've sent our best search party to find them. </p>
+              <p> In the meantime, you can go back home and try again. </p>
+              <p> <a href="/" phx-click="posts">Go home</a>!! </p>
+            <% else %>
+              <%= {:safe, @post.body} %>
+            <% end %>
+
             <span class="inline-block bg-gray-300 px-2 text-gray-600">(END)</span>
           </article>
         </main>
