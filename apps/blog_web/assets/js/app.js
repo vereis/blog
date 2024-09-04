@@ -40,11 +40,13 @@ import hljsBash from "highlight.js/lib/languages/bash";
 import hljsElixir from "highlight.js/lib/languages/elixir";
 import hljsNix from "highlight.js/lib/languages/nix";
 import hljsSql from "highlight.js/lib/languages/sql";
+import hljsGql from "highlight.js/lib/languages/graphql";
 
 hljs.registerLanguage("bash", hljsBash);
 hljs.registerLanguage("elixir", hljsElixir);
 hljs.registerLanguage("nix", hljsNix);
 hljs.registerLanguage("sql", hljsSql);
+hljs.registerLanguage("graphql", hljsGql);
 
 const highlightAll = () => {
   let timer;
