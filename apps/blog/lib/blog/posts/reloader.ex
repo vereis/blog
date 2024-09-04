@@ -3,6 +3,7 @@ defmodule Blog.Posts.Reloader do
   use GenServer
 
   alias Blog.Migrator
+  alias Blog.Posts
   alias Blog.Posts.Importer
 
   require Logger
