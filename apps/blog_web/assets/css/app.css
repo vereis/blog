@@ -1,0 +1,31 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+@import "highlight.js/styles/tokyo-night-dark.css";
+
+/* Prevent hljs from overwriting tailwind padding on these pre/code elems */
+pre code.hljs {
+  padding: 0 0;
+  color: #ffffff;
+}
+
+/*  Overrides for styling my pre tags     *
+ *  namely, don't show if not highlighted */
+pre code {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  visibility: hidden !important;
+  display: block;
+  height: 0 !important;
+  overflow: hidden;
+}
+
+pre code[data-highlighted] {
+  visibility: visible !important;
+  height: auto !important;
+  overflow: initial;
+}
+
+/* This file is for your main application CSS */
