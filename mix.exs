@@ -9,6 +9,7 @@ defmodule Blog.Umbrella.MixProject do
       deps: deps(),
       aliases: aliases(),
       test_coverage: [tool: ExCoveralls],
+      dialyzer: [plt_add_apps: [:mix]],
       releases: [
         blog: [
           applications: [blog: :permanent, blog_web: :permanent]

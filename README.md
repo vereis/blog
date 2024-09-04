@@ -51,6 +51,31 @@ You can visit the blog locally via `localhost:4000` in development.
 
 If you use `nix`, this project includes a `flake.nix` to get you set up, and a `.envrc` for direnv integration. The env vars in the `.envrc` are recommended to be sourced before running.
 
+### Writing Posts
+
+Posts are written in Markdown and stored in the `priv/posts` directory. The filename should be in the format `YYYYMMDDHHMMSS_slug.md`. The file should contain the following frontmatter:
+
+```markdown
+---
+title: The Title of the Post
+slug: the_slug
+is_draft: false
+reading_time_minutes: 5
+published_at: 2024-09-04 15:04:13Z
+tags:
+  - elixir
+  - liveview
+---
+```
+
+A `Mix.Task` is provided to create posts. You can run the following command to create a new post:
+
+```sh
+mix gen.post blog_post_slug is_draft=true tags=elixir,liveview
+```
+
+All frontmatter fields support being overrided by a command line argument in the format `key=value`. The `tags` field should be a comma separated list.
+
 ## Building
 
 To build the project, you can run the following command:

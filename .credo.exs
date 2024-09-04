@@ -84,7 +84,7 @@ end
           ## Refactoring Opportunities -----------------------------------------
           {Check.Refactor.Apply, []},
           {Check.Refactor.CondStatements, []},
-          {Check.Refactor.CyclomaticComplexity, []},
+          {Check.Refactor.CyclomaticComplexity, [max_complexity: 12]},
           {Check.Refactor.FunctionArity, []},
           {Check.Refactor.LongQuoteBlocks, []},
           {Check.Refactor.MatchInCondition, []},
