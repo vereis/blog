@@ -3,7 +3,6 @@ defmodule Blog.Posts.Reloader do
   use GenServer
 
   alias Blog.Migrator
-  alias Blog.Posts
   alias Blog.Posts.Importer
 
   require Logger
@@ -25,6 +24,8 @@ defmodule Blog.Posts.Reloader do
   @spec maybe_init_filesystem_watcher() :: :ok
   if Code.ensure_loaded?(FileSystem) do
     defp maybe_init_filesystem_watcher do
+      alias Blog.Posts
+
       {:ok, watcher_pid} = FileSystem.start_link(dirs: [Posts.source_path()])
       FileSystem.subscribe(watcher_pid)
       :ok
