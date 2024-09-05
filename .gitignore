@@ -22,12 +22,11 @@ erl_crash.dump
 # Temporary files, for example, from tests.
 /tmp/
 
-
 # Database files
 *.db
 *.db-*
 
 # Misc artefacts
 .direnv/
-assets/
+/assets/
 rel/
