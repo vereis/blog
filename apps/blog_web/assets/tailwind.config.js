@@ -12,15 +12,15 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: [
-          "FantasqueSansMono Nerd Font Mono",
+          "Reddit Mono",
           ...defaultTheme.fontFamily.mono,
         ],
         serif: [
-          "FantasqueSansMono Nerd Font Mono",
+          "Reddit Mono",
           ...defaultTheme.fontFamily.mono,
         ],
         mono: [
-          "FantasqueSansMono Nerd Font Mono",
+          "Reddit Mono",
           ...defaultTheme.fontFamily.mono,
         ],
       },
