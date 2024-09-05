@@ -30,7 +30,7 @@ module.exports = {
       typography: ({ theme }) => ({
         mono: {
           css: {
-            "pre > code": { backgroundColor: "transparent !important" },
+            "pre > code": { backgroundColor: "transparent !important; line-height: 22px !important;" },
             "blockquote p": { fontStyle: "normal" },
             "blockquote p:first-of-type::before": { content: "none" },
             "blockquote p:first-of-type::after": { content: "none" },

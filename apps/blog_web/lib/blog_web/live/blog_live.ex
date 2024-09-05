@@ -173,7 +173,7 @@ defmodule BlogWeb.BlogLive do
       <%= if @live_action == :list_projects do %>
         <main class="px-4 mx-auto">
           <div>
-            <h1 class="px-2 bg-blue-700 inline-block mb-4">
+            <h1 class="px-[1rem] bg-blue-700 inline-block mb-4">
               All Projects <%= if @tag, do: "tagged #{@tag}", else: "" %>
             </h1>
             <%= if @tag do %>
@@ -211,7 +211,7 @@ defmodule BlogWeb.BlogLive do
       <%= if @live_action == :list_posts do %>
         <main class="px-4 mx-auto">
           <div>
-            <h1 class="px-2 bg-blue-700 inline-block mb-4">
+            <h1 class="px-[1rem] bg-blue-700 inline-block mb-4">
               All Posts <%= if @tag, do: "tagged #{@tag}", else: "" %>
             </h1>
             <%= if @tag do %>
@@ -248,9 +248,9 @@ defmodule BlogWeb.BlogLive do
         <main class="px-4 mx-auto">
           <div class="flex justify-between items-center">
             <%= if is_nil(@post) do %>
-              <h1 class="px-2 bg-blue-700 inline-block">Ut-oh !!</h1>
+              <h1 class="px-[1rem] bg-blue-700 inline-block">Ut-oh !!</h1>
             <% else %>
-              <h1 class="px-2 bg-blue-700 inline-block"><%= @post.title %></h1>
+              <h1 class="px-[1rem] bg-blue-700 inline-block"><%= @post.title %></h1>
               <div class="flex flex-row-reverse items-center -mr-2">
                 <%= for tag <- @post.tags do %>
                   <.button class="px-2" phx-click="tag" phx-value-tag={tag.label}>
@@ -263,18 +263,18 @@ defmodule BlogWeb.BlogLive do
           </div>
 
           <%= unless is_nil(@post) do %>
-            <div class="flex flex-row-reverse mt-1 text-gray-400">
+            <div class="flex flex-row-reverse text-gray-400 my-[1px]">
               Published <%= DateTime.to_date(@post.published_at) %> @ <%= DateTime.to_time(
                 @post.published_at
               ) %>
             </div>
-            <div class="flex flex-row-reverse text-gray-400">
+            <div class="flex flex-row-reverse -mt-1 text-gray-400">
               Approx. <%= @post.reading_time_minutes %> minutes
             </div>
           <% end %>
 
           <article class="
-            prose prose-mono max-w-none leading-tight
+            prose prose-mono max-w-none
             selection:bg-pink-300 selection:text-pink-900
             my-4
 
@@ -289,8 +289,8 @@ defmodule BlogWeb.BlogLive do
 
             --code-blocks
             prose-code:text-base
-            prose-code:outline-slate-800 prose-code:outline prose-code:outline-3
-            prose-code:border prose-code:border-slate-800 prose-code:border-x-4 prose-code:border-solid
+            prose-code:outline-slate-800 prose-code:outline prose-code:outline-1
+            prose-code:border prose-code:border-slate-800 prose-code:border-x-[0.5em] prose-code:border-solid
             prose-code:bg-slate-800 prose-code:text-red-400 prose-code:font-normal
             prose-code:before:content-[''] prose-code:after:content-['']
 
