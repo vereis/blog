@@ -39,7 +39,7 @@ defmodule BlogWeb do
   def controller do
     quote do
       use Phoenix.Controller,
-        formats: [:html, :json],
+        formats: [:html, :json, :xml],
         layouts: [html: BlogWeb.Layouts]
 
       import BlogWeb.Gettext
@@ -75,6 +75,14 @@ defmodule BlogWeb do
         only: [get_csrf_token: 0, view_module: 1, view_template: 1]
 
       # Include general helpers for rendering HTML
+      unquote(html_helpers())
+    end
+  end
+
+  def xml do
+    quote do
+      use Phoenix.Component
+
       unquote(html_helpers())
     end
   end

@@ -1,0 +1,21 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Vereis' Site</title>
+    <description>All things Nix, Erlang, and Elixir</description>
+    <link>https://vereis.com/</link>
+    <lastBuildDate><%= pub_date(@posts) %></lastBuildDate>
+    <pubDate><%= pub_date(@posts) %></pubDate>
+    <ttl>1800</ttl>
+    <atom:link href="https://example.com/rss" rel="self" type="application/rss+xml"/>
+
+    <%= for post <- Enum.reverse(@posts), not post.is_draft do %>
+      <item>
+        <title><%= post.title %></title>
+        <description><![CDATA[ <%= post.description %> ]]></description>
+        <link><%= "https://vereis.com/posts/#{post.slug}" %></link>
+        <guid isPermaLink="false"><%= post.slug %></guid>
+        <pubDate><%= pub_date(post) %></pubDate>
+      </item>
+    <% end %>
+  </channel>
+</rss>

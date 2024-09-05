@@ -14,6 +14,7 @@ defmodule Blog.Posts.Post do
     field(:reading_time_minutes, :integer, default: 0)
     field(:is_draft, :boolean, default: true)
     field(:published_at, :utc_datetime)
+    field(:description, :string)
 
     many_to_many(:tags, Tag,
       join_through: join_schema("posts_tags", {:post_id, :tag_id}),
@@ -28,8 +29,9 @@ defmodule Blog.Posts.Post do
     post
     |> cast(attrs, fields())
     |> generate_body()
+    |> generate_description()
     |> generate_reading_time(attrs)
-    |> validate_required([:title, :slug])
+    |> validate_required([:title, :slug, :description])
     |> preload_put_assoc(attrs, :tags, :tag_ids)
     |> unique_constraint(:slug)
   end
@@ -44,6 +46,19 @@ defmodule Blog.Posts.Post do
       {~r/<\/code>/, ""}
     ])
     |> then(&Ecto.Changeset.put_change(changeset, :body, &1))
+  end
+
+  defp generate_description(changeset) do
+    description =
+      changeset
+      |> Ecto.Changeset.get_field(:raw_body)
+      |> String.split(~r/\n/)
+      |> Enum.take(8)
+      |> Enum.join("\n")
+
+    (description <> "\n ... Read more ...")
+    |> Md.generate()
+    |> then(&Ecto.Changeset.put_change(changeset, :description, &1))
   end
 
   defp generate_reading_time(changeset, attrs)

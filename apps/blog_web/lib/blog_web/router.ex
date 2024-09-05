@@ -17,6 +17,8 @@ defmodule BlogWeb.Router do
   scope "/", BlogWeb do
     pipe_through :browser
 
+    get "/rss", RssController, :index
+
     live_session :default do
       live "/", BlogLive, :home
       live "/projects/", BlogLive, :list_projects

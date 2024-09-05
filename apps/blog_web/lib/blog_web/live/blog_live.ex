@@ -164,6 +164,7 @@ defmodule BlogWeb.BlogLive do
           <.button pink={true} phx-click="home">vereis (⁠◠⁠‿⁠・⁠)⁠—⁠☆</.button>
         </span>
         <span>
+          <.button href="/rss">rss</.button>
           <.button phx-click="posts">posts</.button>
           <.button phx-click="projects">projects</.button>
           <.button href="https://github.com/vereis/blog">&lt;/&gt;</.button>
@@ -342,6 +343,7 @@ defmodule BlogWeb.BlogLive do
     <a
       class={"#{if @pink, do: "text-pink-300"} hover:bg-pink-300 hover:text-black px-2 cursor-pointer inline-block"}
       {@rest}
+      href={@href}
     >
       <%= render_slot(@inner_block) %>
     </a>
