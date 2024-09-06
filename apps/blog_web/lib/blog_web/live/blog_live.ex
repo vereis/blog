@@ -72,6 +72,14 @@ defmodule BlogWeb.BlogLive do
       """
     },
     %{
+      name: "Monarch",
+      tags: [%{label: "elixir"}, %{label: "ecto"}, %{label: "migrations"}],
+      url: "https://hexdocs.pm/monarch/Monarch.html",
+      description: """
+      A simple Oban powered framework for defining and running long running, large data backfill tasks asynchronously across your cluster.
+      """
+    },
+    %{
       name: "Jarlang",
       tags: [%{label: "erlang"}, %{label: "compiler"}],
       url: "https://github.com/vereis/jarlang",
