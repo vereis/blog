@@ -166,21 +166,21 @@ defmodule BlogWeb.BlogLive do
   @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
-    <div class="text-white max-w-3xl mx-auto space-y-8 p-6 border-x-[1px] border-white/25 min-h-screen">
+    <div class="text-white max-w-3xl mx-auto space-y-8 p-2 md:p-6 border-x-[1px] border-white/25 min-h-screen">
       <header class="flex justify-between font-mono">
         <span>
           <.button pink={true} phx-click="home">vereis (⁠◠⁠‿⁠・⁠)⁠—⁠☆</.button>
         </span>
         <span>
-          <.button href="/rss">rss</.button>
+          <.button mobile?={false} href="/rss">rss</.button>
           <.button phx-click="posts">posts</.button>
-          <.button phx-click="projects">projects</.button>
-          <.button href="https://github.com/vereis/blog">&lt;/&gt;</.button>
+          <.button phx-click="projects">projs</.button>
+          <.button mobile?={false} href="https://github.com/vereis/blog">&lt;/&gt;</.button>
         </span>
       </header>
 
       <%= if @live_action == :list_projects do %>
-        <main class="px-4 mx-auto">
+        <main class="px-2 md:px-4 mx-auto">
           <div>
             <h1 class="px-[1rem] bg-blue-700 inline-block mb-4">
               All Projects <%= if @tag, do: "tagged #{@tag}", else: "" %>
@@ -218,7 +218,7 @@ defmodule BlogWeb.BlogLive do
       <% end %>
 
       <%= if @live_action == :list_posts do %>
-        <main class="px-4 mx-auto">
+        <main class="px-2 md:px-4 mx-auto">
           <div>
             <h1 class="px-[1rem] bg-blue-700 inline-block mb-4">
               All Posts <%= if @tag, do: "tagged #{@tag}", else: "" %>
@@ -232,8 +232,8 @@ defmodule BlogWeb.BlogLive do
               <div class="before:content-['#'] before:-mr-2 text-green-400 col-start-1 col-end-2">
                 <%= post.id %>
               </div>
-              <div class="col-start-2 col-end-7 hover:underline"><%= post.title %></div>
-              <div class="col-start-7 col-end-11 text-right">
+              <div class="col-start-2 md:col-end-7 col-end-10 hover:underline"><%= post.title %></div>
+              <div class="hidden md:block md:col-start-7 md:col-end-11 md:text-right">
                 <%= for tag <- post.tags do %>
                   <span
                     class="cursor-pointer no-underline px-1 hover:bg-pink-300 hover:text-black inline-block"
@@ -244,8 +244,20 @@ defmodule BlogWeb.BlogLive do
                   </span>
                 <% end %>
               </div>
-              <div class="col-start-11 col-end-13 text-right">
+              <div class="col-start-10 md:col-start-11 col-end-13 text-right">
                 <%= DateTime.to_date(post.published_at) %>
+              </div>
+              <div class="md:hidden col-start-2 col-end-13 text-gray-400">
+                Tagged:
+                <%= for tag <- post.tags do %>
+                  <span
+                    class="cursor-pointer no-underline px-1 hover:bg-pink-300 hover:text-black inline-block"
+                    phx-click="tag"
+                    phx-value-tag={tag.label}
+                  >
+                    <%= tag.label %>
+                  </span>
+                <% end %>
               </div>
             </div>
           <% end %>
@@ -254,13 +266,13 @@ defmodule BlogWeb.BlogLive do
       <% end %>
 
       <%= if @live_action in [:show_post, :home] do %>
-        <main class="px-4 mx-auto">
+        <main class="px-2 md:px-4 mx-auto">
           <div class="flex justify-between items-center">
             <%= if is_nil(@post) do %>
               <h1 class="px-[1rem] bg-blue-700 inline-block">Ut-oh !!</h1>
             <% else %>
               <h1 class="px-[1rem] bg-blue-700 inline-block"><%= @post.title %></h1>
-              <div class="flex flex-row-reverse items-center -mr-2">
+              <div class="hidden md:flex flex flex-row-reverse items-center -mr-2">
                 <%= for tag <- @post.tags do %>
                   <.button class="px-2" phx-click="tag" phx-value-tag={tag.label}>
                     <%= tag.label %>
@@ -271,13 +283,22 @@ defmodule BlogWeb.BlogLive do
             <% end %>
           </div>
 
+              <div class="flex md:hidden flex items-center text-gray-400">
+                Tagged:&nbsp
+                <%= for tag <- @post.tags do %>
+                  <.button class="px-2" phx-click="tag" phx-value-tag={tag.label}>
+                    <%= tag.label %>
+                  </.button>
+                <% end %>
+              </div>
+
           <%= unless is_nil(@post) do %>
-            <div class="flex flex-row-reverse text-gray-400 my-[1px]">
+            <div class="hidden md:flex flex-row-reverse text-gray-400 my-[1px]">
               Published <%= DateTime.to_date(@post.published_at) %> @ <%= DateTime.to_time(
                 @post.published_at
               ) %>
             </div>
-            <div class="flex flex-row-reverse -mt-1 text-gray-400">
+            <div class="hidden md:flex flex-row-reverse -mt-1 text-gray-400">
               Approx. <%= @post.reading_time_minutes %> minutes
             </div>
           <% end %>
@@ -341,15 +362,16 @@ defmodule BlogWeb.BlogLive do
     """
   end
 
-  attr :pink, :boolean, default: false
-  attr :href, :string, default: nil
-  slot :inner_block, required: true
-  attr :rest, :global, include: ~w(disabled form name value)
+  attr(:pink, :boolean, default: false)
+  attr(:href, :string, default: nil)
+  slot(:inner_block, required: true)
+  attr(:rest, :global, include: ~w(disabled form name value))
+  attr(:mobile?, :boolean, default: true)
 
   def button(assigns) do
     ~H"""
     <a
-      class={"#{if @pink, do: "text-pink-300"} hover:bg-pink-300 hover:text-black px-2 cursor-pointer inline-block"}
+      class={"#{if @pink, do: "text-pink-300"} hover:bg-pink-300 hover:text-black px-2 cursor-pointer inline-block #{if not @mobile?, do: "hidden md:inline"}"}
       {@rest}
       href={@href}
     >
