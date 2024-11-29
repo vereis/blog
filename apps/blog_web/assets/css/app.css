@@ -180,14 +180,24 @@ table {
   font-weight: bold;
 }
 
+html {
+  background-image: url('/images/bg.png');
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 body {
-  background-color: #080808;
+  background-color: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(5px);
   color: #e0def4;
   font-family: "Custom", monospace !important;
   letter-spacing: 1px;
   font-size: 16px;
   line-height: 1.5;
   padding: 48px;
+  min-height: 100vh;
 }
 
 header {
@@ -397,7 +407,12 @@ blockquote * + * {
 }
 
 .post_tag {
-  display: inline-block;
+  padding-left: 1.3ex;
+  padding-right: 1.3ex;
+}
+
+.post_tag:not(:last-child) {
+  padding-right: 0;
 }
 
 .post_reading_time {
@@ -432,11 +447,12 @@ blockquote * + * {
 }
 
 .project_tag {
-  margin-left: 1.3ex;
+  padding-left: 1.3ex;
+  padding-right: 1.3ex;
 }
 
-.project_tag {
-  display: inline-block;
+.project_tag:not(:last-child) {
+  padding-right: 0;
 }
 
 .project_description {
