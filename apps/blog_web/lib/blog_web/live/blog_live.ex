@@ -177,7 +177,7 @@ defmodule BlogWeb.BlogLive do
     <div>
       <header>
         <span>
-          <.button pink={true} phx-click="home">vereis ♪⁠～⁠(⁠´⁠ε⁠｀⁠ ⁠)</.button>
+          <.button main={true} phx-click="home">vereis ♪⁠～⁠(⁠´⁠ε⁠｀⁠ ⁠)</.button>
         </span>
         <span>
           <.button mobile?={false} href="/rss">rss</.button>
@@ -297,7 +297,7 @@ defmodule BlogWeb.BlogLive do
     """
   end
 
-  attr(:pink, :boolean, default: false)
+  attr(:main, :boolean, default: false)
   attr(:href, :string, default: nil)
   slot(:inner_block, required: true)
   attr(:rest, :global, include: ~w(disabled form name value))
@@ -305,7 +305,7 @@ defmodule BlogWeb.BlogLive do
 
   def button(assigns) do
     ~H"""
-    <a {@rest} href={@href}>
+    <a {@rest} class={@main && "" || "button"} href={@href}>
       <%= render_slot(@inner_block) %>
     </a>
     """

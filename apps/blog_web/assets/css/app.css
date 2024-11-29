@@ -213,13 +213,6 @@ header > span:last-child {
   float: right;
 }
 
-header > span:last-child > * {
-  margin-left: 1.3ex;
-  padding-left: 1ex;
-  text-decoration: none;
-  color: #e0def4;
-}
-
 main {
   padding: 2.6ex;
   max-width: 90ex;
@@ -466,4 +459,57 @@ article em {
 
 article strong {
   font-weight: bold;
+}
+
+.button {
+  padding-left: 1.3ex;
+  padding-right: 1.3ex;
+  text-decoration: none;
+  color: #e0def4;
+}
+
+.button:not(:last-child) {
+  padding-right: 0;
+}
+
+
+@media screen and (max-width: 600px) {
+  body {
+    padding: 0;
+  }
+  header {
+    padding: 2.6ex;
+  }
+  header > span {
+    display: block;
+  }
+  header > span:last-child {
+    float: left !important;
+  }
+  header > span:last-child:before {
+    content: "Links: ";
+  }
+  .button {
+    margin-left: 0;
+  }
+  .tags, .published, .read_time {
+    display: none;
+  }
+  .post {
+    display: block;
+  }
+  .post + .post {
+    margin-top: 2.6ex;
+  }
+  .post_tags {
+    display: block;
+    float: none;
+    margin-left: 0;
+  }
+  .post_tags:before {
+    content: "Tagged: ";
+  }
+  .post_reading_time {
+    display: none;
+  }
 }
