@@ -1,31 +1,453 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
-@import "highlight.js/styles/tokyo-night-dark.css";
+/*!
+  Theme: Rose Pine
+  Origin: https://rosepinetheme.com/
+*/
 
-/* Prevent hljs from overwriting tailwind padding on these pre/code elems */
-pre code.hljs {
-  padding: 0 0;
-  color: #ffffff;
+/*  Comment */
+.hljs-meta,
+.hljs-comment {
+  color: #6e6a86;
 }
 
-/*  Overrides for styling my pre tags     *
- *  namely, don't show if not highlighted */
-pre code {
+/* Red */
+/*INFO: This keyword, HTML elements, Regex group symbol, CSS units, Terminal Red */
+.hljs-tag,
+.hljs-doctag,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-template-tag,
+.hljs-selector-pseudo,
+.hljs-selector-attr,
+.hljs-variable.language_,
+.hljs-deletion {
+  color: #eb6f92;
+}
+
+/*Orange */
+/*INFO: Number and Boolean constants, Language support constants */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-number,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-link {
+  color: #ebbcba;
+}
+
+
+/*  Yellow */
+/* INFO:  	Function parameters, Regex character sets, Terminal Yellow */
+.hljs-built_in,
+.hljs-attribute {
+  color: #f6c177;
+}
+/* cyan */
+/* INFO: Language support functions, CSS HTML elements */
+.hljs-selector-tag {
+  color: #31748f;
+}
+
+/* light blue */
+/* INFO: Object properties, Regex quantifiers and flags, Markdown headings, Terminal Cyan, Markdown code, Import/export keywords */
+.hljs-keyword,
+  .hljs-title.function_,
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-subst,
+.hljs-property {color: #9ccfd8;}
+
+/*Green*/
+/* INFO: Object literal keys, Markdown links, Terminal Green */
+.hljs-selector-tag { color: #9ccfd8;}
+
+
+/*Green(er) */
+/* INFO: Strings, CSS class names */
+.hljs-quote,
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+  color: #31748f;
+}
+
+/* INFO:  	Function names, CSS property names, Terminal Blue */
+.hljs-code,
+.hljs-formula,
+.hljs-section {
+  color: #ebbcba;
+}
+
+
+
+/* Magenta */
+/*INFO: Control Keywords, Storage Types, Regex symbols and operators, HTML Attributes, Terminal Magenta */
+.hljs-name,
+.hljs-keyword,
+.hljs-operator,
+.hljs-keyword,
+.hljs-char.escape_,
+.hljs-attr {
+  color: #c4a7e7;
+}
+
+/* white*/
+/* INFO: Variables, Class names, Terminal White */
+.hljs-punctuation {color: #e0def4}
+
+.hljs {
+  background: #191724;
+  color: #6e6a86;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+  margin-block-end: 0;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:target {
+  scroll-margin-block: 5ex;
+}
+
+@font-face {
+  font-family: 'Custom';
+  src: url('/fonts/FantasqueSansMono-Regular.woff2') format('woff2'),
+       url('/fonts/FantasqueSansMono-Regular.woff') format('woff');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'Custom';
+  src: url('/fonts/FantasqueSansMono-Bold.woff2') format('woff2'),
+       url('/fonts/FantasqueSansMono-Boldl.woff') format('woff');
+  font-weight: bold;
+}
+
+body {
+  background-color: #080808;
+  color: #e0def4;
+  font-family: "Custom", monospace !important;
+  letter-spacing: 1px;
+  font-size: 16px;
+  line-height: 1.5;
+  padding: 48px;
+}
+
+header {
+  margin-bottom: 1.3ex;
+  max-width: 90ex;
+}
+
+header > span:first-child {
+  font-weight: bold;
+}
+
+header > span:last-child {
+  float: right;
+}
+
+header > span:last-child > * {
+  margin-left: 1.3ex;
+  padding-left: 1ex;
+  text-decoration: none;
+  color: #e0def4;
+}
+
+main {
+  padding: 2.6ex;
+  max-width: 90ex;
+}
+
+h1 {
+  background-color: #31748f;
+  display: inline-block;
+  padding-left: 1.3ex;
+  padding-right: 1.3ex;
+}
+
+.tags {
+  display: inline-block;
+  float: right;
+}
+
+.published, .read_time {
+  text-align: right;
+  color: #908caa;
+}
+
+article {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1.3ex;
+  gap: 1.3ex;
+}
+
+h2, h3, h4, h5, h6 {
+  color: #31748f;
+  font-weight: bold;
+}
+
+h2:before {
+  content: '## ';
+}
+
+h3:before {
+  content: '### ';
+}
+
+h4:before {
+  content: '#### ';
+}
+
+h5:before {
+  content: '##### ';
+}
+
+h6:before {
+  content: '###### ';
+}
+
+p code {
+  background-color: #21202e;
+  color: #eb6f92;
+  padding-left: 1.3ex;
+  padding-right: 1.3ex;
+}
+
+article a {
+  color: #9cd8a0;
+  text-decoration: none;
+}
+
+article a:after {
+  content: attr(href);
+  color: #31748f;
+  text-decoration: underline;
+  margin-right: -0.8ex;
+}
+
+ol li {
+  list-style-type: decimal;
+  margin-left: 3.1ex;
+}
+
+ul li {
+  list-style-type: disc;
+  margin-left: 2ex;
+}
+
+pre {
   background-color: transparent !important;
-  border-color: transparent !important;
-  border: none !important;
-  outline: none !important;
-  visibility: hidden !important;
-  display: block;
-  height: 0 !important;
   overflow: hidden;
+  overflow-x: auto;
 }
 
-pre code[data-highlighted] {
-  visibility: visible !important;
-  height: auto !important;
-  overflow: initial;
+pre code {
+  color: #908caa !important;
+  background-color: transparent !important;
 }
 
-/* This file is for your main application CSS */
+pre:before {
+  content: '```';
+  color: #908caa;
+  display: block;
+}
+
+pre:after {
+  content: '```';
+  color: #908caa;
+  display: block;
+}
+
+pre[data-lang]:before {
+  content: '```' attr(data-lang);
+}
+
+.end {
+  color: #080808;
+  background-color: #e0def4;
+  display: inline-block;
+  padding-left: 1ex;
+  padding-right: 1ex;
+  margin-top: 1.3ex;
+  width: 7.7ex;
+}
+
+a, *[phx-click] {
+  cursor: pointer;
+}
+
+a:hover, *[phx-click]:hover {
+  background-color: #6e6a86;
+}
+
+article a:hover {
+  background-color: transparent;
+  text-decoration: underline;
+}
+
+::-moz-selection {
+  background-color: #403d52;
+}
+
+::selection {
+  background-color: #403d52;
+}
+
+blockquote {
+  border-left: 1px solid #31748f;
+  padding-left: 1.3ex;
+  padding-top: 1.3ex;
+  padding-bottom: 1.3ex;
+}
+
+blockquote * + * {
+  margin-top: 1.3ex;
+}
+
+.post {
+  margin-top: 1.3ex;
+  width: 100%;
+  cursor: pointer;
+}
+
+.post:hover {
+  background-color: transparent !important;
+}
+
+.post_id {
+  color: #31748f;
+  display: inline-block;
+  min-width: 3.6ex !important;
+}
+
+.post_id:before {
+  content: "#";
+  margin-right: -1ex;
+}
+
+.post_title {
+  display: inline-block;
+}
+
+.post_title:hover {
+  text-decoration: underline;
+}
+
+.post_tags {
+  float: right;
+  margin: 0 2.6ex;
+}
+
+.post_tag {
+  display: inline-block;
+}
+
+.post_reading_time {
+  float: right;
+}
+
+.project {
+  margin-top: 1.3ex;
+  margin-bottom: 2.6ex;
+  width: 100%;
+  cursor: pointer;
+}
+
+.project_name {
+  color: #31748f;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.project_name:before {
+  content: "#";
+  margin-right: -1ex;
+}
+
+.project_name:hover {
+  background-color: transparent !important;
+  text-decoration: underline;
+}
+
+.project_tags {
+  float: right;
+}
+
+.project_tag {
+  margin-left: 1.3ex;
+}
+
+.project_tag {
+  display: inline-block;
+}
+
+.project_description {
+  margin-bottom: 1.3ex;
+  color: #908caa;
+}
+
+article em {
+  font-style: italic;
+}
+
+article strong {
+  font-weight: bold;
+}

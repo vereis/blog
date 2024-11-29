@@ -9,7 +9,7 @@ tags:
   - patterns
 ---
 
-[Ecto](https://hexdocs.pm/ecto/Ecto.html) is a fantastic library for doing all sorts of database operations in Elixir and is definitely a superpower of the language and ecosystem.
+In Elixir, [Ecto](https://hexdocs.pm/ecto/Ecto.html) is a fantastic library for doing all sorts of database operations in Elixir and is definitely a superpower of the language and ecosystem.
 
 Now, `ecto` isn't just your run-of-the-mill ORM; instead, `ecto` gives you three main things:
 

@@ -9,7 +9,7 @@ tags:
   - patterns
 ---
 
-[Ecto](https://hexdocs.pm/ecto/Ecto.html) migrations are a powerful tool for managing your database schema. They allow you to define changes to your database schema in a way that can be versioned and applied in a consistent manner.
+In Elixir, [Ecto](https://hexdocs.pm/ecto/Ecto.html) migrations are a powerful tool for managing your database schema. They allow you to define changes to your database schema in a way that can be versioned and applied in a consistent manner.
 
 You're likely familiar with the concept of migrations in other languages or frameworks, and Ecto migrations are no different.
 
