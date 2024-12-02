@@ -38,12 +38,14 @@ let liveSocket = new LiveSocket("/live", Socket, {
 import hljs from "highlight.js/lib/core";
 import hljsBash from "highlight.js/lib/languages/bash";
 import hljsElixir from "highlight.js/lib/languages/elixir";
+import hljsErlang from "highlight.js/lib/languages/erlang";
 import hljsNix from "highlight.js/lib/languages/nix";
 import hljsSql from "highlight.js/lib/languages/sql";
 import hljsGql from "highlight.js/lib/languages/graphql";
 
 hljs.registerLanguage("bash", hljsBash);
 hljs.registerLanguage("elixir", hljsElixir);
+hljs.registerLanguage("erlang", hljsErlang);
 hljs.registerLanguage("nix", hljsNix);
 hljs.registerLanguage("sql", hljsSql);
 hljs.registerLanguage("graphql", hljsGql);
