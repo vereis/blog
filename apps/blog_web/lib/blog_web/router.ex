@@ -18,6 +18,7 @@ defmodule BlogWeb.Router do
     pipe_through :browser
 
     get "/rss", RssController, :index
+    get "/minna-chat", RedirectController, :minna_chat
 
     live_session :default do
       live "/", BlogLive, :home
