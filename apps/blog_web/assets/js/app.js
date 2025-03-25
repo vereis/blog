@@ -31,6 +31,7 @@ let liveSocket = new LiveSocket("/live", Socket, {
   dom: {
     onBeforeElUpdated: (_) => {
       highlightAll()();
+      initCrtFilter();
     }
   }
 });
@@ -91,3 +92,32 @@ liveSocket.connect();
 // >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket;
+
+
+const initCrtFilter = () => {
+  let enabled = localStorage.crtFilter === "true";
+
+  // If we've not got a persisted preference, set it
+  if (localStorage.crtFilter === undefined) {
+    console.log("shouldn't be here")
+    enabled = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    localStorage.setItem("crtFilter", enabled);
+  }
+
+  if (enabled) {
+    crtFilter.checked = true;
+    document.body.classList.add("crt-filter");
+  } else {
+    crtFilter.checked = false;
+    document.body.classList.remove("crt-filter");
+  }
+}
+
+const toggleCrtFilter = e => {
+  const enabled = localStorage.crtFilter === "true";
+  localStorage.setItem("crtFilter", !enabled);
+  initCrtFilter();
+  return e.preventDefault();
+}
+
+window.addEventListener("toggle-crt-filter", toggleCrtFilter, false);

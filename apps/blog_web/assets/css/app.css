@@ -200,8 +200,30 @@ body {
   min-height: 100vh;
 }
 
+main, header, footer {
+  padding: 2.6ex;
+  max-width: 90ex;
+}
+
+footer {
+  padding-top: 0;
+  padding-bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.end {
+  color: #080808;
+  background-color: #e0def4;
+  display: inline-block;
+  padding-left: 1ex;
+  padding-right: 1ex;
+}
+
 header {
   margin-bottom: 1.3ex;
+  padding: 0;
   max-width: 90ex;
 }
 
@@ -211,11 +233,6 @@ header > span:first-child {
 
 header > span:last-child {
   float: right;
-}
-
-main {
-  padding: 2.6ex;
-  max-width: 90ex;
 }
 
 h1 {
@@ -323,21 +340,11 @@ pre[data-lang]:before {
   content: '```' attr(data-lang);
 }
 
-.end {
-  color: #080808;
-  background-color: #e0def4;
-  display: inline-block;
-  padding-left: 1ex;
-  padding-right: 1ex;
-  margin-top: 1.3ex;
-  width: 7.7ex;
-}
-
 a, *[phx-click] {
   cursor: pointer;
 }
 
-a:hover, *[phx-click]:hover {
+a:hover, *[phx-click]:hover, .button:hover {
   background-color: #6e6a86;
 }
 
@@ -645,7 +652,7 @@ article strong {
     text-shadow: 2.6208764473832513px 0 1px rgba(0,30,255,0.5), -2.6208764473832513px 0 1px rgba(255,0,80,0.3), 0 0 3px;
   }
 }
-body::after {
+body.crt-filter::after {
   content: " ";
   display: block;
   position: absolute;
@@ -659,7 +666,7 @@ body::after {
   pointer-events: none;
   animation: flicker 0.15s infinite;
 }
-body::before {
+body.crt-filter::before {
   content: " ";
   display: block;
   position: absolute;

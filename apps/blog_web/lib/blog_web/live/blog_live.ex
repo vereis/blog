@@ -2,6 +2,7 @@ defmodule BlogWeb.BlogLive do
   @moduledoc false
   use Phoenix.LiveView
   use BlogWeb, :verified_routes
+  alias Phoenix.LiveView.JS
 
   alias Blog.Posts
 
@@ -180,10 +181,11 @@ defmodule BlogWeb.BlogLive do
           <.button main={true} phx-click="home">vereis ♪⁠～⁠(⁠´⁠ε⁠｀⁠ ⁠)</.button>
         </span>
         <span>
-          <.button mobile?={false} href="/rss">rss</.button>
           <.button phx-click="posts">posts</.button>
-          <.button phx-click="projects">projs</.button>
-          <.button mobile?={false} href="https://github.com/vereis/blog">&lt;/&gt;</.button>
+          <.button phx-click="projects">projects</.button>
+          <label class="button">
+            CRT <input id="crtFilter" phx-click={JS.dispatch("toggle-crt-filter")} type="checkbox" />
+          </label>
         </span>
       </header>
 
@@ -214,7 +216,6 @@ defmodule BlogWeb.BlogLive do
               </div>
             <% end %>
           </div>
-          <blink class="end">(END)</blink>
         </main>
       <% end %>
 
@@ -230,9 +231,9 @@ defmodule BlogWeb.BlogLive do
           </div>
           <%= for post <- @posts, is_nil(@tag) or Enum.any?(post.tags, & &1.label == @tag), not @is_release? or not post.is_draft do %>
             <div class="post" phx-click="post" phx-value-post={post.slug}>
-              <div class="post_id"> <%= post.id %> </div>
+              <div class="post_id"><%= post.id %></div>
               <div class="post_title"><%= post.title %></div>
-              <div class="post_reading_time"> <%= DateTime.to_date(post.published_at) %> </div>
+              <div class="post_reading_time"><%= DateTime.to_date(post.published_at) %></div>
               <div class="post_tags">
                 <%= for tag <- post.tags do %>
                   <span class="post_tag" phx-click="tag" phx-value-tag={tag.label}>
@@ -242,7 +243,6 @@ defmodule BlogWeb.BlogLive do
               </div>
             </div>
           <% end %>
-          <blink class="end">(END)</blink>
         </main>
       <% end %>
 
@@ -288,11 +288,19 @@ defmodule BlogWeb.BlogLive do
             <% else %>
               <%= {:safe, @post.body} %>
             <% end %>
-
-            <blink class="end">(END)</blink>
           </article>
         </main>
       <% end %>
+
+      <footer>
+        <a class="end" href="#">
+          <span>BACK</span>
+        </a>
+        <span>
+          <.button mobile?={false} href="/rss">rss</.button>
+          <.button mobile?={false} href="https://github.com/vereis/blog">source code</.button>
+        </span>
+      </footer>
     </div>
     """
   end
@@ -305,7 +313,7 @@ defmodule BlogWeb.BlogLive do
 
   def button(assigns) do
     ~H"""
-    <a {@rest} class={@main && "" || "button"} href={@href}>
+    <a {@rest} class={(@main && "") || "button"} href={@href}>
       <%= render_slot(@inner_block) %>
     </a>
     """
