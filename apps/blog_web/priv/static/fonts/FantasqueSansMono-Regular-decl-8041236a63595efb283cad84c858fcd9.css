@@ -1,0 +1,9 @@
+@font-face {
+  font-family: 'Fantasque Sans Mono';
+  src: url('./FantasqueSansMono-Regular-5ab3ffe10d8c9b1cc00d5fe63b68e12f.woff2?vsn=d') format('woff2'),
+       url('./FantasqueSansMono-Regular-6af88077a2fca2823057aacb8627478b.woff?vsn=d') format('woff'), /* Firefox >= 3.6, any other modern browser */
+       url('FantasqueSansMono-Regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('FantasqueSansMono-Regular.svg#FantasqueSansMono-Regular') format('svg'); /* Chrome < 4, Legacy iOS */
+  font-weight: 400;
+  font-style: normal;
+}

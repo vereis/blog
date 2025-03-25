@@ -1,0 +1,9 @@
+@font-face {
+  font-family: 'Fantasque Sans Mono';
+  src: url('./FantasqueSansMono-BoldItalic-0cc21b17c169ec0450c6c50d94f77d8d.woff2?vsn=d') format('woff2'),
+       url('./FantasqueSansMono-BoldItalic-6e27761f4cf8084549e832f1882c4dc9.woff?vsn=d') format('woff'), /* Firefox >= 3.6, any other modern browser */
+       url('FantasqueSansMono-BoldItalic.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('FantasqueSansMono-BoldItalic.svg#FantasqueSansMono-BoldItalic') format('svg'); /* Chrome < 4, Legacy iOS */
+  font-weight: 700;
+  font-style: italic;
+}
