@@ -677,6 +677,9 @@ body.crt-filter::before {
   background-size: 100% 2px, 3px 100%;
   pointer-events: none;
 }
-body {
+body.crt-filter {
   animation: textShadow 1.6s infinite;
+}
+footer .button {
+  color: #908caa;
 }
