@@ -37,14 +37,13 @@ body {
 main,
 header,
 footer {
-	padding: 2.6ex 0;
+	padding: 3ex 0;
 	max-width: 90ex;
 }
 
 header {
 	display: flex;
 	justify-content: space-between;
-	margin-bottom: 1.3ex;
 	padding: 0;
 	max-width: 90ex;
 
@@ -84,6 +83,10 @@ h5,
 h6 {
 	color: #31748f;
 	font-weight: bold;
+
+	*+& {
+		margin-top: 1ex;
+	}
 }
 
 h2:before {
@@ -145,7 +148,7 @@ article {
 		text-decoration: none;
 
 		&:hover {
-			background-color: transparent;
+			background-color: transparent !important;
 			text-decoration: underline;
 		}
 
@@ -187,7 +190,7 @@ ol li {
 
 ul li {
 	list-style-type: disc;
-	margin-left: 2ex;
+	margin-left: 2.25ex;
 }
 
 blockquote {
@@ -250,7 +253,7 @@ blockquote {
 .posts {
 	display: flex;
 	flex-direction: column;
-	gap: 3ex;
+	gap: 2ex;
 
 	* & {
 		margin-top: 1ex;
@@ -296,7 +299,7 @@ blockquote {
 .projects {
 	display: flex;
 	flex-direction: column;
-	gap: 3ex;
+	gap: 2ex;
 
 	* & {
 		margin-top: 1ex;
@@ -430,6 +433,10 @@ blockquote {
 	}
 }
 
+#crtFilter {
+	transform: translateY(15%);
+}
+
 /* ============ Responsive Design ============ */
 @media screen and (max-width: 600px) {
 	body {
@@ -437,8 +444,32 @@ blockquote {
 		font-size: 16px;
 	}
 
-	header>span {
-		display: block;
+	header {
+		margin-bottom: -1ex;
+		justify-content: normal;
+		flex-direction: column;
+
+		& .button-container:not(:first-child) {
+			display: flex;
+			flex-direction: column;
+			gap: 0ex;
+
+			& * {
+				color: #e0def4;
+
+				&:hover {
+					background-color: transparent !important;
+					text-decoration: underline !important;
+				}
+
+				&:before {
+					content: '> ';
+					margin-left: 1ex;
+					color: #31748f;
+				}
+			}
+
+		}
 	}
 }
 
