@@ -178,7 +178,10 @@ defmodule BlogWeb.BlogLive do
     <div>
       <header>
         <span class="button-container">
-          <.button main={true} phx-click="home">root@vereis.com ~</.button>
+          <.button phx-click="home">
+            root@vereis.com ~
+            <blink>█</blink>
+          </.button>
         </span>
         <span class="button-container">
           <.button phx-click="posts">blog</.button>

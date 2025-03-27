@@ -680,3 +680,6 @@ footer .button-container > * {
   color: #908caa !important;
   text-decoration: none;
 }
+
+@keyframes blinker {50% {opacity: 0;}}
+blink {animation: blinker 1.25s step-start infinite;}
