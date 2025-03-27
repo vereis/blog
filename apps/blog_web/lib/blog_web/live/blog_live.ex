@@ -177,14 +177,14 @@ defmodule BlogWeb.BlogLive do
     ~H"""
     <div>
       <header>
-        <span>
-          <.button main={true} phx-click="home">vereis ♪⁠～⁠(⁠´⁠ε⁠｀⁠ ⁠)</.button>
+        <span class="button-container">
+          <.button main={true} phx-click="home">root@vereis.com ~</.button>
         </span>
-        <span>
-          <.button phx-click="posts">posts</.button>
+        <span class="button-container">
+          <.button phx-click="posts">blog</.button>
           <.button phx-click="projects">projects</.button>
           <label class="button">
-            CRT <input id="crtFilter" phx-click={JS.dispatch("toggle-crt-filter")} type="checkbox" />
+            crt <input id="crtFilter" phx-click={JS.dispatch("toggle-crt-filter")} type="checkbox" />
           </label>
         </span>
       </header>
@@ -223,26 +223,54 @@ defmodule BlogWeb.BlogLive do
         <main>
           <div>
             <h1>
-              All Posts <%= if @tag, do: "tagged #{@tag}", else: "" %>
+              Blog Posts <%= if @tag, do: "(##{@tag})", else: "" %>
             </h1>
             <%= if @tag do %>
-              <a phx-click="posts">(clear)</a>
+              <a class="show-all" phx-click="posts">x</a>
             <% end %>
           </div>
-          <%= for post <- @posts, is_nil(@tag) or Enum.any?(post.tags, & &1.label == @tag), not @is_release? or not post.is_draft do %>
-            <div class="post" phx-click="post" phx-value-post={post.slug}>
-              <div class="post_id"><%= post.id %></div>
-              <div class="post_title"><%= post.title %></div>
-              <div class="post_reading_time"><%= DateTime.to_date(post.published_at) %></div>
-              <div class="post_tags">
-                <%= for tag <- post.tags do %>
-                  <span class="post_tag" phx-click="tag" phx-value-tag={tag.label}>
-                    <%= tag.label %>
-                  </span>
-                <% end %>
+          <article>
+            <p>
+              Here are a collection of posts I've written about anything and everything that comes to mind.
+            </p>
+            <p>Views expressed are my own and do not represent the views of my employer.</p>
+            <p>You can filter by tags or search for a specific post below.</p>
+            <div class="metadata">
+              <div>
+                Tags:
+                <div class="tags">
+                  <%= for tag <- Enum.flat_map(@posts, & &1.tags) |> Enum.uniq() |> Enum.sort() do %>
+                    <.button phx-click="tag" phx-value-tag={tag.label}>
+                      <%= "#" <> tag.label %>
+                    </.button>
+                  <% end %>
+                  <%= if @tag do %>
+                    <a class="show-all" phx-click="posts">(clear)</a>
+                  <% end %>
+                </div>
               </div>
             </div>
-          <% end %>
+          </article>
+          <div class="posts">
+            <%= for post <- @posts, is_nil(@tag) or Enum.any?(post.tags, & &1.label == @tag), not @is_release? or not post.is_draft do %>
+              <div class="post" phx-click="post" phx-value-post={post.slug}>
+                <div class="post_id"><%= "##{post.id}" %></div>
+                <div class="post_title_container">
+                  <div class="post_title"><%= post.title %></div>
+                  <div class="post_reading_time">
+                    <%= Calendar.strftime(post.published_at, "%B %d %Y, %H:%M:%S") %>
+                  </div>
+                </div>
+                <div class="post_tags">
+                  <%= for tag <- post.tags do %>
+                    <span class="post_tag" phx-click="tag" phx-value-tag={tag.label}>
+                      <%= "#" <> tag.label %>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
         </main>
       <% end %>
 
@@ -254,23 +282,24 @@ defmodule BlogWeb.BlogLive do
             <% else %>
               <h1><%= @post.title %></h1>
             <% end %>
-            <div class="tags">
-              Tagged:&nbsp
-              <%= for tag <- @post.tags do %>
-                <.button phx-click="tag" phx-value-tag={tag.label}>
-                  <%= tag.label %>
-                </.button>
-              <% end %>
-            </div>
           </div>
           <%= unless is_nil(@post) do %>
-            <div class="published">
-              Published <%= DateTime.to_date(@post.published_at) %> @ <%= DateTime.to_time(
-                @post.published_at
-              ) %>
-            </div>
-            <div class="read_time">
-              Approx. <%= @post.reading_time_minutes %> minutes
+            <div class="metadata">
+              <div>
+                <div class="published">
+                  <%= Calendar.strftime(@post.published_at, "%B %d %Y, %H:%M:%S") %>
+                </div>
+                <div class="tags">
+                  <%= for tag <- @post.tags do %>
+                    <.button phx-click="tag" phx-value-tag={tag.label}>
+                      <%= "#" <> tag.label %>
+                    </.button>
+                  <% end %>
+                </div>
+              </div>
+              <div class="read_time">
+                Approx. <%= @post.reading_time_minutes %> minute read
+              </div>
             </div>
           <% end %>
 
@@ -296,26 +325,22 @@ defmodule BlogWeb.BlogLive do
         <a class="end" href="#">
           <span>BACK</span>
         </a>
-        <span>
-          <.button mobile?={false} href="/rss">rss</.button>
-          <.button mobile?={false} href="https://github.com/vereis/blog">source code</.button>
-        </span>
+        <div class="button-container">
+          <.button href="/rss">rss</.button>
+          <.button href="https://github.com/vereis/blog">source code</.button>
+        </div>
       </footer>
     </div>
     """
   end
 
-  attr(:main, :boolean, default: false)
   attr(:href, :string, default: nil)
   slot(:inner_block, required: true)
   attr(:rest, :global, include: ~w(disabled form name value))
-  attr(:mobile?, :boolean, default: true)
 
   def button(assigns) do
     ~H"""
-    <a {@rest} class={(@main && "") || "button"} href={@href}>
-      <%= render_slot(@inner_block) %>
-    </a>
+    <a {@rest} href={@href}><%= render_slot(@inner_block) %></a>
     """
   end
 end
