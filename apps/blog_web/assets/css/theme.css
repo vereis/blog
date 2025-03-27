@@ -1,0 +1,481 @@
+/* ============ Setup ============ */
+@import url("animations.css");
+
+@font-face {
+	font-family: 'Custom';
+	src: url('/fonts/FantasqueSansMono-Regular.woff2') format('woff2'),
+		url('/fonts/FantasqueSansMono-Regular.woff') format('woff');
+	font-weight: normal;
+}
+
+@font-face {
+	font-family: 'Custom';
+	src: url('/fonts/FantasqueSansMono-Bold.woff2') format('woff2'),
+		url('/fonts/FantasqueSansMono-Boldl.woff') format('woff');
+	font-weight: bold;
+}
+
+/* ============ Semantic HTML Styles ============ */
+html {
+	background-image: url('/images/bg.png');
+	background-size: cover;
+	background-attachment: fixed;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+body {
+	color: #e0def4;
+	font-family: "Custom", monospace !important;
+	letter-spacing: 1px;
+	font-size: 18px;
+	line-height: 1.5;
+	padding: 48px;
+	min-height: 100vh;
+}
+
+main,
+header,
+footer {
+	padding: 2.6ex 0;
+	max-width: 90ex;
+}
+
+header {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 1.3ex;
+	padding: 0;
+	max-width: 90ex;
+
+	&>*:first-child {
+		font-weight: bold;
+	}
+}
+
+footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	&>.end {
+		color: #21202e;
+		text-decoration: none;
+		background-color: #e0def4;
+		display: inline-block;
+		padding-left: 1ex;
+		padding-right: 1ex;
+	}
+
+}
+
+h1 {
+	background-color: #31748f;
+	display: inline-block;
+	padding-left: 1.3ex;
+	padding-right: 1.3ex;
+	margin-bottom: 0.3ex;
+}
+
+h2,
+h3,
+h4,
+h5,
+h6 {
+	color: #31748f;
+	font-weight: bold;
+}
+
+h2:before {
+	content: '## ';
+}
+
+h3:before {
+	content: '### ';
+}
+
+h4:before {
+	content: '#### ';
+}
+
+h5:before {
+	content: '##### ';
+}
+
+h6:before {
+	content: '###### ';
+}
+
+a,
+*[phx-click] {
+	cursor: pointer;
+
+	&:hover {
+		background-color: #6e6a86;
+	}
+}
+
+em {
+	font-style: italic;
+}
+
+strong {
+	font-weight: bold;
+}
+
+blink {
+	animation: blink 1.25s step-start infinite;
+}
+
+code {
+	background-color: #21202e;
+	color: #eb6f92;
+	padding-left: 1.3ex;
+	padding-right: 1.3ex;
+}
+
+article {
+	display: flex;
+	flex-direction: column;
+	margin-top: 1.3ex;
+	gap: 1.3ex;
+
+	& a {
+		color: #9cd8a0;
+		text-decoration: none;
+
+		&:hover {
+			background-color: transparent;
+			text-decoration: underline;
+		}
+
+		&:after {
+			content: attr(href);
+			color: #31748f;
+			text-decoration: underline;
+			margin-right: -0.8ex;
+		}
+	}
+}
+
+pre code {
+	color: #908caa !important;
+	background-color: transparent !important;
+}
+
+pre {
+	background-color: transparent !important;
+	overflow: hidden;
+	overflow-x: auto;
+
+	&:before,
+	&:after {
+		content: '```';
+		color: #908caa;
+		display: block;
+	}
+
+	&[data-lang]:before {
+		content: '```' attr(data-lang);
+	}
+}
+
+ol li {
+	list-style-type: decimal;
+	margin-left: 3.75ex;
+}
+
+ul li {
+	list-style-type: disc;
+	margin-left: 2ex;
+}
+
+blockquote {
+	border-left: 1px solid #31748f;
+	padding-left: 1.3ex;
+	padding-top: 1.3ex;
+	padding-bottom: 1.3ex;
+
+	& *+* {
+		margin-top: 1.3ex;
+	}
+}
+
+::-moz-selection {
+	background-color: #403d52;
+}
+
+::selection {
+	background-color: #403d52;
+}
+
+/* ============ Component Styles ============ */
+.button {
+	cursor: pointer;
+}
+
+.button-container {
+	display: flex;
+	gap: 0 2ex;
+	align-items: flex-start;
+
+	&>* {
+		height: auto;
+		display: inline-block;
+	}
+
+	footer &>* {
+		color: #908caa !important;
+		text-decoration: none;
+	}
+}
+
+.tags {
+	display: flex;
+	flex-wrap: wrap;
+	flex-grow: 1;
+	gap: 0 3ex;
+
+	& a,
+	& .tag {
+		color: #9cd8a0;
+
+		&:hover {
+			background-color: transparent !important;
+			text-decoration: underline;
+		}
+	}
+}
+
+.posts {
+	display: flex;
+	flex-direction: column;
+	gap: 3ex;
+
+	* & {
+		margin-top: 1ex;
+	}
+
+	& .post {
+		display: flex;
+		gap: 3ex;
+		cursor: pointer;
+
+		&:hover {
+			background-color: transparent !important;
+		}
+
+		& .post-id {
+			color: #31748f;
+			flex-shrink: 0;
+			min-width: 2ex;
+		}
+
+		& .post-title-container {
+			flex-grow: 1;
+
+			& .post-title:hover {
+				text-decoration: underline;
+			}
+
+			& .post-reading-time {
+				color: #908caa;
+			}
+		}
+
+		& .tags {
+			display: flex;
+			flex-wrap: nowrap;
+			justify-content: flex-end;
+			gap: 0 2ex;
+			color: #908caa;
+		}
+	}
+}
+
+.projects {
+	display: flex;
+	flex-direction: column;
+	gap: 3ex;
+
+	* & {
+		margin-top: 1ex;
+	}
+
+	& .project {
+		display: flex;
+		gap: 3ex;
+		cursor: pointer;
+
+		& .project-id {
+			color: #31748f;
+			flex-shrink: 0;
+			min-width: 2ex;
+		}
+
+		& .project-title-container {
+			flex-grow: 1;
+
+			& .project-name {
+				color: #e0def4;
+				display: inline-block;
+				text-decoration: none;
+
+				&:hover {
+					background-color: transparent !important;
+					text-decoration: underline;
+				}
+			}
+
+			& .project-description {
+				color: #908caa;
+			}
+		}
+
+		& .tags {
+			display: flex;
+			flex-wrap: nowrap;
+			justify-content: flex-end;
+			gap: 0 2ex;
+			color: #908caa;
+		}
+	}
+}
+
+.post-metadata {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+
+	& .post-title {
+		display: flex;
+		gap: 0 2ex;
+
+		& .tags {
+			gap: 2ex;
+		}
+	}
+
+	&>*:not(.post-title) {
+		color: #908caa;
+	}
+
+	&+article {
+		margin-top: 3ex;
+	}
+}
+
+.component-container {
+	margin-top: 0.5ex;
+	margin-bottom: 2ex;
+	display: flex;
+	gap: 1ex 0;
+	flex-direction: column;
+	color: #908caa;
+
+	&>div {
+		display: flex;
+		gap: 0 2ex;
+	}
+}
+
+.search-container {
+	display: flex;
+	gap: 0 1ex;
+	flex-wrap: nowrap;
+
+	/* First element is assumed to be the label */
+	&>* {
+		flex-shrink: 0;
+	}
+
+	/* And this is a hack that allows auto-sizing the input */
+	/* Requires JS to set data-attr to current input content */
+	& .input-container {
+		display: inline-grid;
+		vertical-align: top;
+		align-items: center;
+		position: relative;
+		outline: none;
+
+		&:after {
+			width: auto;
+			min-width: 0ex;
+			grid-area: 1 / 2;
+			font: inherit;
+			margin: 0;
+			resize: none;
+			background: none;
+			appearance: none;
+			border: none;
+			content: attr(data-value) ' ';
+			visibility: hidden;
+			white-space: pre-wrap;
+			outline: none;
+		}
+
+		& input[type="text"] {
+			width: auto;
+			min-width: 0ex;
+			grid-area: 1 / 2;
+			font: inherit;
+			margin: 0;
+			resize: none;
+			background: none;
+			appearance: none;
+			border: none;
+			outline: none;
+			color: #e0def4;
+		}
+	}
+}
+
+/* ============ Responsive Design ============ */
+@media screen and (max-width: 600px) {
+	body {
+		padding: 2ex;
+		font-size: 16px;
+	}
+
+	header>span {
+		display: block;
+	}
+}
+
+/* ============ Utility Classes ============ */
+.hidden {
+	display: none;
+}
+
+.crt-filter::after {
+	content: " ";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	background: rgba(18, 16, 16, 0.1);
+	opacity: 0;
+	z-index: 2;
+	pointer-events: none;
+	animation: flicker 0.15s infinite;
+}
+
+.crt-filter::before {
+	content: " ";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+	z-index: 2;
+	background-size: 100% 2px, 3px 100%;
+	pointer-events: none;
+}
+
+.crt-filter {
+	animation: phosphor 1.6s infinite;
+}
