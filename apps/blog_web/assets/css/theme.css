@@ -468,7 +468,15 @@ blockquote {
 					color: #31748f;
 				}
 			}
+		}
+	}
 
+	.post-title {
+		flex-direction: column;
+
+		& .tags {
+			margin-left: 0.5ex;
+			gap: 0 1ex !important;
 		}
 	}
 }
