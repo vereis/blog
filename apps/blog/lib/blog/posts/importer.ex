@@ -48,7 +48,7 @@ defmodule Blog.Posts.Importer do
 
     attrs
     |> Stream.map(fn x -> Map.put(x, :tag_ids, Enum.map(x.tags, &tag_lookup_table[&1])) end)
-    |> Task.async_stream(&({:ok, %Post{}} = Posts.upsert_post(&1)))
+    |> Task.async_stream(&({:ok, %Post{}} = Posts.upsert_post(&1)), max_concurrency: 1)
     |> Stream.run()
   after
     Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", :post_reload)

@@ -16,6 +16,8 @@ defmodule Blog.Posts.Post do
     field(:published_at, :utc_datetime)
     field(:description, :string)
 
+    field(:rank, :float, virtual: true)
+
     many_to_many(:tags, Tag,
       join_through: join_schema("posts_tags", {:post_id, :tag_id}),
       on_replace: :delete
@@ -93,5 +95,21 @@ defmodule Blog.Posts.Post do
     |> Enum.join("")
     |> Regex.compile!()
     |> then(&String.replace(html, &1, "\\1#{append}\\3"))
+  end
+
+  @impl EctoUtils.Queryable
+  def query(base_query, filters) do
+    Enum.reduce(filters, base_query, fn
+      {:search, search_term}, query ->
+        from post in query,
+          join: fts in "posts_fts",
+          on: post.id == fts.post_id,
+          where: fragment("posts_fts MATCH ?", ^search_term),
+          order_by: [asc: fts.rank],
+          select_merge: %{rank: fts.rank}
+
+      {key, value}, query ->
+        EctoUtils.Queryable.apply_filter(query, key, value)
+    end)
   end
 end

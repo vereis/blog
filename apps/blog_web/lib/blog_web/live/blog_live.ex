@@ -2,9 +2,9 @@ defmodule BlogWeb.BlogLive do
   @moduledoc false
   use Phoenix.LiveView
   use BlogWeb, :verified_routes
-  alias Phoenix.LiveView.JS
 
   alias Blog.Posts
+  alias Phoenix.LiveView.JS
 
   # TODO: source these from some `Blog` context.
   @projects Enum.reverse([
