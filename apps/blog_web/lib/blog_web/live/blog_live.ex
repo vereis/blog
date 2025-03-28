@@ -5,6 +5,7 @@ defmodule BlogWeb.BlogLive do
 
   alias Blog.Posts
   alias Phoenix.LiveView.JS
+  import BlogWeb.CoreComponents, only: [input: 1]
 
   # TODO: source these from some `Blog` context.
   @projects Enum.reverse([
@@ -117,6 +118,7 @@ defmodule BlogWeb.BlogLive do
       |> assign_new(:post, fn -> Posts.get_post(slug: params["slug"] || "hello_world") end)
       |> assign_new(:projects, fn -> @projects end)
       |> assign_new(:tag, fn -> nil end)
+      |> assign_new(:search, fn -> %{} end)
 
     {:ok, socket}
   end
@@ -170,6 +172,18 @@ defmodule BlogWeb.BlogLive do
   def handle_event("proj-tag", %{"tag" => tag}, socket) do
     socket = assign(socket, :tag, tag)
     {:noreply, push_patch(socket, to: ~p"/projects")}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_event("search", %{"search" => search_term}, socket)
+      when byte_size(search_term) > 0 do
+    socket = assign(socket, :posts, Posts.list_posts(search: search_term))
+    {:noreply, socket}
+  end
+
+  def handle_event("search", _params, socket) do
+    socket = assign(socket, :posts, Posts.list_posts())
+    {:noreply, socket}
   end
 
   @impl Phoenix.LiveView
@@ -281,17 +295,17 @@ defmodule BlogWeb.BlogLive do
             </p>
             <p>Views expressed are my own and do not represent the views of my employer.</p>
             <p>You can filter by tags or search for a specific post below.</p>
-            <div class="component-container">
+            <.form class="component-container" for={@search} phx-change="search">
               <label class="search-container hidden">
                 <span>search :: ~ >></span>
-                <span class="input-container">
-                  <input
-                    type="text"
-                    onInput="this.parentNode.dataset.value = this.value"
-                    size="1"
-                    placeholder=""
-                  />
-                </span>
+                <.input
+                  field={@search[:value]}
+                  name="search"
+                  value=""
+                  type="text"
+                  size="1"
+                  placeholder=""
+                />
               </label>
 
               <div>
@@ -307,7 +321,7 @@ defmodule BlogWeb.BlogLive do
                   <% end %>
                 </div>
               </div>
-            </div>
+            </.form>
           </article>
 
           <div class="posts">

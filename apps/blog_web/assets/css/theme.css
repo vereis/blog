@@ -376,7 +376,7 @@ blockquote {
 	flex-direction: column;
 	color: #908caa;
 
-	&>div {
+	&>* {
 		display: flex;
 		gap: 0 2ex;
 	}
@@ -388,48 +388,24 @@ blockquote {
 	flex-wrap: nowrap;
 
 	/* First element is assumed to be the label */
-	&>* {
+	&>*:first-child {
 		flex-shrink: 0;
 	}
 
-	/* And this is a hack that allows auto-sizing the input */
-	/* Requires JS to set data-attr to current input content */
-	& .input-container {
-		display: inline-grid;
-		vertical-align: top;
-		align-items: center;
-		position: relative;
+	&>*:not(:first-child) {
+		flex-grow: 1;
+	}
+
+	& input[type="text"] {
+		width: 100%;
+		font: inherit;
+		margin: 0;
+		resize: none;
+		background: none;
+		appearance: none;
+		border: none;
 		outline: none;
-
-		&:after {
-			width: auto;
-			min-width: 0ex;
-			grid-area: 1 / 2;
-			font: inherit;
-			margin: 0;
-			resize: none;
-			background: none;
-			appearance: none;
-			border: none;
-			content: attr(data-value) ' ';
-			visibility: hidden;
-			white-space: pre-wrap;
-			outline: none;
-		}
-
-		& input[type="text"] {
-			width: auto;
-			min-width: 0ex;
-			grid-area: 1 / 2;
-			font: inherit;
-			margin: 0;
-			resize: none;
-			background: none;
-			appearance: none;
-			border: none;
-			outline: none;
-			color: #e0def4;
-		}
+		color: #e0def4;
 	}
 }
 
