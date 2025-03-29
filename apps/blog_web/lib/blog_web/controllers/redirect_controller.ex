@@ -7,4 +7,8 @@ defmodule BlogWeb.RedirectController do
   def minna_chat(conn, _params) do
     redirect(conn, external: "https://discord.gg/WGGhk5wjYT")
   end
+
+  def uses(conn, _params) do
+    redirect(conn, to: "/posts/uses")
+  end
 end
