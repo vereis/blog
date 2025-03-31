@@ -84,8 +84,8 @@ h6 {
 	color: #31748f;
 	font-weight: bold;
 
-	*+& {
-		margin-top: 1ex;
+	*:not(h1, h2, h3, h4, h5, h6)+& {
+		margin-top: 2ex;
 	}
 }
 
@@ -183,24 +183,39 @@ pre {
 	}
 }
 
+ol,
+ul {
+	margin-left: 0;
+
+	& ol,
+	& ul {
+		margin-left: 3ex;
+	}
+}
+
 ol li {
 	list-style-type: decimal;
-	margin-left: 3.75ex;
+	list-style-position: inside;
 }
 
 ul li {
 	list-style-type: disc;
-	margin-left: 2.25ex;
+	list-style-position: inside;
 }
 
 blockquote {
 	border-left: 1px solid #31748f;
-	padding-left: 1.3ex;
-	padding-top: 1.3ex;
-	padding-bottom: 1.3ex;
+	margin-left: -1px;
+	padding-left: 3ex;
+	padding-top: 1ex;
+	padding-bottom: 1ex;
+
+	*+& {
+		margin-top: 1ex;
+	}
 
 	& *+* {
-		margin-top: 1.3ex;
+		margin-top: 1ex;
 	}
 }
 
