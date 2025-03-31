@@ -31,6 +31,7 @@ let liveSocket = new LiveSocket("/live", Socket, {
   dom: {
     onBeforeElUpdated: (_) => {
       highlightAll()();
+      dataHrefAll()();
       initCrtFilter();
     }
   }
@@ -71,6 +72,57 @@ const highlightAll = () => {
         }
       })
     }, 100)
+  }
+}
+
+const dataHrefAll = () => {
+  let timer;
+
+  return (...args) => {
+    clearTimeout(timer);
+
+    timer = setTimeout(() => {
+      document.querySelectorAll("a[href]").forEach((el) => {
+        const url = new URL(el.href);
+        const slugs = url.pathname.split("/").filter((s) => s !== "");
+
+        if (url.hash !== "") {
+          slugs.push(url.hash);
+        }
+
+        if (slugs.length >= 2) {
+          let dataHref = "";
+
+          switch (url.host) {
+            case "audible.com":
+            case "www.audible.com":
+              // Grab the book title
+              dataHref = `${url.origin}/../${slugs[slugs.length - 2].replace("-Audiobook", "")}`;
+              break;
+
+            case "github.com":
+            case "www.github.com":
+              // Always show user and repo
+              dataHref = `${url.origin}/${slugs[0]}/${slugs[1]}/../${slugs[slugs.length - 1]}`;
+              break;
+
+            case "mariagefreres.com":
+            case "www.mariagefreres.com":
+              // Always show the product
+              dataHref = `${url.origin}/../${slugs[slugs.length - 1].replace("-tea-by-the-weight.html", "")}`;
+              break;
+
+            default:
+              dataHref = `${url.origin}/../${slugs[slugs.length - 1]}`;
+              break;
+          }
+
+          if (dataHref.length < el.href.length) {
+            el.setAttribute("data-href", dataHref.replace(/\.html$/, ""));
+          }
+        }
+      })
+    }, 10)
   }
 }
 

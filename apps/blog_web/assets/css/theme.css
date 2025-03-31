@@ -158,6 +158,10 @@ article {
 			text-decoration: underline;
 			margin-right: -0.8ex;
 		}
+
+		&[data-href]:after {
+			content: attr(data-href);
+		}
 	}
 }
 
