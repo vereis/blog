@@ -7,9 +7,31 @@ defmodule Blog.Posts do
 
   @spec source_path() :: Path.t()
   def source_path do
+    :dev = apply(Mix, :env, [])
+    "apps/blog/priv/posts"
+  rescue
+    _e ->
+      :blog
+      |> :code.priv_dir()
+      |> Path.join("posts")
+  end
+
+  @spec image_path() :: Path.t()
+  def image_path do
+    :dev = apply(Mix, :env, [])
+    "apps/blog/priv/images"
+  rescue
+    _e ->
+      :blog
+      |> :code.priv_dir()
+      |> Path.join("images")
+  end
+
+  @spec image_path() :: Path.t()
+  def image_path do
     :blog
     |> :code.priv_dir()
-    |> Path.join("posts")
+    |> Path.join("images")
   end
 
   @spec upsert_post(attrs :: map()) :: {:ok, Post.t()} | {:error, Ecto.Changeset.t()}

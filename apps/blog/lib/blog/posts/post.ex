@@ -3,6 +3,7 @@ defmodule Blog.Posts.Post do
 
   use Blog.Schema
 
+  alias Blog.Posts
   alias Blog.Posts.Tag
 
   schema "posts" do
@@ -42,12 +43,31 @@ defmodule Blog.Posts.Post do
   defp generate_body(changeset) do
     changeset
     |> Ecto.Changeset.get_field(:raw_body)
+    |> render_images()
     |> Md.generate()
     |> append_space_between_alphanum_and_pattern([
       {~r/<\/a>/, "&nbsp;"},
       {~r/<\/code>/, ""}
     ])
     |> then(&Ecto.Changeset.put_change(changeset, :body, &1))
+  end
+
+  defp render_images(markdown_text) do
+    Regex.replace(~r/!\[image\]\(([^\)]+)/, markdown_text, fn
+      # Only encode local images
+      match, "../images/" <> image_path ->
+        encoded_image =
+          Posts.image_path()
+          |> Path.join(image_path)
+          |> File.read!()
+          |> Base.encode64()
+
+        "![image](data:image/png;base64,#{encoded_image}"
+
+      # External images should just work
+      match, _rest ->
+        match
+    end)
   end
 
   defp generate_description(changeset) do

@@ -118,6 +118,19 @@ a,
 	}
 }
 
+img {
+	cursor: zoom-in;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: contain;
+	margin-top: 1ex;
+	margin-bottom: 1ex;
+
+	&+blockquote {
+		margin-top: -1ex;
+	}
+}
+
 em {
 	font-style: italic;
 }
