@@ -71,9 +71,8 @@ footer {
 h1 {
 	background-color: #31748f;
 	display: inline-block;
-	padding-left: 1.3ex;
-	padding-right: 1.3ex;
-	margin-bottom: 0.3ex;
+	padding-left: 1ex;
+	padding-right: 1ex;
 }
 
 h2,
@@ -146,15 +145,15 @@ blink {
 code {
 	background-color: #21202e;
 	color: #eb6f92;
-	padding-left: 1.3ex;
-	padding-right: 1.3ex;
+	padding-left: 1ex;
+	padding-right: 1ex;
 }
 
 article {
 	display: flex;
 	flex-direction: column;
-	margin-top: 1.3ex;
-	gap: 1.3ex;
+	margin-top: 1ex;
+	gap: 1ex;
 
 	& a {
 		color: #9cd8a0;
@@ -169,7 +168,7 @@ article {
 			content: attr(href);
 			color: #31748f;
 			text-decoration: underline;
-			margin-right: -0.8ex;
+			margin-right: -1ex;
 		}
 
 		&[data-href]:after {
@@ -178,15 +177,16 @@ article {
 	}
 }
 
-pre code {
-	color: #908caa !important;
-	background-color: transparent !important;
-}
-
 pre {
 	background-color: transparent !important;
 	overflow: hidden;
 	overflow-x: auto;
+
+	& code {
+		color: #908caa !important;
+		background-color: transparent !important;
+		padding: 0 !important;
+	}
 
 	&:before,
 	&:after {
@@ -401,7 +401,7 @@ blockquote {
 }
 
 .component-container {
-	margin-top: 0.5ex;
+	margin-top: 1ex;
 	margin-bottom: 2ex;
 	display: flex;
 	gap: 1ex 0;
@@ -483,7 +483,7 @@ blockquote {
 		flex-direction: column;
 
 		& .tags {
-			margin-left: 0.5ex;
+			margin-left: 1ex;
 			gap: 0 1ex !important;
 		}
 	}
@@ -494,35 +494,37 @@ blockquote {
 	display: none;
 }
 
-.crt-filter::after {
-	content: " ";
-	display: block;
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	background: rgba(18, 16, 16, 0.1);
-	opacity: 0;
-	z-index: 2;
-	pointer-events: none;
-	animation: flicker 0.15s infinite;
-}
-
-.crt-filter::before {
-	content: " ";
-	display: block;
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-	z-index: 2;
-	background-size: 100% 2px, 3px 100%;
-	pointer-events: none;
-}
-
 .crt-filter {
-	animation: phosphor 1.6s infinite;
+	&:after {
+		content: " ";
+		display: block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		background: rgba(18, 16, 16, 0.1);
+		opacity: 0;
+		z-index: 2;
+		pointer-events: none;
+		animation: flicker 0.15s infinite;
+	}
+
+	&:before {
+		content: " ";
+		display: block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+		z-index: 2;
+		background-size: 100% 2px, 3px 100%;
+		pointer-events: none;
+	}
+
+	& * {
+		animation: phosphor 1.6s infinite !important;
+	}
 }
