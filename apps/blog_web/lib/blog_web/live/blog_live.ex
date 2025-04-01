@@ -189,7 +189,7 @@ defmodule BlogWeb.BlogLive do
   @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
-    <div>
+    <div class="layout">
       <header>
         <span class="button-container">
           <.button phx-click="home">
@@ -216,65 +216,64 @@ defmodule BlogWeb.BlogLive do
               <a phx-click="projects">x</a>
             <% end %>
           </div>
-          <div>
-            <article>
-              <p>
-                Here is a list of open-source projects, libraries, tools, and configs I've created.
-              </p>
-              <p>
-                You may be interested in a more complete list of repositories I've contributed to on
-                <a href="https://github.com/vereis">GitHub </a>
-              </p>
-              <p>Unless otherwise noted, all projects are `MIT` Licensed.</p>
+          <p>
+            Here is a list of open-source projects, libraries, tools, and configs I've created.
+          </p>
+          <p>
+            You may be interested in a more complete list of repositories I've contributed to on
+            <a href="https://github.com/vereis">GitHub </a>
+          </p>
+          <p>Unless otherwise noted, all projects are `MIT` Licensed.</p>
 
-              <div class="component-container">
-                <label class="search-container hidden">
-                  <span>search :: ~ >></span>
-                  <span class="input-container">
-                    <input
-                      type="text"
-                      onInput="this.parentNode.dataset.value = this.value"
-                      size="1"
-                      placeholder=""
-                    />
-                  </span>
-                </label>
+          <h2>Index</h2>
 
-                <div>
-                  tags:
-                  <div class="tags">
-                    <%= for tag <- Enum.flat_map(@projects, & &1.tags) |> Enum.uniq() |> Enum.sort() do %>
-                      <.button phx-click="proj-tag" phx-value-tag={tag.label}>
-                        <%= "#" <> tag.label %>
-                      </.button>
-                    <% end %>
-                    <%= if @tag do %>
-                      <a phx-click="projects">(clear)</a>
-                    <% end %>
-                  </div>
+          <div class="component-container">
+            <label class="search-container hidden">
+              <span>search :: ~ >></span>
+              <span class="input-container">
+                <input
+                  type="text"
+                  onInput="this.parentNode.dataset.value = this.value"
+                  size="1"
+                  placeholder=""
+                />
+              </span>
+            </label>
+
+            <div>
+              tags:
+              <div class="tags">
+                <%= for tag <- Enum.flat_map(@projects, & &1.tags) |> Enum.uniq() |> Enum.sort() do %>
+                  <.button phx-click="proj-tag" phx-value-tag={tag.label}>
+                    <%= "#" <> tag.label %>
+                  </.button>
+                <% end %>
+                <%= if @tag do %>
+                  <a phx-click="projects">(clear)</a>
+                <% end %>
+              </div>
+            </div>
+          </div>
+
+          <div class="projects">
+            <%= for {project, idx} <- Enum.reverse(Enum.with_index(@projects)), is_nil(@tag) or Enum.any?(project.tags, & &1.label == @tag) do %>
+              <div class="project">
+                <div class="project-id"><%= "##{idx}" %></div>
+                <div class="project-title-container">
+                  <a class="project-name" href={project.url}>
+                    <%= project.name %>
+                  </a>
+                  <p class="project-description"><%= project.description %></p>
+                </div>
+                <div class="tags">
+                  <%= for tag <- project.tags do %>
+                    <span class="tag" phx-click="proj-tag" phx-value-tag={tag.label}>
+                      <%= "#" <> tag.label %>
+                    </span>
+                  <% end %>
                 </div>
               </div>
-            </article>
-            <div class="projects">
-              <%= for {project, idx} <- Enum.reverse(Enum.with_index(@projects)), is_nil(@tag) or Enum.any?(project.tags, & &1.label == @tag) do %>
-                <div class="project">
-                  <div class="project-id"><%= "##{idx}" %></div>
-                  <div class="project-title-container">
-                    <a class="project-name" href={project.url}>
-                      <%= project.name %>
-                    </a>
-                    <p class="project-description"><%= project.description %></p>
-                  </div>
-                  <div class="tags">
-                    <%= for tag <- project.tags do %>
-                      <span class="tag" phx-click="proj-tag" phx-value-tag={tag.label}>
-                        <%= "#" <> tag.label %>
-                      </span>
-                    <% end %>
-                  </div>
-                </div>
-              <% end %>
-            </div>
+            <% end %>
           </div>
         </main>
       <% end %>
@@ -289,40 +288,41 @@ defmodule BlogWeb.BlogLive do
               <a phx-click="posts">x</a>
             <% end %>
           </div>
-          <article>
-            <p>
-              Here are a collection of posts I've written about anything and everything that comes to mind.
-            </p>
-            <p>Views expressed are my own and do not represent the views of my employer.</p>
-            <p>You can filter by tags or search for a specific post below.</p>
-            <.form class="component-container" for={@search} phx-change="search">
-              <label class="search-container hidden">
-                <span>search :: ~ >></span>
-                <.input
-                  field={@search[:value]}
-                  name="search"
-                  value=""
-                  type="text"
-                  size="1"
-                  placeholder=""
-                />
-              </label>
+          <p>
+            Here are a collection of posts I've written about anything and everything that comes to mind.
+          </p>
+          <p>Views expressed are my own and do not represent the views of my employer.</p>
+          <p>You can filter by tags or search for a specific post below.</p>
 
-              <div>
-                tags:
-                <div class="tags">
-                  <%= for tag <- Enum.flat_map(@posts, & &1.tags) |> Enum.uniq() |> Enum.sort() do %>
-                    <.button phx-click="tag" phx-value-tag={tag.label}>
-                      <%= "#" <> tag.label %>
-                    </.button>
-                  <% end %>
-                  <%= if @tag do %>
-                    <a phx-click="posts">(clear)</a>
-                  <% end %>
-                </div>
+          <h2>Index</h2>
+
+          <.form class="component-container" for={@search} phx-change="search">
+            <label class="search-container hidden">
+              <span>search :: ~ >></span>
+              <.input
+                field={@search[:value]}
+                name="search"
+                value=""
+                type="text"
+                size="1"
+                placeholder=""
+              />
+            </label>
+
+            <div>
+              tags:
+              <div class="tags">
+                <%= for tag <- Enum.flat_map(@posts, & &1.tags) |> Enum.uniq() |> Enum.sort() do %>
+                  <.button phx-click="tag" phx-value-tag={tag.label}>
+                    <%= "#" <> tag.label %>
+                  </.button>
+                <% end %>
+                <%= if @tag do %>
+                  <a phx-click="posts">(clear)</a>
+                <% end %>
               </div>
-            </.form>
-          </article>
+            </div>
+          </.form>
 
           <div class="posts">
             <%= for post <- @posts, is_nil(@tag) or Enum.any?(post.tags, & &1.label == @tag), not @is_release? or not post.is_draft do %>
@@ -368,9 +368,7 @@ defmodule BlogWeb.BlogLive do
             </div>
           </div>
 
-          <article>
-            <%= {:safe, @post.body} %>
-          </article>
+          <%= {:safe, @post.body} %>
         </main>
       <% end %>
 

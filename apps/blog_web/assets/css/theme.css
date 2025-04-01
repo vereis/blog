@@ -32,30 +32,46 @@ body {
 	line-height: 1.5;
 	padding: 48px;
 	min-height: 100vh;
-}
 
-main,
-header,
-footer {
-	padding: 3ex 0;
-	max-width: 90ex;
+	& .layout {
+		display: grid;
+		grid-template-areas:
+			"header ."
+			"main aside"
+			"footer .";
+		grid-template-columns: minmax(0, 90ex) 1fr;
+		grid-template-rows: auto 1fr auto;
+		gap: 2ex;
+	}
 }
 
 header {
+	grid-area: header;
 	display: flex;
 	justify-content: space-between;
-	padding: 0;
-	max-width: 90ex;
 
 	&>*:first-child {
 		font-weight: bold;
 	}
 }
 
+main {
+	grid-area: main;
+	display: flex;
+	flex-direction: column;
+	gap: 1ex;
+}
+
+aside {
+	grid-area: aside;
+}
+
 footer {
+	grid-area: footer;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	margin-top: 4ex;
 
 	&>.end {
 		color: #21202e;
@@ -69,8 +85,8 @@ footer {
 }
 
 h1 {
-	background-color: #31748f;
 	display: inline-block;
+	background-color: #31748f;
 	padding-left: 1ex;
 	padding-right: 1ex;
 }
@@ -118,7 +134,6 @@ a,
 }
 
 img {
-	cursor: zoom-in;
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: contain;
@@ -149,31 +164,24 @@ code {
 	padding-right: 1ex;
 }
 
-article {
-	display: flex;
-	flex-direction: column;
-	margin-top: 1ex;
-	gap: 1ex;
+main a {
+	color: #9cd8a0;
+	text-decoration: none;
 
-	& a {
-		color: #9cd8a0;
-		text-decoration: none;
+	&:hover {
+		background-color: transparent !important;
+		text-decoration: underline;
+	}
 
-		&:hover {
-			background-color: transparent !important;
-			text-decoration: underline;
-		}
+	&:after {
+		content: attr(href);
+		color: #31748f;
+		text-decoration: underline;
+		margin-right: -1ex;
+	}
 
-		&:after {
-			content: attr(href);
-			color: #31748f;
-			text-decoration: underline;
-			margin-right: -1ex;
-		}
-
-		&[data-href]:after {
-			content: attr(data-href);
-		}
+	&[data-href]:after {
+		content: attr(data-href);
 	}
 }
 
@@ -287,10 +295,6 @@ blockquote {
 	flex-direction: column;
 	gap: 2ex;
 
-	* & {
-		margin-top: 1ex;
-	}
-
 	& .post {
 		display: flex;
 		gap: 3ex;
@@ -332,10 +336,6 @@ blockquote {
 	display: flex;
 	flex-direction: column;
 	gap: 2ex;
-
-	* & {
-		margin-top: 1ex;
-	}
 
 	& .project {
 		display: flex;
@@ -395,14 +395,10 @@ blockquote {
 		color: #908caa;
 	}
 
-	&+article {
-		margin-top: 3ex;
-	}
+	margin-bottom: 2ex;
 }
 
 .component-container {
-	margin-top: 1ex;
-	margin-bottom: 2ex;
 	display: flex;
 	gap: 1ex 0;
 	flex-direction: column;
@@ -450,10 +446,20 @@ blockquote {
 	body {
 		padding: 2ex;
 		font-size: 16px;
+
+		& .layout {
+			display: grid;
+			grid-template-areas:
+				"header ."
+				"main ."
+				"footer .";
+			grid-template-columns: 100%;
+			grid-template-rows: auto 1fr auto;
+			gap: 1ex;
+		}
 	}
 
 	header {
-		margin-bottom: -1ex;
 		justify-content: normal;
 		flex-direction: column;
 
@@ -483,9 +489,17 @@ blockquote {
 		flex-direction: column;
 
 		& .tags {
-			margin-left: 1ex;
+			margin-left: 0;
 			gap: 0 1ex !important;
 		}
+	}
+
+	.post-metadata {
+		margin-bottom: 1ex;
+	}
+
+	blockquote {
+		padding: 1ex 2ex;
 	}
 }
 
