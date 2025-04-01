@@ -2,11 +2,7 @@ defmodule Blog.Posts.Post do
   @moduledoc "A blog post."
 
   use Blog.Schema
-
-  alias Blog.Posts
   alias Blog.Posts.Tag
-
-  require Logger
 
   schema "posts" do
     field(:title, :string)
@@ -45,38 +41,18 @@ defmodule Blog.Posts.Post do
   defp generate_body(changeset) do
     changeset
     |> Ecto.Changeset.get_field(:raw_body)
-    |> render_images()
     |> Md.generate()
     |> append_space_between_alphanum_and_pattern([
       {~r/<\/a>/, "&nbsp;"},
       {~r/<\/code>/, ""}
     ])
+    |> render_internal_images()
     |> then(&Ecto.Changeset.put_change(changeset, :body, &1))
   end
 
-  defp render_images(markdown_text) do
-    Regex.replace(~r/!\[image\]\(([^\)]+)/, markdown_text, fn
-      # Only encode local images
-      match, "../images/" <> image_path ->
-        encoded_image =
-          Posts.image_path()
-          |> Path.join(image_path)
-          |> File.read()
-          |> case do
-            {:ok, binary} ->
-              Base.encode64(binary)
-
-            error ->
-              Logger.warn("Failed to encode image: #{image_path} - #{inspect(error)}")
-              ""
-          end
-
-        "![image](data:image/png;base64,#{encoded_image}"
-
-      # External images should just work
-      match, _rest ->
-        match
-    end)
+  defp render_internal_images(html) do
+    regex = ~r/src="\.\.\/images\//
+    String.replace(html, regex, "src=\"/assets/images/")
   end
 
   defp generate_description(changeset) do

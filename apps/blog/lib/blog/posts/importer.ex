@@ -14,6 +14,8 @@ defmodule Blog.Posts.Importer do
   alias Blog.Posts.Tag
   alias Blog.Repo
 
+  require Logger
+
   @spec run!() :: :ok
   def run! do
     now =
@@ -21,7 +23,15 @@ defmodule Blog.Posts.Importer do
       |> DateTime.to_naive()
       |> NaiveDateTime.truncate(:second)
 
-    attrs =
+    image_attrs =
+      Posts.image_path()
+      |> File.ls!()
+      |> Task.async_stream(&parse_images/1)
+      |> Stream.map(fn {:ok, attrs} -> attrs end)
+      |> Enum.with_index(1)
+      |> Enum.map(fn {attrs, index} -> Map.put(attrs, :id, index) end)
+
+    post_attrs =
       Posts.source_path()
       |> File.ls!()
       |> Task.async_stream(&parse_posts/1)
@@ -31,7 +41,7 @@ defmodule Blog.Posts.Importer do
       |> Enum.map(fn {attrs, index} -> Map.put(attrs, :id, index) end)
 
     {_count, tags} =
-      attrs
+      post_attrs
       |> Enum.flat_map(& &1.tags)
       |> Enum.uniq()
       |> Enum.map(&%{label: &1, inserted_at: now, updated_at: now})
@@ -46,12 +56,35 @@ defmodule Blog.Posts.Importer do
 
     tag_lookup_table = Map.new(tags, fn tag -> {tag.label, tag.id} end)
 
-    attrs
+    post_attrs
     |> Stream.map(fn x -> Map.put(x, :tag_ids, Enum.map(x.tags, &tag_lookup_table[&1])) end)
     |> Task.async_stream(&({:ok, %Post{}} = Posts.upsert_post(&1)), max_concurrency: 1)
     |> Stream.run()
+
+    image_attrs
+    |> Task.async_stream(&({:ok, %Posts.Image{}} = Posts.upsert_image(&1)), max_concurrency: 1)
+    |> Stream.run()
   after
     Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", :post_reload)
+  end
+
+  defp parse_images(filename) do
+    image_path = Posts.image_path() |> Path.join(filename)
+
+    %{
+      name: Path.basename(image_path),
+      content_type: image_path |> Path.extname() |> String.trim_leading(".") |> MIME.type(),
+      data: File.read!(image_path)
+    }
+  rescue
+    e in File.Error ->
+      Logger.warning("Failed to read image: #{filename} -- #{inspect(e)}")
+
+      %{
+        name: Posts.image_path() |> Path.join(filename) |> Path.basename(),
+        content_type: "image/png",
+        data: ""
+      }
   end
 
   defp parse_posts(filename) do

@@ -22,7 +22,7 @@ defmodule BlogWeb.Endpoint do
   plug Plug.Static,
     at: "/",
     from: :blog_web,
-    gzip: false,
+    gzip: true,
     only: BlogWeb.static_paths()
 
   # Code reloading can be explicitly enabled under the

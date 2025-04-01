@@ -1,6 +1,7 @@
 defmodule Blog.Posts do
   @moduledoc "Context module exposing an API for managing Posts and related data."
 
+  alias Blog.Posts.Image
   alias Blog.Posts.Post
   alias Blog.Posts.Tag
   alias Blog.Repo
@@ -27,11 +28,30 @@ defmodule Blog.Posts do
       |> Path.join("images")
   end
 
-  @spec image_path() :: Path.t()
-  def image_path do
-    :blog
-    |> :code.priv_dir()
-    |> Path.join("images")
+  @spec upsert_image(attrs :: map()) :: {:ok, Image.t()} | {:error, Ecto.Changeset.t()}
+  def upsert_image(attrs) do
+    (get_image(name: attrs.name) || %Image{})
+    |> Image.changeset(attrs)
+    |> Repo.insert_or_update()
+  end
+
+  @spec get_image(id :: integer()) :: Image.t() | nil
+  @spec get_image(filters :: Keyword.t()) :: Image.t() | nil
+  def get_image(image_id) when is_integer(image_id) do
+    get_image(id: image_id)
+  end
+
+  def get_image(filters) do
+    filters
+    |> Image.query()
+    |> Repo.one()
+  end
+
+  @spec list_images(filters :: Keyword.t()) :: [Image.t()]
+  def list_images(filters \\ []) do
+    filters
+    |> Image.query()
+    |> Repo.all()
   end
 
   @spec upsert_post(attrs :: map()) :: {:ok, Post.t()} | {:error, Ecto.Changeset.t()}

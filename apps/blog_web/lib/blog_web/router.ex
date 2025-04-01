@@ -2,30 +2,32 @@ defmodule BlogWeb.Router do
   use BlogWeb, :router
 
   pipeline :browser do
-    plug :accepts, ["html"]
-    plug :fetch_session
-    plug :fetch_live_flash
-    plug :put_root_layout, html: {BlogWeb.Layouts, :root}
-    plug :protect_from_forgery
-    plug :put_secure_browser_headers
+    plug(:accepts, ["html"])
+    plug(:fetch_session)
+    plug(:fetch_live_flash)
+    plug(:put_root_layout, html: {BlogWeb.Layouts, :root})
+    plug(:protect_from_forgery)
+    plug(:put_secure_browser_headers)
   end
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug(:accepts, ["json"])
   end
 
   scope "/", BlogWeb do
-    pipe_through :browser
+    pipe_through(:browser)
 
-    get "/rss", RssController, :index
-    get "/minna-chat", RedirectController, :minna_chat
-    get "/uses", RedirectController, :uses
+    get("/rss", RssController, :index)
+    get("/minna-chat", RedirectController, :minna_chat)
+    get("/uses", RedirectController, :uses)
+
+    get("/assets/images/:name", AssetsController, :show)
 
     live_session :default do
-      live "/", BlogLive, :home
-      live "/projects/", BlogLive, :list_projects
-      live "/posts/", BlogLive, :list_posts
-      live "/posts/:slug", BlogLive, :show_post
+      live("/", BlogLive, :home)
+      live("/projects/", BlogLive, :list_projects)
+      live("/posts/", BlogLive, :list_posts)
+      live("/posts/:slug", BlogLive, :show_post)
     end
   end
 
@@ -44,9 +46,9 @@ defmodule BlogWeb.Router do
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
-      pipe_through :browser
+      pipe_through(:browser)
 
-      live_dashboard "/dashboard", metrics: BlogWeb.Telemetry
+      live_dashboard("/dashboard", metrics: BlogWeb.Telemetry)
     end
   end
 end

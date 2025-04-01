@@ -24,8 +24,9 @@ defmodule Blog.Posts.Reloader do
 
   @spec maybe_init_filesystem_watcher() :: :ok
   defp maybe_init_filesystem_watcher do
-    {:ok, watcher_pid} = FileSystem.start_link(dirs: [Posts.source_path()] |> IO.inspect())
-    FileSystem.subscribe(watcher_pid) |> IO.inspect()
+    {:ok, watcher_pid} = FileSystem.start_link(dirs: [Posts.source_path(), Posts.image_path()])
+    FileSystem.subscribe(watcher_pid)
+
     :ok
   rescue
     _error -> :ok
