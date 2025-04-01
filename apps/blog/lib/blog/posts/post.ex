@@ -6,6 +6,8 @@ defmodule Blog.Posts.Post do
   alias Blog.Posts
   alias Blog.Posts.Tag
 
+  require Logger
+
   schema "posts" do
     field(:title, :string)
     field(:body, :string, default: "")
@@ -59,8 +61,15 @@ defmodule Blog.Posts.Post do
         encoded_image =
           Posts.image_path()
           |> Path.join(image_path)
-          |> File.read!()
-          |> Base.encode64()
+          |> File.read()
+          |> case do
+            {:ok, binary} ->
+              Base.encode64(binary)
+
+            error ->
+              Logger.warn("Failed to encode image: #{image_path} - #{inspect(error)}")
+              ""
+          end
 
         "![image](data:image/png;base64,#{encoded_image}"
 
