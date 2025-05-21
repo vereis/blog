@@ -126,11 +126,11 @@ Solipsism can easily lead to (negative) `nihilism`, I largely get by by having `
 
 I'll continue the rest of the post with this in mind.
 
-## Pansychism
+## Panpsychism
 
-I think the most interesting take on `consciousness` is the idea of [pansychism](https://en.wikipedia.org/wiki/Pansychism).
+I think the most interesting take on `consciousness` is the idea of [panpsychism](https://en.wikipedia.org/wiki/Panpsychism).
 
-Pansychism is the idea that `consciousness` is a fundamental property of the universe, and that all things have some degree of `consciousness`.
+Panpsychism is the idea that `consciousness` is a fundamental property of the universe, and that all things have some degree of `consciousness`.
 
 This is a very interesting idea, and one that I think is worth exploring.
 
@@ -226,11 +226,11 @@ What about Shinto beliefs that everything, namely old, special objects have a `k
 
 Perhaps this is the result of our `consciousness` is a unified, fundamental property of the universe?
 
-I'm unsure. But I do believe that my pansychic beliefs correlate largely with the idea of `souls`.
+I'm unsure. But I do believe that my panpsychic beliefs correlate largely with the idea of `souls`.
 
 ## Theism
 
-Despite my dualist and pansychic beliefs, I don't believe in (a) god(s) in the traditional sense.
+Despite my dualist and panpsychic beliefs, I don't believe in (a) god(s) in the traditional sense.
 
 If there is some "creator" god, whatever they are must be so far removed from us that we can't even begin to comprehend them.
 
