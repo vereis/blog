@@ -1,7 +1,8 @@
 ---
-title: Ecto Queries are just Data!
+title: Ecto Queryable Pattern
 slug: ecto_queries_are_data
 is_draft: false
+is_redacted: false
 reading_time_minutes:
 published_at: 2024-09-03 14:02:12Z
 tags:
@@ -146,7 +147,7 @@ So, while this pattern is useful, if not better, it's definitely still somewhat 
 
 Another one of Elixir's superpowers is metaprogramming. Now, the actual metaprogramming here is optional, but it's a pretty cool way to solve the problems we've outlined above.
 
-> At [Vetspire](https://vetspire.com), we started doing this without any macros and it still worked.
+> At my current job, we started doing this without any macros and it still worked.
 >
 > We iterated on this pattern until we felt comfortable with it, and then we started using macros to:
 >
@@ -259,7 +260,7 @@ Now that we've got a basic compositional query pattern, we can start to build on
 
 We noticed that we generally always want to be able to query based on the values of our schema fields. This isn't _all_ we need, but it's a good start.
 
-At Vetspire, we added a function in our `MyApp.Queryable` module that we delegate to in our `query/2` callback:
+At my current job, we added a function in our `MyApp.Queryable` module that we delegate to in our `query/2` callback:
 
 ```elixir
 defmodule MyApp.Queryable do
@@ -289,7 +290,7 @@ def query(base_query \\ User, opts) do
 end
 ```
 
-> In reality, Vetspire's `apply_filter/3` function is a bit more complex than this, but this is the basic idea.
+> In reality, my current job's `apply_filter/3` function is a bit more complex than this, but this is the basic idea.
 >
 > We extended the logic to be able to handle things like:
 > - Preloading associations
@@ -306,7 +307,7 @@ This is a small change, but it makes our queryable schemas even more powerful an
 
 ### Rolling it Out
 
-Once we started implementing this behaviour all over the place at Vetspire, we agreed that this was how we wanted to write queries going forwards.
+Once we started implementing this behaviour all over the place at my current job, we agreed that this was how we wanted to write queries going forwards.
 
 We noticed the following things in our usage:
 
@@ -362,7 +363,7 @@ This automatically injects the code inside the `quote` block into a function tha
 
 ## Additional Benefits
 
-At Vetspire, we heavily rely on [Absinthe](https://absinthe-graphql.org) for our GraphQL API. We've found that this pattern of queryable schemas has a few additional benefits when used in conjunction with Absinthe.
+At my current job, we heavily rely on [Absinthe](https://absinthe-graphql.org) for our GraphQL API. We've found that this pattern of queryable schemas has a few additional benefits when used in conjunction with Absinthe.
 
 Typically, when you write a resolver, everything's great because you end up just delegating business logic to some core context function, which can follow whatever patterns you've subscribed to for your application.
 
@@ -436,7 +437,7 @@ Ecto queries are just data structures, and we can leverage this to build powerfu
 
 By using behaviours, callbacks, and macros, we can build a simple compositional query pattern that allows us to define our query logic in our queryable schemas and reuse it across our application.
 
-This pattern has been used so much, and has been so successful at Vetspire, that we've open-sourced our implementation in a library called [EctoModel](https://hex.pm/packages/ecto_model). It comes with a few additional things, but you can both see the core pattern we use as well as how we've extended it.
+This pattern has been used so much, and has been so successful at my current job, that we've open-sourced our implementation in a library called [EctoModel](https://hex.pm/packages/ecto_model). It comes with a few additional things, but you can both see the core pattern we use as well as how we've extended it.
 
 If you try to use `ecto_model`, you have to opt into any of the bits of functionality provided, so you'll need to define a `MyApp.Queryable` module that uses `EctoModel.Queryable`.
 

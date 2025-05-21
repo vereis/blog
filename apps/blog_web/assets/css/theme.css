@@ -356,6 +356,11 @@ blockquote {
 				display: inline-block;
 				text-decoration: none;
 
+
+				&:after {
+					display: block;
+				}
+
 				&:hover {
 					background-color: transparent !important;
 					text-decoration: underline;

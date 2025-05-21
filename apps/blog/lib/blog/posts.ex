@@ -77,6 +77,7 @@ defmodule Blog.Posts do
   @spec list_posts(filters :: Keyword.t()) :: [Post.t()]
   def list_posts(filters \\ []) do
     filters
+    |> Keyword.put(:is_redacted, false)
     |> Post.query()
     |> Repo.all()
     |> Repo.preload(:tags)

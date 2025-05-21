@@ -12,6 +12,7 @@ defmodule Blog.Posts.Post do
     field(:slug, :string)
     field(:reading_time_minutes, :integer, default: 0)
     field(:is_draft, :boolean, default: true)
+    field(:is_redacted, :boolean, default: false)
     field(:published_at, :utc_datetime)
     field(:description, :string)
 

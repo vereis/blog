@@ -2,6 +2,7 @@
 title: The Story of a Function
 slug: story_of_a_function
 is_draft: false
+is_redacted: true
 reading_time_minutes:
 published_at: 2024-09-04 16:22:16Z
 tags:

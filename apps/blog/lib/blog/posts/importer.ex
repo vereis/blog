@@ -100,6 +100,7 @@ defmodule Blog.Posts.Importer do
     %{
       id: nil,
       is_draft: metadata["is_draft"],
+      is_redacted: metadata["is_redacted"] || false,
       published_at: metadata["published_at"],
       raw_body: String.trim(raw_body),
       reading_time_minutes: metadata["reading_time_minutes"],

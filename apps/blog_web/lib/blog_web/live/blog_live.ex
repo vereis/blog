@@ -217,13 +217,11 @@ defmodule BlogWeb.BlogLive do
             <% end %>
           </div>
           <p>
-            Here is a list of open-source projects, libraries, tools, and configs I've created.
+            Personal projects or open source contributions.
           </p>
-          <p>
-            You may be interested in a more complete list of repositories I've contributed to on
-            <a href="https://github.com/vereis">GitHub </a>
-          </p>
-          <p>Unless otherwise noted, all projects are `MIT` Licensed.</p>
+          <blockquote>
+            For a more complete list, check out <a href="https://github.com/vereis">my GitHub </a> profile.
+          </blockquote>
 
           <h2>Index</h2>
 
@@ -289,10 +287,12 @@ defmodule BlogWeb.BlogLive do
             <% end %>
           </div>
           <p>
-            Here are a collection of posts I've written about anything and everything that comes to mind.
+            Personal blog posts, notes, and other ramblings.
           </p>
-          <p>Views expressed are my own and do not represent the views of my employer.</p>
-          <p>You can filter by tags or search for a specific post below.</p>
+
+          <blockquote>
+            Views expressed here or elsewhere online are my own and do not reflect the views of my employer.
+          </blockquote>
 
           <h2>Index</h2>
 
