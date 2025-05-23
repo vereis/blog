@@ -42,6 +42,21 @@ body {
 		grid-template-columns: minmax(0, 90ex) 1fr;
 		grid-template-rows: auto 1fr auto;
 		gap: 2ex;
+		min-height: 100vh;
+	}
+
+	& aside {
+		grid-area: aside;
+		position: sticky;
+		top: 0;
+		align-self: start;
+		height: fit-content;
+		overflow-y: auto;
+		padding: 2ex;
+
+		/* Padding only when user scrolls and its sticky */
+		margin-top: -4ex;
+		padding-top: 4ex;
 	}
 }
 
@@ -164,7 +179,8 @@ code {
 	padding-right: 1ex;
 }
 
-main a {
+main a,
+.table-of-contents-container a {
 	color: #9cd8a0;
 	text-decoration: none;
 
@@ -307,7 +323,7 @@ blockquote {
 		& .post-id {
 			color: #31748f;
 			flex-shrink: 0;
-			min-width: 2ex;
+			min-width: 3.5ex;
 		}
 
 		& .post-title-container {
@@ -442,12 +458,61 @@ blockquote {
 	}
 }
 
+main .table-of-contents-container {
+	display: none;
+}
+
+.table-of-contents-container {
+	display: flex;
+	flex-direction: column;
+	grid-area: aside;
+
+	margin-top: -1ex;
+	margin-bottom: 1ex;
+
+	& a[data-level="2"] {
+		margin-left: 2ex;
+	}
+
+	& a[data-level="3"] {
+		margin-left: 4ex;
+	}
+
+	& a[data-level="4"] {
+		margin-left: 6ex;
+	}
+
+	& a[data-level="5"] {
+		margin-left: 8ex;
+	}
+
+	& a[data-level="6"] {
+		margin-left: 10ex;
+	}
+
+	& a:after {
+		content: '' !important;
+	}
+}
+
 #crtFilter {
 	transform: translateY(15%);
 }
 
 /* ============ Responsive Design ============ */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 1300px) {
+	body {
+		& aside {
+			display: none !important;
+		}
+	}
+
+	main .table-of-contents-container {
+		display: flex !important;
+	}
+}
+
+@media screen and (max-width: 800px) {
 	body {
 		padding: 2ex;
 		font-size: 16px;
@@ -495,7 +560,7 @@ blockquote {
 
 		& .tags {
 			margin-left: 0;
-			gap: 0 1ex !important;
+			gap: 0 2ex !important;
 		}
 	}
 

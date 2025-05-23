@@ -16,6 +16,12 @@ defmodule Blog.Posts.Post do
     field(:published_at, :utc_datetime)
     field(:description, :string)
 
+    embeds_many(:headings, Heading, on_replace: :delete) do
+      field(:link, :string)
+      field(:title, :string)
+      field(:level, :integer)
+    end
+
     field(:rank, :float, virtual: true)
 
     many_to_many(:tags, Tag,
@@ -29,8 +35,9 @@ defmodule Blog.Posts.Post do
   @spec changeset(t(), attrs :: map()) :: Ecto.Changeset.t()
   def changeset(%Post{} = post, attrs) do
     post
-    |> cast(attrs, fields())
+    |> cast(attrs, fields() -- [:headings])
     |> generate_body()
+    |> generate_headings()
     |> generate_description()
     |> generate_reading_time(attrs)
     |> validate_required([:title, :slug, :description])
@@ -49,6 +56,47 @@ defmodule Blog.Posts.Post do
     ])
     |> render_internal_images()
     |> then(&Ecto.Changeset.put_change(changeset, :body, &1))
+  end
+
+  defp generate_headings(changeset) do
+    regex = ~r/<h([123456])>[\s\n]*([^<\n]+)[\s\n]*<\/h[123456]>/
+    title = Ecto.Changeset.get_field(changeset, :title)
+    body = Ecto.Changeset.get_field(changeset, :body)
+
+    normalize = fn heading ->
+      heading
+      |> String.downcase()
+      |> String.replace(~r/\s+/, "-")
+    end
+
+    headings =
+      regex
+      |> Regex.scan(body)
+      |> then(&[[nil, "1", title] | &1])
+      |> Enum.map(fn [_match, level, title] ->
+        id = "heading-" <> normalize.(title)
+
+        %{
+          id: id,
+          link: "##{id}",
+          title: "#{List.duplicate("#", String.to_integer(level))} #{title}",
+          level: String.to_integer(level)
+        }
+      end)
+
+    updated_body =
+      Regex.replace(regex, body, fn
+        _match, level, title ->
+          """
+          <h#{level} id="heading-#{normalize.(title)}">
+            #{title}
+          </h#{level}>
+          """
+      end)
+
+    changeset
+    |> Ecto.Changeset.put_change(:body, updated_body)
+    |> Ecto.Changeset.put_embed(:headings, headings)
   end
 
   defp render_internal_images(html) do

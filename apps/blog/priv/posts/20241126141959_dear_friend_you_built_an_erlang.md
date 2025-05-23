@@ -11,92 +11,259 @@ tags:
 
 > This post will make more sense if you first read [Dear Sir, You Have Built a Kubernetes](https://www.macchaffee.com/blog/2024/you-have-built-a-kubernetes/).
 
-**Dear friend,**
+## Dear Friend...
 
-I regret to inform you that, despite your best intentions, **you have built an Erlang**.
+I regret to inform you that -- despite your best intentions -- **you have built an Erlang**.
 
-I know all you wanted was to "keep it simple." You just needed a way to notify your services when data changed—nothing fancy.
+I know that you never meant for this to happen, but happen... it did.
 
-A dedicated background job system or message bus? Too much. *"YAGNI,"* you said, confident you could sprinkle a few API calls here and there.
+### The Innocent Beginning
 
-But now, six months later, your once-pristine codebase is riddled with ad-hoc HTTP calls. Like an invasive species, these calls have spread through your business logic, impossible to remove without ripping out half the ecosystem.
+You just needed a `simple` way to notify services when data changed.
 
-*"It’s fine,"* you thought. *"HTTP is simple."*
+> No big deal, right?
 
-You wrote a helper function to `POST` updates to the relevant services, proudly abstracting away the repetitive boilerplate. *"What could go wrong?"*
+- A full-blown message bug? Eugh, **overkill**.
+- A background job? **YAGNI**, the koans scoffed...
 
-But alas! Your startup thrived. Your services grew, and suddenly everything wanted to know everything.
+So you started small:
 
-- *"Who signed up?"*
-- *"What action was performed?"*
-- *"Did the user close the modal?"*
+```python
+def notify_service(event, payload):
+  requests.post(f"{service.url}/events", json=payload)
+```
 
-You were drowning in code churn, endlessly updating each service to notify its growing list of friends. There had to be a better way.
+> "HTTP is simple!" you declared. "What could go so wrong?"
+
+### The Spaghetti Creeps In
+
+But then, you started getting customers. Your startup thrived.
+
+Suddenly, **everything** needed to know **everything** else:
+
+- Who just signed up?.. Flows for mail providers... custom domains...
+- What action was performed?.. When, what, and how?
+- Did the user close the modal?.. Did they cancel? Maybe refreshed?
+
+Your codebase became a tangle of ad-hoc HTTP calls, each one a little more complex than the last.
+
+Like an invasive species, these calls spread through your business logic, impossible to remove without ripping out half the ecosystem.
+
+### A Tale of Subscriptions
+
+> "There... there just had to be a better way..." you thought.
 
 Then it hit you: **subscriptions.**
 
-What if services could just… register their interest in events? You could store subscribers in a database and notify them automatically. Elegant, you thought.
+Each service could subscribe to events it cared about, and you could publish events to all subscribers.
 
-So, you built a lightweight system to emit events and iterate over the subscribers, sending notifications as needed. Surely, this would be enough.
+Complexity... tight coupling... adieu! You throw something together:
 
-But then, something broke.
+```python
+def notify_service(event, payload):
+  subscribers = db.query("SELECT url FROM services WHERE event = ?", [event])
+  for sub in subscribers:
+      do_notify_service(sub.url, payload)
+```
 
-A user created an account, but a dependent service missed the memo. Investigating, you discovered a service had received the `POST` but crashed before it could process it.
+**"Elegant!"** you cried!
 
-*No problem,* you thought. You added a queue to track pending events and retry failed deliveries.
+You built a lightweight system to send notifications as needed. Surely, this would be enough.
 
-It wasn’t RabbitMQ or Kafka—you were smarter than that. Your solution was simpler and better, surely.
+But as traffic grew and business boomed, your support team heard whispers of **invalid states**.
 
-Then came scaling.
+A user created an account, but one of your `POST` requests timed out.
 
-Polling your queue didn’t cut it anymore. Services were growing, pods were scaling dynamically, and now you needed to target specific processes.
+> Subsequent services were confused. They thought the user was already registered, but your database said otherwise.
+>
+> Migrating back to a good state took hours and hours... no telemetry, no logs, no clue...
 
-*"What if I encode pod IDs in the event metadata?"* you mused. *"How elegant!"*
+### Retry, Retry, Retry
 
-And just like that, you built a distributed messaging system.
+You were horrified. You had to fix this.
+
+"No problem going forward," you thought. "We can just retry!"
+
+> You didn't want `Kafka`, even `SQS` was too much... you wanted simplicity... you knew what you were doing.
+
+```python
+def notify_service(event, payload):
+  queue.insert(event, payload, retries=3)
+```
+
+It wasn't pretty... your database cried... but **it was yours** and **it worked**...
+
+Time to move on.
+
+### The Descent into Madness
+
+Your system... homegrown. Your profits... rised.
+
+Your startup just landed a big contract. You were scaling up, and your system was chugging along.
+
+**Everything** went down. **Everyone** complained.
+
+> The database is down. The queues are full. The services are deadlocked.
+>
+> Dear friend, you **need** to fix this or we're all out of a job.
+
+Services just poll from our queue? How did this even pass code review?
+
+Hmm.. `git blame`... *"Oh, that was me."*... the shame.
+
+- Our pods scale dynamically.
+- Too many exhausts our database connections and add too load...
+- Our queues are full of retries.
+- Our services are deadlocked.
+
+This would have been better with good old `HTTP`... let's step back...
+
+> What if we just... **"No, no, no!"** you thought. **"We can fix this."**
+
+We can look up pods via `k8s` and `DNS`... we can write receipts to the database, but `POST` first we shall...
+
+We can encode Pod IDs, targets, channels in our payload... we can use `gRPC`... each pod **is its own queue**... a mailbox...
+
+```python
+{
+  "event": "user_signup",
+  "payload": {...},
+  "target_pod": "web-xyz123"
+}
+```
+
+On boot just check for missed messages and try anew...
+
+```python
+def check_for_missed_messages():
+  missed = db.query("SELECT * FROM messages WHERE pod_id = ?", [pod_id])
+  for message in missed:
+      do_notify_service(message.target_pod, message.payload)
+```
+
+Just write back acknowledgements, and everything will be fine...
+
+```python
+def handle_event(event):
+  process_message(event)
+  db.execute("UPDATE messages SET status = 'ack' WHERE id = ?", [event.id])
+```
+
+### The Precipice of Fragility
 
 But distributed systems are fragile.
 
-- A process died mid-event.
-- Another service deadlocked while waiting for a response.
+- Processes died sporadically.
+- Double-acknowledging events.
+- Pods fought over missed events.
 
 Chaos ensued.
 
-You added timeouts, retries, heartbeats, and state tracking to detect failures and recover gracefully.
+> Pods seem healthy, but they're not processing messages...
+>
+> "I've read about this in a book!", you thought. This is a `netsplit`...!
 
-You even added live introspection tools to debug your increasingly opaque web of systems.
+Like a true engineer, a 10x-er, a ninja wearing many hats, you dove in:
 
-*"This is good engineering,"* you told yourself. *"This solves real problems."*
+1. Let's implement some `timeouts`.
+2. Some `heartbeats` to better track our pods.
+3. Each pod should be a state machine.
+4. `SELECT FOR UPDATE` to prevent deadlocks.
+
+```python
+class Worker:
+    def __init__(self):
+        self.state = "idle"
+        self.current_event = None
+        self.retries = 0
+```
+
+You even added telemetry, introspection, and logging.
+
+**This is good engineering!** you thought. **This solves real problems!**
+
+> Dear friend, let's open source this! Let's make it a library!
+>
+> The whole world needs this!
 
 And then, you took a vacation.
 
-Naturally, something broke.
+### The Bitter End
 
-- Services hung.
-- Tables deadlocked.
-- Timeouts triggered cascades of errors.
+Naturally, something went wrong...
 
-Your teammates, staring at an indecipherable tangle of queues, retries, and state transitions, called you in to save the day.
+- Cascading timeouts...
+- Deadlocked tables...
+- Your team, egyptologists, working to decipher your hieroglyphics...
 
-*"This needs documentation!"* you declared.
+You get paged at 3 AM. You're in Honolulu, sipping a Mai Tai...
 
-You meticulously documented workflows, tightened APIs, and refactored your system into atomic, stateful workers. Surely, this would make things easier to reason about.
+**"This needs documentation!"** you declared.
 
-But now, here you stand.
+> **"How do I even explain this to the team?"** you thought.
+>
+> It's so simple... its just queues, and retries, and service discovery... and heartbeats...
+>
+> It's just state machines... it's just mailboxes... how did this go so, so wrong?
+
+You began to write... you began to train... you began to refactor...
+
+- Document the workflows.
+- Tighten the APIs.
+- Make all your stateful workers atomic.
+- Interfaces, strategies, patterns galore.
+
+> "This is so beautiful!" you thought. "This is so clean!.. its finally right..."
+
+### Awakening
+
+But now, here you stand...
 
 You’ve built:
 
-- An asynchronous, message-based runtime.
-- Supervision trees for fault-tolerant processes.
-- Lifecycle management for dynamic workers.
-- APIs for synchronous and asynchronous calls.
-- Live introspection tools for debugging.
-- A distributed message inbox (that still isn’t quite sharded right).
+- An asynchronous, dynamic food-web of services.
+- Supvervision trees, albeit by another name.
+- Stateful, isolated processes, in some limited, ad-hoc way.
+- Synchronous, and asynchronous requests, to fulfill all possible needs.
+- Telemetry, introspection, and logging, to track all the things.
+- Distributed message queues (that still aren't quite sharded right).
 
-Dear friend, your journey, driven by a desire for simplicity and a refusal to use tools others had already perfected, has brought you full circle.
-
-**Dear friend, you have built an Erlang.**
+> **Dear friend,** driven by a desire for simplicity, refusal to use tools deemed `esoteric` or `complex`, you've been brought full circle.
+>
+> **Dear friend,** I regret to say... **you have built an Erlang.**
 
 **Addressed to:**
 
-Those who just wanted to trigger actions between their services.
+Those who wanted to `POST` events between a few services.
+
+## Addendum
+
+This post is admittedly quite a bit of a joke.
+
+When I read the origin [Dear Sir, You Have Built a Kubernetes](https://www.macchaffee.com/blog/2024/you-have-built-a-kubernetes/) post, I couldn't help but think of the many times I've seen this pattern in the wild.
+
+Frankly, I feel like `Kubernetes` is itself a bit of an Erlang in many senses.
+
+The whole thing reminds me of `Virding's Law`:
+
+> Any sufficiently complicated concurrent program in another language contains an ad hoc informally-specified bug-ridden slow implementation of half of Erlang.
+
+I do want to note, however, that I don't think this is a bad thing.
+
+At the end of the day, we all have to make trade-offs.
+
+Maybe sure, you don't want to pull `Erlang` into your stack, maybe you don't want to use `Kafka`, or `RabbitMQ`, or `Redis`, or whatever.
+
+That's totally okay.
+
+But I do think it's important to recognize that there are trade-offs to be made.
+
+Sometimes, even if you start out with a simple solution, there are opporunities along the way where you can just stop the train and say "Hey! Maybe we should just `X` for this instead!"
+
+> **Edit:** I'm actually very surprised this hit the front page of [Hacker News](https://news.ycombinator.com/).
+>
+> I threw this together very quickly. I didn't even think it would be a good post.
+>
+> As a result of some feedback, I've added some formatting and fixed a few clunky bits, but alas.
+>
+> If you want to see the original version, you can find it in this file's `git` history!

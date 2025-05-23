@@ -146,13 +146,13 @@ defmodule BlogWeb.BlogLive do
 
   @impl Phoenix.LiveView
   def handle_event("projects", _params, socket) do
-    socket = assign(socket, :tag, nil)
+    socket = socket |> assign(:tag, nil) |> assign(:post, nil)
     {:noreply, push_patch(socket, to: ~p"/projects")}
   end
 
   @impl Phoenix.LiveView
   def handle_event("posts", _params, socket) do
-    socket = assign(socket, :tag, nil)
+    socket = socket |> assign(:tag, nil) |> assign(:post, nil)
     {:noreply, push_patch(socket, to: ~p"/posts")}
   end
 
@@ -205,6 +205,15 @@ defmodule BlogWeb.BlogLive do
           </label>
         </span>
       </header>
+
+      <%= if is_struct(@post) do %>
+        <aside aria-label="Table of contents" class="table-of-contents-container">
+          <p><strong>Table of Contents</strong></p>
+          <%= for header <- @post.headings do %>
+            <a data-level={header.level} href={header.link}><%= header.title %></a>
+          <% end %>
+        </aside>
+      <% end %>
 
       <%= if @live_action == :list_projects do %>
         <main>
@@ -351,7 +360,7 @@ defmodule BlogWeb.BlogLive do
         <main>
           <div class="post-metadata">
             <div class="post-title">
-              <h1><%= @post.title %></h1>
+              <h1 id={hd(@post.headings).id}><%= @post.title %></h1>
               <div class="tags">
                 <%= for tag <- @post.tags do %>
                   <.button phx-click="tag" phx-value-tag={tag.label}>
@@ -367,6 +376,13 @@ defmodule BlogWeb.BlogLive do
               Approx. <%= @post.reading_time_minutes %> minute read
             </div>
           </div>
+
+          <nav class="table-of-contents-container">
+            <p><strong>Table of Contents</strong></p>
+            <%= for header <- @post.headings do %>
+              <a data-level={header.level} href={header.link}><%= header.title %></a>
+            <% end %>
+          </nav>
 
           <%= {:safe, @post.body} %>
         </main>
