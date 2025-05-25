@@ -70,21 +70,7 @@ defmodule Blog.Posts.Importer do
 
   defp parse_images(filename) do
     image_path = Posts.image_path() |> Path.join(filename)
-
-    %{
-      name: Path.basename(image_path),
-      content_type: image_path |> Path.extname() |> String.trim_leading(".") |> MIME.type(),
-      data: File.read!(image_path)
-    }
-  rescue
-    e in File.Error ->
-      Logger.warning("Failed to read image: #{filename} -- #{inspect(e)}")
-
-      %{
-        name: Posts.image_path() |> Path.join(filename) |> Path.basename(),
-        content_type: "image/png",
-        data: ""
-      }
+    %{path: image_path}
   end
 
   defp parse_posts(filename) do

@@ -30,7 +30,7 @@ defmodule Blog.Posts do
 
   @spec upsert_image(attrs :: map()) :: {:ok, Image.t()} | {:error, Ecto.Changeset.t()}
   def upsert_image(attrs) do
-    (get_image(name: attrs.name) || %Image{})
+    (get_image(path: attrs.path) || %Image{})
     |> Image.changeset(attrs)
     |> Repo.insert_or_update()
   end

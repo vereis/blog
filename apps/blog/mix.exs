@@ -43,7 +43,8 @@ defmodule Blog.MixProject do
       {:ecto_sqlite3, ">= 0.0.0"},
       {:jason, "~> 1.2"},
       {:yaml_elixir, "~> 2.9"},
-      {:md, "~> 0.9.9"}
+      {:md, "~> 0.9.9"},
+      {:vix, "~> 0.33.1"}
     ]
   end
 
