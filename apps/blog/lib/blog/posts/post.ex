@@ -49,11 +49,7 @@ defmodule Blog.Posts.Post do
   defp generate_body(changeset) do
     changeset
     |> Ecto.Changeset.get_field(:raw_body)
-    |> Md.generate()
-    |> append_space_between_alphanum_and_pattern([
-      {~r/<\/a>/, "&nbsp;"},
-      {~r/<\/code>/, ""}
-    ])
+    |> MDEx.to_html!(extension: [table: true])
     |> render_internal_images()
     |> then(&Ecto.Changeset.put_change(changeset, :body, &1))
   end
@@ -113,7 +109,7 @@ defmodule Blog.Posts.Post do
       |> Enum.join("\n")
 
     (description <> "\n ... Read more ...")
-    |> Md.generate()
+    |> MDEx.to_html!(extension: [table: true])
     |> then(&Ecto.Changeset.put_change(changeset, :description, &1))
   end
 
@@ -134,21 +130,6 @@ defmodule Blog.Posts.Post do
 
   defp generate_reading_time(changeset, attrs) do
     Ecto.Changeset.put_change(changeset, :reading_time_minutes, attrs.reading_time_minutes)
-  end
-
-  defp append_space_between_alphanum_and_pattern(html, regexes) when is_list(regexes) do
-    Enum.reduce(regexes, html, fn {regex, append}, acc ->
-      append_space_between_alphanum_and_pattern(acc, regex, append)
-    end)
-  end
-
-  defp append_space_between_alphanum_and_pattern(html, %Regex{source: source}, append) do
-    "(#{source})"
-    |> List.wrap()
-    |> Enum.concat(["(\\s+)([^A-Za-z0-9])"])
-    |> Enum.join("")
-    |> Regex.compile!()
-    |> then(&String.replace(html, &1, "\\1#{append}\\3"))
   end
 
   @impl EctoUtils.Queryable

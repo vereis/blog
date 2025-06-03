@@ -47,14 +47,31 @@ import hljsJs from "highlight.js/lib/languages/javascript";
 import hljsSql from "highlight.js/lib/languages/sql";
 import hljsGql from "highlight.js/lib/languages/graphql";
 
-hljs.registerLanguage("bash", hljsBash);
-hljs.registerLanguage("python", hljsPython);
-hljs.registerLanguage("elixir", hljsElixir);
-hljs.registerLanguage("erlang", hljsErlang);
-hljs.registerLanguage("nix", hljsNix);
-hljs.registerLanguage("js", hljsJs);
-hljs.registerLanguage("sql", hljsSql);
-hljs.registerLanguage("graphql", hljsGql);
+hljs.registerLanguage("language-bash", hljsBash);
+hljs.registerLanguage("language-python", hljsPython);
+hljs.registerLanguage("language-elixir", hljsElixir);
+hljs.registerLanguage("language-erlang", hljsErlang);
+hljs.registerLanguage("language-nix", hljsNix);
+hljs.registerLanguage("language-js", hljsJs);
+hljs.registerLanguage("language-sql", hljsSql);
+hljs.registerLanguage("language-graphql", hljsGql);
+
+const imgLinkAll = () => {
+  let timer;
+
+  return (...args) => {
+    clearTimeout(timer);
+
+    timer = setTimeout(() => {
+      document.querySelectorAll("img[src]").forEach((el) => {
+        console.log("wow", el)
+        el.onclick = () => {
+          window.open(el.src, "_blank");
+        }
+      });
+    }, 10);
+  }
+}
 
 const highlightAll = () => {
   let timer;
@@ -139,6 +156,11 @@ window.addEventListener("phx:page-loading-stop", (_info) => topbar.hide());
 window.addEventListener("phx:page-loading-stop", (_info) => highlightAll()());
 window.addEventListener("phx:page-loading-stop", (_info) => highlightAll()());
 window.addEventListener("phx:navigate", (_info) => highlightAll()());
+
+// Update all images to open in a new tab when clicked
+window.addEventListener("phx:page-loading-stop", (_info) => imgLinkAll()());
+window.addEventListener("phx:page-loading-stop", (_info) => imgLinkAll()());
+window.addEventListener("phx:navigate", (_info) => imgLinkAll()());
 
 // connect if there are any LiveViews on the page
 liveSocket.connect();

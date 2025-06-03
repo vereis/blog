@@ -152,11 +152,25 @@ img {
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: contain;
+	max-width: 100%;
 	margin-top: 1ex;
-	margin-bottom: 1ex;
+	margin-bottom: -2ex;
 
-	&+blockquote {
-		margin-top: -1ex;
+	 &:hover {
+		cursor: pointer;
+	}
+}
+
+table {
+	overflow-x: auto;
+	table-layout: fixed;
+	width: max-content;
+	max-width: max-content;
+
+	& th {
+		text-align: left;
+		font-weight: bold;
+		padding-right: 2ex;
 	}
 }
 
@@ -193,7 +207,7 @@ main a,
 		content: attr(href);
 		color: #31748f;
 		text-decoration: underline;
-		margin-right: -1ex;
+		margin-left: 1ex;
 	}
 
 	&[data-href]:after {
@@ -293,7 +307,7 @@ blockquote {
 	display: flex;
 	flex-wrap: wrap;
 	flex-grow: 1;
-	gap: 0 3ex;
+	gap: 0 1ex;
 
 	& a,
 	& .tag {
@@ -342,7 +356,7 @@ blockquote {
 			display: flex;
 			flex-wrap: nowrap;
 			justify-content: flex-end;
-			gap: 0 2ex;
+			gap: 0 1ex;
 			color: #908caa;
 		}
 	}
@@ -392,7 +406,7 @@ blockquote {
 			display: flex;
 			flex-wrap: nowrap;
 			justify-content: flex-end;
-			gap: 0 2ex;
+			gap: 0 1ex;
 			color: #908caa;
 		}
 	}
@@ -408,7 +422,7 @@ blockquote {
 		gap: 0 2ex;
 
 		& .tags {
-			gap: 2ex;
+			gap: 1ex;
 		}
 	}
 
@@ -560,7 +574,7 @@ main .table-of-contents-container {
 
 		& .tags {
 			margin-left: 0;
-			gap: 0 2ex !important;
+			gap: 0 1ex !important;
 		}
 	}
 
