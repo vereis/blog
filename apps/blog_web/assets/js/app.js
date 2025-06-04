@@ -30,31 +30,12 @@ let liveSocket = new LiveSocket("/live", Socket, {
   params: { _csrf_token: csrfToken },
   dom: {
     onBeforeElUpdated: (_) => {
-      highlightAll()();
+      imgLinkAll()();
       dataHrefAll()();
       initCrtFilter();
     }
   }
 });
-
-import hljs from "highlight.js/lib/core";
-import hljsBash from "highlight.js/lib/languages/bash";
-import hljsPython from "highlight.js/lib/languages/python";
-import hljsElixir from "highlight.js/lib/languages/elixir";
-import hljsErlang from "highlight.js/lib/languages/erlang";
-import hljsNix from "highlight.js/lib/languages/nix";
-import hljsJs from "highlight.js/lib/languages/javascript";
-import hljsSql from "highlight.js/lib/languages/sql";
-import hljsGql from "highlight.js/lib/languages/graphql";
-
-hljs.registerLanguage("language-bash", hljsBash);
-hljs.registerLanguage("language-python", hljsPython);
-hljs.registerLanguage("language-elixir", hljsElixir);
-hljs.registerLanguage("language-erlang", hljsErlang);
-hljs.registerLanguage("language-nix", hljsNix);
-hljs.registerLanguage("language-js", hljsJs);
-hljs.registerLanguage("language-sql", hljsSql);
-hljs.registerLanguage("language-graphql", hljsGql);
 
 const imgLinkAll = () => {
   let timer;
@@ -64,35 +45,11 @@ const imgLinkAll = () => {
 
     timer = setTimeout(() => {
       document.querySelectorAll("img[src]").forEach((el) => {
-        console.log("wow", el)
         el.onclick = () => {
           window.open(el.src, "_blank");
         }
       });
     }, 10);
-  }
-}
-
-const highlightAll = () => {
-  let timer;
-
-  return (...args) => {
-    clearTimeout(timer);
-
-    timer = setTimeout(() => {
-      document.querySelectorAll("pre code[data-highlighted]").forEach((code) => {
-        code.dataset.highlighted = false;
-      });
-
-      hljs.highlightAll()
-
-      document.querySelectorAll("pre code[data-highlighted]").forEach((code) => {
-        const lang = code.classList?.[0]
-        if (lang) {
-          code.parentNode.setAttribute("data-lang", lang)
-        }
-      })
-    }, 100)
   }
 }
 
@@ -152,16 +109,6 @@ topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" });
 window.addEventListener("phx:page-loading-start", (_info) => topbar.show(300));
 window.addEventListener("phx:page-loading-stop", (_info) => topbar.hide());
 
-// Highlight all code blocks on page load and live navigation
-window.addEventListener("phx:page-loading-stop", (_info) => highlightAll()());
-window.addEventListener("phx:page-loading-stop", (_info) => highlightAll()());
-window.addEventListener("phx:navigate", (_info) => highlightAll()());
-
-// Update all images to open in a new tab when clicked
-window.addEventListener("phx:page-loading-stop", (_info) => imgLinkAll()());
-window.addEventListener("phx:page-loading-stop", (_info) => imgLinkAll()());
-window.addEventListener("phx:navigate", (_info) => imgLinkAll()());
-
 // connect if there are any LiveViews on the page
 liveSocket.connect();
 
@@ -177,7 +124,6 @@ const initCrtFilter = () => {
 
   // If we've not got a persisted preference, set it
   if (localStorage.crtFilter === undefined) {
-    console.log("shouldn't be here")
     enabled = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     localStorage.setItem("crtFilter", enabled);
   }
