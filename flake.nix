@@ -14,7 +14,7 @@
           devShells.default = mkShell {
             buildInputs = [
               # API Deps ------------------------------------
-              sqlite flyctl imagemagick (elixir_1_17.override { erlang = erlang_27; }) erlang_27
+              sqlite flyctl imagemagick (elixir_1_18.override { erlang = erlang_27; }) erlang_27
 
               # Web Deps ------------------------------------
               nodePackages.prettier nodejs_20

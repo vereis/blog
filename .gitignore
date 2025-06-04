@@ -30,3 +30,4 @@ erl_crash.dump
 .direnv/
 /assets/
 rel/
+apps/blog_web/priv/static/**/*.gz
