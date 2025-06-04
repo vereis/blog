@@ -49,7 +49,15 @@ defmodule Blog.Posts.Post do
   defp generate_body(changeset) do
     changeset
     |> Ecto.Changeset.get_field(:raw_body)
-    |> MDEx.to_html!(extension: [table: true])
+    |> MDEx.to_html!(
+      extension: [
+        table: true,
+        strikethrough: true,
+        shortcodes: true,
+        underline: true
+      ],
+      syntax_highlight: [formatter: {:html_inline, theme: "rosepine_dark"}]
+    )
     |> render_internal_images()
     |> then(&Ecto.Changeset.put_change(changeset, :body, &1))
   end
@@ -109,7 +117,15 @@ defmodule Blog.Posts.Post do
       |> Enum.join("\n")
 
     (description <> "\n ... Read more ...")
-    |> MDEx.to_html!(extension: [table: true])
+    |> MDEx.to_html!(
+      extension: [
+        table: true,
+        strikethrough: true,
+        shortcodes: true,
+        underline: true
+      ],
+      syntax_highlight: [formatter: {:html_inline, theme: "rosepine_dark"}]
+    )
     |> then(&Ecto.Changeset.put_change(changeset, :description, &1))
   end
 
