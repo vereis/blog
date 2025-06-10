@@ -65,14 +65,16 @@ Literally the screen you view the world through, the actual `feeling` of your se
 
 > I think this is the most important part of `consciousness` and the part that makes it so difficult to understand.
 
-Please see ["qualia"](https://en.wikipedia.org/wiki/Qualia) for a starting point discussion on this.
+This concept is explored extensively in the academic literature on [qualia](https://iep.utm.edu/qualia/) — the intrinsic, experiential qualities of conscious states.
+
+> For a comprehensive introduction to these ideas, David Chalmers' foundational paper ["Facing Up to the Hard Problem of Consciousness"](https://www.imprint.co.uk/chalmers.html) (1995) and his book **The Conscious Mind** (1996) remain essential reading.
 
 ## My Background
 
 For the vast majority of my life, I would have described myself as a:
 
-- [Physicalist](https://en.wikipedia.org/wiki/Physicalism)
-- [Materialist](https://en.wikipedia.org/wiki/Materialism)
+- [Physicalist](https://plato.stanford.edu/entries/physicalism/)
+- [Materialist](https://iep.utm.edu/consciousness/) (see materialism discussion)
 
 To summarize these thoughts, I was largely of the mind that if we could understand the low level physical building blocks of the universe, we could understand **anything**.
 
@@ -89,7 +91,9 @@ I still largely believe this, but of late, I've had a revalation that my own `su
 >
 > I'd go as far as to say they're the **only** thing we know of that is strictly not physical.
 
-The belief that there are physical and non-physical -- ineffable -- things aligns with [dualism](https://en.wikipedia.org/wiki/Dualism_(philosophy_of_mind)), which I now ascribe to.
+The belief that there are physical and non-physical — ineffable — things aligns with [dualism](https://plato.stanford.edu/entries/dualism/), which I now ascribe to.
+
+> René Descartes' **Meditations on First Philosophy** (1641) established the classic formulation of substance dualism, though modern property dualism offers more nuanced approaches to the mind-body problem.
 
 ## The Thought Experiment
 
@@ -118,7 +122,9 @@ One of the things that makes talking about `consciousness` so difficult is that 
 
 By this, I mean that we have no way of knowing if other people are `conscious` or not -- we're all just black boxes.
 
-This leads to the problem of [solipsism](https://en.wikipedia.org/wiki/Solipsism) -- the idea that only your own mind is sure to exist.
+This leads to the problem of [solipsism](https://plato.stanford.edu/entries/other-minds/) — the idea that only your own mind is sure to exist.
+
+> Thomas Nagel's famous essay ["What Is It Like to Be a Bat?"](https://www.jstor.org/stable/2183914) (1974) explores this fundamental epistemological problem of accessing other minds' subjective experiences.
 
 I think this is a very real problem, and one that I think is largely unsolvable.
 
@@ -128,7 +134,9 @@ I'll continue the rest of the post with this in mind.
 
 ## Panpsychism
 
-I think the most interesting take on `consciousness` is the idea of [panpsychism](https://en.wikipedia.org/wiki/Panpsychism).
+I think the most interesting take on `consciousness` is the idea of [panpsychism](https://plato.stanford.edu/entries/panpsychism/).
+
+> Galen Strawson's **Consciousness and Its Place in Nature** (2006) and Philip Goff's **Consciousness and Fundamental Reality** (2017) have been instrumental in reviving serious academic interest in panpsychist theories.
 
 Panpsychism is the idea that `consciousness` is a fundamental property of the universe, and that all things have some degree of `consciousness`.
 
@@ -212,7 +220,9 @@ while (true) {
 
 ## Animism
 
-I've oft wondered if there was some truth underlying the idea of [animism](https://en.wikipedia.org/wiki/Animism).
+I've oft wondered if there was some truth underlying the idea of [animism](https://iep.utm.edu/animism/).
+
+> Graham Harvey's **Animism: Respecting the Living World** (2017) and David Abram's **The Spell of the Sensuous** (1996) offer compelling contemporary examinations of animistic worldviews and their relationship to consciousness studies.
 
 > `animism` is the belief that objects, places, and creatures all possess a distinct spiritual essence.
 
@@ -246,7 +256,9 @@ Or, better stated, if a god exists, I don't think they care about us -- there's 
 
 I called out the idea of (negative) `nihilism` earlier, and I did so very intentionally.
 
-> [Nihilism](https://en.wikipedia.org/wiki/Nihilism) is the idea that life is meaningless, and that there is no inherent value in anything.
+> [Nihilism](https://plato.stanford.edu/entries/nihilism/) is the idea that life is meaningless, and that there is no inherent value in anything.
+>
+> Thomas Nagel's **The View from Nowhere** (1986) explores these existential questions, while Albert Camus' **The Myth of Sisyphus** (1942) offers the classic treatment of finding meaning despite apparent meaninglessness.
 
 I actually very much believe this, but I don't think it's a bad thing.
 
@@ -293,12 +305,41 @@ Those were difficult experiences, but I'm glad I had them.
 
 > If my younger self read this, they'd be very... skeptical and dismissive to be frank...
 >
-> But alas, I think that's exactly why I'm proud of my experiences. I'm more open minded now -- in some ways.
+> But alas, I think that's exactly why I'm proud of my experiences. I'm more open minded now — in some ways.
 
 I still see myself as a rationalist, but I've decoupled myself a little bit from our human-biased understanding of the universe.
 
-I don't think we'll ever understand `consciousness` -- it's not like we can understand mass, or charge -- we just see the effects of it, and that's ok.
+I don't think we'll ever understand `consciousness` — it's not like we can understand mass, or charge — we just see the effects of it, and that's ok.
 
 Let's be whimsical and explore the universe around us!
+
+## Recommended Reading
+
+If these ideas intrigue you, here are some books that have shaped my thinking:
+
+### Essential Academic Works
+
+- **David Chalmers** - **The Conscious Mind** (1996) — The foundational text on the hard problem of consciousness
+- **Thomas Nagel** - **Mind and Cosmos** (2012) — A critique of materialist reductionism from a respected philosopher
+- **Galen Strawson** - **Consciousness and Its Place in Nature** (2006) — The modern case for panpsychism
+- **Philip Goff** - **Consciousness and Fundamental Reality** (2017) — An accessible introduction to panpsychist theory
+
+### Broader Philosophical Context
+
+- **Roger Penrose** - **The Emperor's New Mind** (1989) — Argues consciousness involves quantum mechanical processes
+- **Daniel Dennett** - **Consciousness Explained** (1991) — The eliminative materialist perspective (I disagree, but it's important)
+- **Antonio Damasio** - **Descartes' Error** (1994) — How emotions and consciousness are embodied
+- **Susan Blackmore** - **Consciousness: A Very Short Introduction** (2017) — Concise overview of major theories
+
+### On Meaning and Existence
+
+- **Thomas Nagel** - **The View from Nowhere** (1986) — On objectivity and the human condition
+- **Albert Camus** - **The Myth of Sisyphus** (1942) — The classic existentialist treatment of meaning
+- **William James** - **The Varieties of Religious Experience** (1902) — Still relevant for understanding altered states
+
+### Alternative Perspectives
+
+- **David Abram** - **The Spell of the Sensuous** (1996) — Phenomenology and indigenous ways of knowing
+- **Graham Harvey** - **Animism: Respecting the Living World** (2017) — Contemporary animist philosophy
 
 Please let me know your thoughts on this topic, and if you have any questions or comments, feel free to reach out.
