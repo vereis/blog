@@ -209,8 +209,8 @@ defmodule BlogWeb.BlogLive do
       <%= if is_struct(@post) do %>
         <aside aria-label="Table of contents" class="table-of-contents-container">
           <p><strong>Table of Contents</strong></p>
-          <%= for header <- @post.headings do %>
-            <a data-level={header.level} href={header.link}><%= header.title %></a>
+          <%= for {header, index} <- Enum.with_index(@post.headings) do %>
+            <a data-level={header.level} href={header.link} class={if index == 0, do: "active", else: ""}><%= header.title %></a>
           <% end %>
         </aside>
       <% end %>

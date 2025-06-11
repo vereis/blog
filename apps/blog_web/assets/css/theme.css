@@ -474,6 +474,11 @@ blockquote {
 
 main .table-of-contents-container {
 	display: none;
+
+	/* Always show active styling for inline TOC since it's just navigation */
+	& a {
+		color: #9cd8a0 !important;
+	}
 }
 
 .table-of-contents-container {
@@ -506,6 +511,14 @@ main .table-of-contents-container {
 
 	& a:after {
 		content: '' !important;
+	}
+
+	& a {
+		color: #31748f !important;
+	}
+
+	& a.active {
+		color: #9cd8a0 !important;
 	}
 }
 
