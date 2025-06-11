@@ -1,6 +1,30 @@
 /* ============ Setup ============ */
 @import url("animations.css");
 
+/* ============ Color System ============ */
+:root {
+	/* Background colors */
+	--bg-primary: #21202e;
+	--bg-code: #21202e;
+	--bg-selection: #403d52;
+	
+	/* Text colors */
+	--text-primary: #e0def4;
+	--text-muted: #908caa;
+	--text-subtle: #6e6a86;
+	--text-code: #eb6f92;
+	
+	/* Interactive colors */
+	--link-color: #9ccfd8;
+	--heading-color: var(--accent-color);
+	--heading-bg: var(--accent-color);
+	--accent-color: #31748f;
+	
+	/* UI colors */
+	--border-color: var(--accent-color);
+	--hover-bg: #6e6a86;
+}
+
 @font-face {
 	font-family: 'Custom';
 	src: url('/fonts/FantasqueSansMono-Regular.woff2') format('woff2'),
@@ -25,7 +49,7 @@ html {
 }
 
 body {
-	color: #e0def4;
+	color: var(--text-primary);
 	font-family: "Custom", monospace !important;
 	letter-spacing: 1px;
 	font-size: 18px;
@@ -89,9 +113,9 @@ footer {
 	margin-top: 4ex;
 
 	&>.end {
-		color: #21202e;
+		color: var(--bg-primary);
 		text-decoration: none;
-		background-color: #e0def4;
+		background-color: var(--text-primary);
 		display: inline-block;
 		padding-left: 1ex;
 		padding-right: 1ex;
@@ -101,7 +125,7 @@ footer {
 
 h1 {
 	display: inline-block;
-	background-color: #31748f;
+	background-color: var(--heading-bg);
 	padding-left: 1ex;
 	padding-right: 1ex;
 }
@@ -111,7 +135,7 @@ h3,
 h4,
 h5,
 h6 {
-	color: #31748f;
+	color: var(--heading-color);
 	font-weight: bold;
 
 	*:not(h1, h2, h3, h4, h5, h6)+& {
@@ -144,7 +168,7 @@ a,
 	cursor: pointer;
 
 	&:hover {
-		background-color: #6e6a86;
+		background-color: var(--hover-bg);
 	}
 }
 
@@ -187,15 +211,15 @@ blink {
 }
 
 code {
-	background-color: #21202e;
-	color: #eb6f92;
+	background-color: var(--bg-code);
+	color: var(--text-code);
 	padding-left: 1ex;
 	padding-right: 1ex;
 }
 
 main a,
 .table-of-contents-container a {
-	color: #9ccfd8;
+	color: var(--link-color);
 	text-decoration: none;
 
 	&:hover {
@@ -205,7 +229,7 @@ main a,
 
 	&:after {
 		content: attr(href);
-		color: #31748f;
+		color: var(--accent-color);
 		text-decoration: underline;
 		margin-left: 1ex;
 	}
@@ -221,7 +245,7 @@ pre {
 	overflow-x: auto;
 
 	& code {
-		color: #908caa !important;
+		color: var(--text-muted) !important;
 		background-color: transparent !important;
 		padding: 0 !important;
 	}
@@ -229,7 +253,7 @@ pre {
 	&:before,
 	&:after {
 		content: '```';
-		color: #908caa;
+		color: var(--text-muted);
 		display: block;
 	}
 
@@ -259,7 +283,7 @@ ul li {
 }
 
 blockquote {
-	border-left: 1px solid #31748f;
+	border-left: 1px solid var(--border-color);
 	margin-left: -1px;
 	padding-left: 3ex;
 	padding-top: 1ex;
@@ -275,11 +299,11 @@ blockquote {
 }
 
 ::-moz-selection {
-	background-color: #403d52;
+	background-color: var(--bg-selection);
 }
 
 ::selection {
-	background-color: #403d52;
+	background-color: var(--bg-selection);
 }
 
 /* ============ Component Styles ============ */
@@ -298,7 +322,7 @@ blockquote {
 	}
 
 	footer &>* {
-		color: #908caa !important;
+		color: var(--text-muted) !important;
 		text-decoration: none;
 	}
 }
@@ -311,7 +335,7 @@ blockquote {
 
 	& a,
 	& .tag {
-		color: #9ccfd8;
+		color: var(--link-color);
 
 		&:hover {
 			background-color: transparent !important;
@@ -335,7 +359,7 @@ blockquote {
 		}
 
 		& .post-id {
-			color: #31748f;
+			color: var(--accent-color);
 			flex-shrink: 0;
 			min-width: 3.5ex;
 		}
@@ -348,7 +372,7 @@ blockquote {
 			}
 
 			& .post-reading-time {
-				color: #908caa;
+				color: var(--text-muted);
 			}
 		}
 
@@ -357,7 +381,7 @@ blockquote {
 			flex-wrap: nowrap;
 			justify-content: flex-end;
 			gap: 0 1ex;
-			color: #908caa;
+			color: var(--text-muted);
 		}
 	}
 }
@@ -373,7 +397,7 @@ blockquote {
 		cursor: pointer;
 
 		& .project-id {
-			color: #31748f;
+			color: var(--accent-color);
 			flex-shrink: 0;
 			min-width: 2ex;
 		}
@@ -398,7 +422,7 @@ blockquote {
 			}
 
 			& .project-description {
-				color: #908caa;
+				color: var(--text-muted);
 			}
 		}
 
@@ -407,7 +431,7 @@ blockquote {
 			flex-wrap: nowrap;
 			justify-content: flex-end;
 			gap: 0 1ex;
-			color: #908caa;
+			color: var(--text-muted);
 		}
 	}
 }
@@ -427,7 +451,7 @@ blockquote {
 	}
 
 	&>*:not(.post-title) {
-		color: #908caa;
+		color: var(--text-muted);
 	}
 
 	margin-bottom: 2ex;
@@ -437,7 +461,7 @@ blockquote {
 	display: flex;
 	gap: 1ex 0;
 	flex-direction: column;
-	color: #908caa;
+	color: var(--text-muted);
 
 	&>* {
 		display: flex;
@@ -514,11 +538,11 @@ main .table-of-contents-container {
 	}
 
 	& a {
-		color: #31748f !important;
+		color: var(--accent-color) !important;
 	}
 
 	& a.active {
-		color: #9ccfd8 !important;
+		color: var(--link-color) !important;
 	}
 }
 
@@ -576,7 +600,7 @@ main .table-of-contents-container {
 				&:before {
 					content: '> ';
 					margin-left: 1ex;
-					color: #31748f;
+					color: var(--accent-color);
 				}
 			}
 		}
