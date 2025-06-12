@@ -48,7 +48,10 @@ defmodule Blog.MixProject do
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
       {:ecto_sqlite3, "~> 0.17"},
-      {:jason, "~> 1.2"}
+      {:jason, "~> 1.2"},
+      {:ecto_utils, "~> 0.2"},
+      {:yaml_elixir, "~> 2.9"},
+      {:mdex, "~> 0.7"}
     ]
   end
 
