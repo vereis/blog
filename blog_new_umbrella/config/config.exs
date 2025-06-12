@@ -13,15 +13,6 @@ import Config
 config :blog,
   ecto_repos: [Blog.Repo]
 
-# Configures the mailer
-#
-# By default it uses the "Local" adapter which stores the emails
-# locally. You can see the emails in your browser, at "/dev/mailbox".
-#
-# For production it's recommended to configure a different adapter
-# at the `config/runtime.exs`.
-config :blog, Blog.Mailer, adapter: Swoosh.Adapters.Local
-
 config :blog_web,
   ecto_repos: [Blog.Repo],
   generators: [context_app: :blog]
