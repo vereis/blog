@@ -12,8 +12,6 @@ defmodule Blog.Application do
       Blog.Repo.SQLite,
       {DNSCluster, query: Application.get_env(:blog, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Blog.PubSub}
-      # Start a worker by calling: Blog.Worker.start_link(arg)
-      # {Blog.Worker, arg}
     ]
 
     Supervisor.start_link(children, strategy: :one_for_one, name: Blog.Supervisor)

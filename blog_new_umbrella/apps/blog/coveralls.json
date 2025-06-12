@@ -1,5 +1,10 @@
 {
   "skip_files": [
-    "test/support/"
+    "test/support/",
+    "lib/blog_web/application.ex",
+    "lib/blog_web/telemetry.ex",
+    "lib/blog_web/components/layouts.ex",
+    "lib/blog_web/controllers/page_html.ex",
+    "lib/blog_web/components/core_components.ex"
   ]
 }
