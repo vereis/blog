@@ -2,7 +2,6 @@ defmodule Blog.Posts.PostTest do
   use Blog.DataCase, async: true
 
   alias Blog.Posts.Post
-  alias Blog.Posts.Tag
   alias Blog.Repo.SQLite
 
   describe "generate_reading_time/2" do
@@ -168,8 +167,8 @@ defmodule Blog.Posts.PostTest do
 
   describe "changeset/2" do
     test "handles tag associations" do
-      {:ok, tag1} = SQLite.insert(%Tag{label: "elixir"})
-      {:ok, tag2} = SQLite.insert(%Tag{label: "web"})
+      tag1 = insert(:tag, label: "elixir")
+      tag2 = insert(:tag, label: "web")
 
       attrs = %{
         title: "Test Post",
@@ -183,13 +182,7 @@ defmodule Blog.Posts.PostTest do
     end
 
     test "enforces unique slug constraint" do
-      {:ok, _existing} =
-        SQLite.insert(%Post{
-          title: "Existing Post",
-          slug: "duplicate-slug",
-          body: "Content",
-          description: "Description"
-        })
+      insert(:post, slug: "duplicate-slug")
 
       attrs = %{
         title: "New Post",

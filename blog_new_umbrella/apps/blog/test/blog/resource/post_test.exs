@@ -1,10 +1,11 @@
 defmodule Blog.Resource.PostTest do
   use Blog.DataCase, async: true
+  use Mimic
 
-  alias Blog.Resource.Post, as: PostResource
   alias Blog.Posts.Post
   alias Blog.Posts.Tag
   alias Blog.Repo.SQLite
+  alias Blog.Resource.Post, as: PostResource
 
   describe "source/0" do
     test "returns development path when in development" do
@@ -16,9 +17,8 @@ defmodule Blog.Resource.PostTest do
 
   describe "parse/1" do
     setup do
-      # Create a test fixture directory and file
-      # TODO: bring in `briefly` as a test dependency and replace
-      fixture_dir = "test/fixtures/posts"
+      {:ok, temp_dir} = Briefly.create(directory: true)
+      fixture_dir = Path.join(temp_dir, "posts")
       File.mkdir_p!(fixture_dir)
 
       post_content = """
@@ -41,60 +41,35 @@ defmodule Blog.Resource.PostTest do
 
       File.write!("#{fixture_dir}/test_post.md", post_content)
 
-      on_exit(fn -> File.rm_rf!("test/fixtures") end)
-
       %{fixture_dir: fixture_dir, filename: "test_post.md"}
     end
 
-    test "parses markdown file with YAML frontmatter correctly", %{filename: filename} do
-      try do
-        # TODO: bring in `mimic` to be able to mock this
-        expected_path = Path.join(PostResource.source(), filename)
-        File.mkdir_p!(Path.dirname(expected_path))
+    test "parses markdown file with YAML frontmatter correctly", %{
+      fixture_dir: fixture_dir,
+      filename: filename
+    } do
+      stub(PostResource, :source, fn -> fixture_dir end)
+      result = PostResource.parse(filename)
 
-        post_content = """
-        ---
-        title: "Test Post"
-        slug: "test-post"
-        is_draft: false
-        is_redacted: false
-        published_at: "2023-07-22T14:03:00Z"
-        reading_time_minutes: 5
-        tags: ["test", "elixir"]
-        ---
+      assert result.title == "Test Post"
+      assert result.slug == "test-post"
+      assert result.is_draft == false
+      assert result.is_redacted == false
+      assert result.published_at == "2023-07-22T14:03:00Z"
+      assert result.reading_time_minutes == 5
+      assert result.tags == ["test", "elixir"]
 
-        This is the body of the test post.
+      assert result.raw_body ==
+               "This is the body of the test post.\n\n## A heading\n\nSome more content here."
 
-        ## A heading
-
-        Some more content here.
-        """
-
-        File.write!(expected_path, post_content)
-
-        result = PostResource.parse(filename)
-
-        assert result.title == "Test Post"
-        assert result.slug == "test-post"
-        assert result.is_draft == false
-        assert result.is_redacted == false
-        assert result.published_at == "2023-07-22T14:03:00Z"
-        assert result.reading_time_minutes == 5
-        assert result.tags == ["test", "elixir"]
-
-        assert result.raw_body ==
-                 "This is the body of the test post.\n\n## A heading\n\nSome more content here."
-
-        assert result.sort_key == 20_230_722_140_300
-        assert result.id == nil
-      after
-        File.rm_rf!(Path.dirname(PostResource.source()))
-      end
+      assert result.sort_key == 20_230_722_140_300
+      assert result.id == nil
     end
 
     test "handles missing optional fields" do
-      expected_path = Path.join(PostResource.source(), "minimal_post.md")
-      File.mkdir_p!(Path.dirname(expected_path))
+      {:ok, temp_dir} = Briefly.create(directory: true)
+      fixture_dir = Path.join(temp_dir, "posts")
+      File.mkdir_p!(fixture_dir)
 
       post_content = """
       ---
@@ -107,21 +82,18 @@ defmodule Blog.Resource.PostTest do
       Minimal content.
       """
 
-      File.write!(expected_path, post_content)
+      File.write!(Path.join(fixture_dir, "minimal_post.md"), post_content)
 
-      try do
-        result = PostResource.parse("minimal_post.md")
+      stub(PostResource, :source, fn -> fixture_dir end)
+      result = PostResource.parse("minimal_post.md")
 
-        assert result.title == "Minimal Post"
-        assert result.slug == "minimal-post"
-        assert result.is_draft == nil
-        # defaults to false
-        assert result.is_redacted == false
-        assert result.reading_time_minutes == nil
-        assert result.tags == []
-      after
-        File.rm_rf!(Path.dirname(PostResource.source()))
-      end
+      assert result.title == "Minimal Post"
+      assert result.slug == "minimal-post"
+      assert result.is_draft == nil
+      # defaults to false
+      assert result.is_redacted == false
+      assert result.reading_time_minutes == nil
+      assert result.tags == []
     end
   end
 
@@ -164,7 +136,7 @@ defmodule Blog.Resource.PostTest do
       assert "web" in tag_labels
 
       # Verify posts were created
-      posts = SQLite.all(Post) |> SQLite.preload(:tags)
+      posts = Post |> SQLite.all() |> SQLite.preload(:tags)
       assert length(posts) == 2
 
       first_post = Enum.find(posts, &(&1.slug == "first-post"))

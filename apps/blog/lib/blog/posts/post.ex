@@ -2,6 +2,7 @@ defmodule Blog.Posts.Post do
   @moduledoc "A blog post."
 
   use Blog.Schema
+
   alias Blog.Posts.Tag
 
   schema "posts" do

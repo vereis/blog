@@ -69,7 +69,7 @@ defmodule Blog.Posts.Importer do
   end
 
   defp parse_images(filename) do
-    image_path = Posts.image_path() |> Path.join(filename)
+    image_path = Path.join(Posts.image_path(), filename)
     %{path: image_path}
   end
 

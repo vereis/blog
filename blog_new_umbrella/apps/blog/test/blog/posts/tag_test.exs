@@ -2,7 +2,6 @@ defmodule Blog.Posts.TagTest do
   use Blog.DataCase, async: true
 
   alias Blog.Posts.Tag
-  alias Blog.Posts.Post
   alias Blog.Repo.SQLite
 
   describe "changeset/2" do
@@ -22,8 +21,8 @@ defmodule Blog.Posts.TagTest do
     end
 
     test "enforces unique label constraint" do
-      # Create first tag
-      {:ok, _existing} = SQLite.insert(%Tag{label: "duplicate"})
+      # Create first tag using factory
+      insert(:tag, label: "duplicate")
 
       # Try to create second tag with same label
       attrs = %{label: "duplicate"}
@@ -34,21 +33,8 @@ defmodule Blog.Posts.TagTest do
     end
 
     test "handles post associations" do
-      {:ok, post1} =
-        SQLite.insert(%Post{
-          title: "Post 1",
-          slug: "post-1",
-          body: "Content",
-          description: "Description"
-        })
-
-      {:ok, post2} =
-        SQLite.insert(%Post{
-          title: "Post 2",
-          slug: "post-2",
-          body: "Content",
-          description: "Description"
-        })
+      post1 = insert(:post, title: "Post 1", slug: "post-1")
+      post2 = insert(:post, title: "Post 2", slug: "post-2")
 
       attrs = %{
         label: "elixir",

@@ -3,6 +3,7 @@ defmodule Blog.ResourceTest do
 
   # Mock implementation for testing the generic import function
   defmodule MockResource do
+    @moduledoc false
     @behaviour Blog.Resource
 
     @impl Blog.Resource
@@ -23,6 +24,7 @@ defmodule Blog.ResourceTest do
 
   # Mock implementation that returns an error
   defmodule MockResourceWithError do
+    @moduledoc false
     @behaviour Blog.Resource
 
     @impl Blog.Resource
@@ -93,6 +95,7 @@ defmodule Blog.ResourceTest do
 
     test "handles non-existent source directory" do
       defmodule MockResourceBadPath do
+        @moduledoc false
         @behaviour Blog.Resource
 
         @impl Blog.Resource
@@ -111,4 +114,3 @@ defmodule Blog.ResourceTest do
     end
   end
 end
-
