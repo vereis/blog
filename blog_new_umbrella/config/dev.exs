@@ -1,7 +1,7 @@
 import Config
 
 # Configure your database
-config :blog, Blog.Repo,
+config :blog, Blog.Repo.Postgres,
   username: System.fetch_env!("POSTGRES_USER"),
   password: System.fetch_env!("POSTGRES_PASSWORD"),
   hostname: "localhost",
