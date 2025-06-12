@@ -13,6 +13,10 @@ import Config
 config :blog,
   ecto_repos: [Blog.Repo.Postgres]
 
+# Configure Blog.Repo.Postgres defaults
+config :blog, Blog.Repo.Postgres,
+  priv: "priv/repo/postgres"
+
 config :blog_web,
   ecto_repos: [Blog.Repo.Postgres],
   generators: [context_app: :blog]
