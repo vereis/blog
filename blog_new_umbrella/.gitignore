@@ -34,6 +34,8 @@ blog_test.db*
 .direnv/
 /assets/
 rel/
+apps/*/*.coverdata
+*.coverdata
 
 # Phoenix static assets
 apps/*/priv/static/**/*.gz
