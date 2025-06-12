@@ -11,14 +11,16 @@ import Config
 
 # Configure Mix tasks and generators
 config :blog,
-  ecto_repos: [Blog.Repo.Postgres]
+  ecto_repos: [Blog.Repo.Postgres, Blog.Repo.SQLite]
 
 # Configure Blog.Repo.Postgres defaults
-config :blog, Blog.Repo.Postgres,
-  priv: "priv/repo/postgres"
+config :blog, Blog.Repo.Postgres, priv: "priv/repo/postgres"
+
+# Configure Blog.Repo.SQLite defaults
+config :blog, Blog.Repo.SQLite, priv: "priv/repo/sqlite"
 
 config :blog_web,
-  ecto_repos: [Blog.Repo.Postgres],
+  ecto_repos: [Blog.Repo.Postgres, Blog.Repo.SQLite],
   generators: [context_app: :blog]
 
 # Configures the endpoint

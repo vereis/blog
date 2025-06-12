@@ -36,8 +36,12 @@ defmodule Blog.DataCase do
   Sets up the sandbox based on the test tags.
   """
   def setup_sandbox(tags) do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(Blog.Repo.Postgres, shared: not tags[:async])
-    on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+    postgres_pid = Ecto.Adapters.SQL.Sandbox.start_owner!(Blog.Repo.Postgres, shared: not tags[:async])
+    sqlite_pid = Ecto.Adapters.SQL.Sandbox.start_owner!(Blog.Repo.SQLite, shared: not tags[:async])
+    on_exit(fn -> 
+      Ecto.Adapters.SQL.Sandbox.stop_owner(postgres_pid)
+      Ecto.Adapters.SQL.Sandbox.stop_owner(sqlite_pid)
+    end)
   end
 
   @doc """

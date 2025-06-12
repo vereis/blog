@@ -14,6 +14,12 @@ config :blog, Blog.Repo.Postgres,
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 
+# Configure SQLite database for testing
+config :blog, Blog.Repo.SQLite,
+  database: "#{System.fetch_env!("DATABASE_PATH")}_test",
+  pool: Ecto.Adapters.SQL.Sandbox,
+  pool_size: System.schedulers_online() * 2
+
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
 config :blog_web, BlogWeb.Endpoint,
