@@ -22,6 +22,11 @@ if config_env() == :prod do
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     socket_options: maybe_ipv6
 
+  # Configure SQLite database for production
+  config :blog, Blog.Repo.SQLite,
+    database: System.fetch_env!("DATABASE_PATH"),
+    pool_size: String.to_integer(System.fetch_env!("SQLITE_POOL_SIZE"))
+
   import Config
 
   # The secret key base is used to sign/encrypt cookies and other secrets.

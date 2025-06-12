@@ -22,4 +22,46 @@ erl_crash.dump
 # Temporary files, for example, from tests.
 /tmp/
 
+# Database files - SQLite databases
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+blog.db*
+blog_test.db*
 
+# Misc artefacts
+.direnv/
+/assets/
+rel/
+
+# Phoenix static assets
+apps/*/priv/static/**/*.gz
+apps/*/priv/static/cache_manifest.json
+
+# Environment files
+.env
+.env.*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+
+# Node modules (if any)
+node_modules/
