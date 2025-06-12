@@ -18,6 +18,9 @@
 
               # Web Deps ------------------------------------
               nodePackages.prettier nodejs_20
+
+              # Docker Deps ---------------------------------
+              docker-compose
             ]
               ++ lib.optionals stdenv.isLinux  ([ libnotify inotify-tools ])
               ++ lib.optionals stdenv.isDarwin ([ terminal-notifier
