@@ -5,7 +5,7 @@ defmodule Blog.PostsTest do
 
   describe "get_post/1" do
     test "gets post by id" do
-      {:ok, post} = create_post(%{title: "Test Post", slug: "test-post"})
+      post = insert(:post, title: "Test Post", slug: "test-post")
 
       result = Posts.get_post(post.id)
       assert result.id == post.id
@@ -13,7 +13,7 @@ defmodule Blog.PostsTest do
     end
 
     test "gets post by filters" do
-      {:ok, post} = create_post(%{title: "Test Post", slug: "test-post"})
+      post = insert(:post, title: "Test Post", slug: "test-post")
 
       result = Posts.get_post(slug: "test-post")
       assert result.id == post.id
@@ -26,8 +26,8 @@ defmodule Blog.PostsTest do
     end
 
     test "preloads tags" do
-      {:ok, tag} = create_tag(%{label: "elixir"})
-      {:ok, post} = create_post(%{title: "Test Post", slug: "test-post", tag_ids: [tag.id]})
+      tag = insert(:tag, label: "elixir")
+      post = insert(:post, title: "Test Post", slug: "test-post", tags: [tag])
 
       result = Posts.get_post(post.id)
       assert length(result.tags) == 1
@@ -37,9 +37,9 @@ defmodule Blog.PostsTest do
 
   describe "list_posts/1" do
     test "lists all non-redacted posts" do
-      {:ok, _post1} = create_post(%{title: "Post 1", slug: "post-1", is_redacted: false})
-      {:ok, _post2} = create_post(%{title: "Post 2", slug: "post-2", is_redacted: false})
-      {:ok, _redacted} = create_post(%{title: "Redacted", slug: "redacted", is_redacted: true})
+      insert(:post, title: "Post 1", slug: "post-1", is_redacted: false)
+      insert(:post, title: "Post 2", slug: "post-2", is_redacted: false)
+      insert(:redacted_post, title: "Redacted", slug: "redacted")
 
       posts = Posts.list_posts()
       assert length(posts) == 2
@@ -51,8 +51,8 @@ defmodule Blog.PostsTest do
     end
 
     test "accepts additional filters" do
-      {:ok, _draft} = create_post(%{title: "Draft", slug: "draft", is_draft: true})
-      {:ok, _published} = create_post(%{title: "Published", slug: "published", is_draft: false})
+      insert(:draft_post, title: "Draft", slug: "draft")
+      insert(:post, title: "Published", slug: "published", is_draft: false)
 
       published_posts = Posts.list_posts(is_draft: false)
       assert length(published_posts) == 1
@@ -60,8 +60,8 @@ defmodule Blog.PostsTest do
     end
 
     test "preloads tags" do
-      {:ok, tag} = create_tag(%{label: "elixir"})
-      {:ok, _post} = create_post(%{title: "Test Post", slug: "test-post", tag_ids: [tag.id]})
+      tag = insert(:tag, label: "elixir")
+      insert(:post, title: "Test Post", slug: "test-post", tags: [tag])
 
       [post] = Posts.list_posts()
       assert length(post.tags) == 1
@@ -91,7 +91,7 @@ defmodule Blog.PostsTest do
     end
 
     test "updates existing post when slug exists" do
-      {:ok, existing} = create_post(%{title: "Original", slug: "test-post"})
+      existing = insert(:post, title: "Original", slug: "test-post")
 
       attrs = %{
         title: "Updated Title",
@@ -114,8 +114,8 @@ defmodule Blog.PostsTest do
     end
 
     test "associates tags by tag_ids" do
-      {:ok, tag1} = create_tag(%{label: "elixir"})
-      {:ok, tag2} = create_tag(%{label: "web"})
+      tag1 = insert(:tag, label: "elixir")
+      tag2 = insert(:tag, label: "web")
 
       attrs = %{
         title: "Tagged Post",
@@ -135,7 +135,7 @@ defmodule Blog.PostsTest do
 
   describe "get_tag/1" do
     test "gets tag by id" do
-      {:ok, tag} = create_tag(%{label: "elixir"})
+      tag = insert(:tag, label: "elixir")
 
       result = Posts.get_tag(tag.id)
       assert result.id == tag.id
@@ -143,7 +143,7 @@ defmodule Blog.PostsTest do
     end
 
     test "gets tag by filters" do
-      {:ok, tag} = create_tag(%{label: "elixir"})
+      tag = insert(:tag, label: "elixir")
 
       result = Posts.get_tag(label: "elixir")
       assert result.id == tag.id
@@ -158,8 +158,8 @@ defmodule Blog.PostsTest do
 
   describe "list_tags/1" do
     test "lists all tags" do
-      {:ok, _tag1} = create_tag(%{label: "elixir"})
-      {:ok, _tag2} = create_tag(%{label: "web"})
+      insert(:tag, label: "elixir")
+      insert(:tag, label: "web")
 
       tags = Posts.list_tags()
       assert length(tags) == 2
@@ -170,8 +170,8 @@ defmodule Blog.PostsTest do
     end
 
     test "accepts filters" do
-      {:ok, _tag1} = create_tag(%{label: "elixir"})
-      {:ok, _tag2} = create_tag(%{label: "web"})
+      insert(:tag, label: "elixir")
+      insert(:tag, label: "web")
 
       filtered = Posts.list_tags(label: "elixir")
       assert length(filtered) == 1
@@ -192,7 +192,7 @@ defmodule Blog.PostsTest do
     end
 
     test "updates existing tag when label exists" do
-      {:ok, existing} = create_tag(%{label: "existing"})
+      existing = insert(:tag, label: "existing")
 
       # Tags don't have other fields to update, but this tests the upsert logic
       attrs = %{label: "existing"}
@@ -211,37 +211,12 @@ defmodule Blog.PostsTest do
     end
 
     test "handles duplicate labels by updating existing" do
-      {:ok, existing} = create_tag(%{label: "duplicate"})
+      existing = insert(:tag, label: "duplicate")
 
       # Try to create another tag with same label - should update existing
       assert {:ok, updated_tag} = Posts.upsert_tag(%{label: "duplicate"})
       assert updated_tag.id == existing.id
       assert updated_tag.label == "duplicate"
     end
-  end
-
-  # Helper functions
-  # TODO: use `ExMachina` for factories to replace this sort of thing
-  defp create_post(attrs) do
-    default_attrs = %{
-      title: "Default Title",
-      slug: "default-slug-#{:rand.uniform(10000)}",
-      raw_body: "Default content",
-      is_draft: false,
-      is_redacted: false
-    }
-
-    attrs = Map.merge(default_attrs, Enum.into(attrs, %{}))
-    Posts.upsert_post(attrs)
-  end
-
-  # TODO: use `ExMachina` for factories to replace this sort of thing
-  defp create_tag(attrs) do
-    default_attrs = %{
-      label: "default-tag-#{:rand.uniform(10000)}"
-    }
-
-    attrs = Map.merge(default_attrs, Enum.into(attrs, %{}))
-    Posts.upsert_tag(attrs)
   end
 end

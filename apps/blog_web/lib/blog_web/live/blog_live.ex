@@ -3,9 +3,10 @@ defmodule BlogWeb.BlogLive do
   use Phoenix.LiveView
   use BlogWeb, :verified_routes
 
+  import BlogWeb.CoreComponents, only: [input: 1]
+
   alias Blog.Posts
   alias Phoenix.LiveView.JS
-  import BlogWeb.CoreComponents, only: [input: 1]
 
   # TODO: source these from some `Blog` context.
   @projects Enum.reverse([
@@ -175,8 +176,7 @@ defmodule BlogWeb.BlogLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_event("search", %{"search" => search_term}, socket)
-      when byte_size(search_term) > 0 do
+  def handle_event("search", %{"search" => search_term}, socket) when byte_size(search_term) > 0 do
     socket = assign(socket, :posts, Posts.list_posts(search: search_term))
     {:noreply, socket}
   end
@@ -210,7 +210,13 @@ defmodule BlogWeb.BlogLive do
         <aside aria-label="Table of contents" class="table-of-contents-container">
           <p><strong>Table of Contents</strong></p>
           <%= for {header, index} <- Enum.with_index(@post.headings) do %>
-            <a data-level={header.level} href={header.link} class={if index == 0, do: "active", else: ""}><%= header.title %></a>
+            <a
+              data-level={header.level}
+              href={header.link}
+              class={if index == 0, do: "active", else: ""}
+            >
+              <%= header.title %>
+            </a>
           <% end %>
         </aside>
       <% end %>
@@ -229,7 +235,8 @@ defmodule BlogWeb.BlogLive do
             Personal projects or open source contributions.
           </p>
           <blockquote>
-            For a more complete list, check out <a href="https://github.com/vereis">my GitHub </a> profile.
+            For a more complete list, check out <a href="https://github.com/vereis">my GitHub </a>
+            profile.
           </blockquote>
 
           <h2>Index</h2>

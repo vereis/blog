@@ -51,7 +51,11 @@ defmodule Blog.MixProject do
       {:jason, "~> 1.2"},
       {:ecto_utils, "~> 0.2"},
       {:yaml_elixir, "~> 2.9"},
-      {:mdex, "~> 0.7"}
+      {:mdex, "~> 0.7"},
+      {:vix, "~> 0.33.1"},
+      {:ex_machina, "~> 2.7", only: :test},
+      {:briefly, "~> 0.3", only: :test},
+      {:mimic, "~> 1.7", only: :test}
     ]
   end
 
