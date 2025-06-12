@@ -8,7 +8,7 @@ defmodule Blog.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      Blog.Repo,
+      Blog.Repo.Postgres,
       {DNSCluster, query: Application.get_env(:blog, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Blog.PubSub}
       # Start a worker by calling: Blog.Worker.start_link(arg)

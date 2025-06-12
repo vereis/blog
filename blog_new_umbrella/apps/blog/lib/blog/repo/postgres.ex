@@ -1,4 +1,4 @@
-defmodule Blog.Repo do
+defmodule Blog.Repo.Postgres do
   use Ecto.Repo,
     otp_app: :blog,
     adapter: Ecto.Adapters.Postgres
