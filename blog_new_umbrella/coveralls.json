@@ -1,0 +1,17 @@
+{
+  "skip_files": [
+    "apps/blog/test/support/",
+    "apps/blog_web/test/support/",
+    "apps/blog/lib/blog/application.ex",
+    "apps/blog_web/lib/blog_web/application.ex",
+    "apps/blog_web/lib/blog_web/telemetry.ex",
+    "apps/blog_web/lib/blog_web/components/layouts.ex",
+    "apps/blog_web/lib/blog_web/controllers/page_html.ex",
+    "apps/blog_web/lib/blog_web/components/core_components.ex"
+  ],
+  "coverage_options": {
+    "treat_no_relevant_lines_as_covered": true,
+    "output_dir": "cover/",
+    "template_path": "cover/excoveralls.html.eex"
+  }
+}

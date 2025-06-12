@@ -7,6 +7,8 @@ import Config
 # any compile-time configuration in here, as it won't be applied.
 # The block below contains prod specific runtime configuration.
 if config_env() == :prod do
+  import Config
+
   database_url =
     System.get_env("DATABASE_URL") ||
       raise """
@@ -26,8 +28,6 @@ if config_env() == :prod do
   config :blog, Blog.Repo.SQLite,
     database: System.fetch_env!("DATABASE_PATH"),
     pool_size: String.to_integer(System.fetch_env!("SQLITE_POOL_SIZE"))
-
-  import Config
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
