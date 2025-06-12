@@ -7,7 +7,9 @@ defmodule Blog.Umbrella.MixProject do
       version: "0.1.0",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      aliases: aliases()
+      aliases: aliases(),
+      test_coverage: [tool: ExCoveralls],
+      dialyzer: [plt_add_apps: [:mix]]
     ]
   end
 
@@ -26,7 +28,15 @@ defmodule Blog.Umbrella.MixProject do
   defp deps do
     [
       # Required to run "mix format" on ~H/.heex files from the umbrella root
-      {:phoenix_live_view, ">= 0.0.0"}
+      {:phoenix_live_view, ">= 0.0.0"},
+
+      # Linting
+      {:styler, "~> 0.11", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.28", only: :dev},
+      {:excoveralls, "~> 0.10", only: :test},
+      {:mix_test_watch, "~> 1.0", only: [:test], runtime: false}
     ]
   end
 
@@ -42,7 +52,14 @@ defmodule Blog.Umbrella.MixProject do
   defp aliases do
     [
       # run `mix setup` in all child apps
-      setup: ["cmd mix setup"]
+      setup: ["cmd mix setup"],
+      test: ["coveralls.html --trace --slowest 10"],
+      lint: [
+        "format --check-formatted --dry-run",
+        "credo --strict",
+        "compile --warnings-as-errors",
+        "dialyzer"
+      ]
     ]
   end
 end
