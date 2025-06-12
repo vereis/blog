@@ -85,10 +85,10 @@ defmodule Blog.Resource.Post do
     tag_lookup_table = Map.new(tags, fn tag -> {tag.label, tag.id} end)
 
     # Import posts with tag associations
-    post_attrs
-    |> Stream.map(fn x -> Map.put(x, :tag_ids, Enum.map(x.tags, &tag_lookup_table[&1])) end)
-    |> Task.async_stream(&({:ok, %Post{}} = Posts.upsert_post(&1)), max_concurrency: 1)
-    |> Stream.run()
+    for post <- post_attrs,
+        post = Map.put(post, :tag_ids, Enum.map(post.tags, &tag_lookup_table[&1])) do
+      {:ok, %Post{}} = Posts.upsert_post(post)
+    end
 
     :ok
   end
