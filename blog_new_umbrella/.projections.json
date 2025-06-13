@@ -1,0 +1,50 @@
+{
+  "apps/blog/lib/blog/*.ex": {
+    "type": "source",
+    "alternate": "apps/blog/test/blog/{}_test.exs"
+  },
+  "apps/blog/test/blog/*_test.exs": {
+    "type": "test",
+    "alternate": "apps/blog/lib/blog/{}.ex"
+  },
+  "apps/blog/lib/blog/*/*.ex": {
+    "type": "source", 
+    "alternate": "apps/blog/test/blog/{dirname}/{basename}_test.exs"
+  },
+  "apps/blog/test/blog/*/*_test.exs": {
+    "type": "test",
+    "alternate": "apps/blog/lib/blog/{dirname}/{basename}.ex"
+  },
+  "apps/blog_web/lib/blog_web/*.ex": {
+    "type": "source",
+    "alternate": "apps/blog_web/test/blog_web/{}_test.exs"
+  },
+  "apps/blog_web/test/blog_web/*_test.exs": {
+    "type": "test", 
+    "alternate": "apps/blog_web/lib/blog_web/{}.ex"
+  },
+  "apps/blog_web/lib/blog_web/*/*.ex": {
+    "type": "source",
+    "alternate": "apps/blog_web/test/blog_web/{dirname}/{basename}_test.exs"
+  },
+  "apps/blog_web/test/blog_web/*/*_test.exs": {
+    "type": "test",
+    "alternate": "apps/blog_web/lib/blog_web/{dirname}/{basename}.ex"
+  },
+  "apps/blog_web/lib/blog_web/controllers/*_controller.ex": {
+    "type": "controller",
+    "alternate": "apps/blog_web/test/blog_web/controllers/{}_controller_test.exs"
+  },
+  "apps/blog_web/test/blog_web/controllers/*_controller_test.exs": {
+    "type": "controller_test",
+    "alternate": "apps/blog_web/lib/blog_web/controllers/{}_controller.ex"
+  },
+  "apps/blog_web/lib/blog_web/live/*.ex": {
+    "type": "live_view",
+    "alternate": "apps/blog_web/test/blog_web/live/{}_test.exs"
+  },
+  "apps/blog_web/test/blog_web/live/*_test.exs": {
+    "type": "live_view_test",
+    "alternate": "apps/blog_web/lib/blog_web/live/{}.ex"
+  }
+}
