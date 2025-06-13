@@ -17,7 +17,18 @@ defmodule BlogWeb.Router do
   scope "/", BlogWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    get "/rss", RssController, :index
+    get "/minna-chat", RedirectController, :minna_chat
+    get "/uses", RedirectController, :uses
+
+    get "/assets/images/:name", AssetsController, :show
+
+    live_session :default do
+      live "/", BlogLive, :home
+      live "/projects/", BlogLive, :list_projects
+      live "/posts/", BlogLive, :list_posts
+      live "/posts/:slug", BlogLive, :show_post
+    end
   end
 
   # Other scopes may use custom stacks.

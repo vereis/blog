@@ -27,8 +27,10 @@ defmodule Blog.Resource.Post do
 
   @impl Blog.Resource
   def parse(filename) do
+    # NOTE: this function is unit tested, so we need to use `__MODULE__` for internal
+    #       function calls to avoid mock errors.
     [metadata_yaml, raw_body] =
-      source()
+      __MODULE__.source()
       |> Path.join(filename)
       |> File.read!()
       |> String.split("---\n", parts: 3)

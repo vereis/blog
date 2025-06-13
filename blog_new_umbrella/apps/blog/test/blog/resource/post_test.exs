@@ -48,7 +48,7 @@ defmodule Blog.Resource.PostTest do
       fixture_dir: fixture_dir,
       filename: filename
     } do
-      stub(PostResource, :source, fn -> fixture_dir end)
+      stub(PostResource, :source, fn -> IO.inspect(fixture_dir, label: :wow) end)
       result = PostResource.parse(filename)
 
       assert result.title == "Test Post"

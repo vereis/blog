@@ -1,5 +1,5 @@
 defmodule Blog.Resource.ImageTest do
-  use Blog.DataCase, async: false
+  use Blog.DataCase, async: true
   use Mimic
 
   alias Blog.Images.Image
