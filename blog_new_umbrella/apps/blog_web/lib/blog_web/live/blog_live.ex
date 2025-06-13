@@ -111,11 +111,14 @@ defmodule BlogWeb.BlogLive do
   def mount(params, _session, socket) do
     Phoenix.PubSub.subscribe(Blog.PubSub, "post:reload")
 
+    posts = Posts.list_posts(order_by: [desc: :published_at])
+    post = Posts.get_post(slug: params["slug"] || "hello_world")
+
     socket =
       socket
       |> assign_new(:is_release?, fn -> :code.get_mode() == :embedded end)
-      |> assign_new(:posts, fn -> Posts.list_posts(order_by: [desc: :published_at]) end)
-      |> assign_new(:post, fn -> Posts.get_post(slug: params["slug"] || "hello_world") end)
+      |> assign_new(:posts, fn -> posts end)
+      |> assign_new(:post, fn -> post end)
       |> assign_new(:projects, fn -> @projects end)
       |> assign_new(:tag, fn -> nil end)
       |> assign_new(:search, fn -> %{} end)
@@ -125,10 +128,14 @@ defmodule BlogWeb.BlogLive do
 
   @impl Phoenix.LiveView
   def handle_info(:post_reload, socket) do
+    posts = Posts.list_posts(order_by: [desc: :published_at])
+    post = Posts.get_post(id: socket.assigns.post.id)
+
     socket =
       socket
-      |> assign(:posts, Posts.list_posts(order_by: [desc: :published_at]))
-      |> assign(:post, Posts.get_post(id: socket.assigns.post.id))
+      |> assign(:posts, posts)
+      |> assign(:post, post)
+      |> assign(:page_title, (post && post.title) || nil)
 
     {:noreply, socket}
   end
@@ -140,26 +147,44 @@ defmodule BlogWeb.BlogLive do
 
   @impl Phoenix.LiveView
   def handle_event("home", _params, socket) do
-    socket = assign(socket, :post, Posts.get_post(1))
-    {:noreply, push_patch(socket, to: ~p"/")}
+    post = Posts.get_post(1)
+
+    {:noreply,
+     socket
+     |> assign(:post, post)
+     |> assign(:page_title, (post && post.title) || nil)
+     |> push_patch(to: ~p"/")}
   end
 
   @impl Phoenix.LiveView
   def handle_event("projects", _params, socket) do
-    socket = socket |> assign(:tag, nil) |> assign(:post, nil)
-    {:noreply, push_patch(socket, to: ~p"/projects")}
+    {:noreply,
+     socket
+     |> assign(:tag, nil)
+     |> assign(:post, nil)
+     |> assign(:page_title, "Projects")
+     |> push_patch(to: ~p"/projects")}
   end
 
   @impl Phoenix.LiveView
   def handle_event("posts", _params, socket) do
-    socket = socket |> assign(:tag, nil) |> assign(:post, nil)
-    {:noreply, push_patch(socket, to: ~p"/posts")}
+    {:noreply,
+     socket
+     |> assign(:tag, nil)
+     |> assign(:post, nil)
+     |> assign(:page_title, "Blog Posts")
+     |> push_patch(to: ~p"/posts")}
   end
 
   @impl Phoenix.LiveView
   def handle_event("post", %{"post" => post}, socket) do
-    socket = assign(socket, :post, Posts.get_post(slug: post))
-    {:noreply, push_patch(socket, to: ~p"/posts/#{post}")}
+    post = Posts.get_post(slug: post)
+
+    {:noreply,
+     socket
+     |> assign(:post, post)
+     |> assign(:page_title, (post && post.title) || nil)
+     |> push_patch(to: ~p"/posts/#{post.slug}")}
   end
 
   @impl Phoenix.LiveView
