@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+env:
+  MIX_ENV: test
+  ELIXIR_VERSION: 1.18.3
+  OTP_VERSION: 27.3.4
+  # TODO: update CI to use nix
+  ERL_AFLAGS: "-kernel shell_history enabled"
+  BLOG_HOST: "localhost"
+  BLOG_PORT: "4000"
+  SECRET_KEY_BASE: "rTpAPJVKdBlNC5XxpJRNOPSX7F9900z50riy1JCY0BVkvSEyzJlOwpco8m2ieorn"
+  DATABASE_PATH: "./blog.db"
+  SQLITE_POOL_SIZE: "5"
+  DATABASE_URL: "ecto://postgres:postgres@localhost:5432/blog_dev"
+  POSTGRES_DB: "blog_dev"
+  POSTGRES_USER: "postgres"
+  POSTGRES_PASSWORD: "postgres"
+  POSTGRES_PORT: "5432"
+
+jobs:
+  test:
+    name: Test and Lint
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: blog_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Elixir
+      uses: erlef/setup-beam@v1
+      with:
+        elixir-version: ${{ env.ELIXIR_VERSION }}
+        otp-version: ${{ env.OTP_VERSION }}
+
+    - name: Restore dependencies cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          deps
+          _build
+        key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+        restore-keys: ${{ runner.os }}-mix-
+
+    - name: Install dependencies
+      run: mix deps.get
+
+    - name: Run linting
+      run: mix lint
+
+    - name: Run tests
+      run: mix test
