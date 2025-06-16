@@ -110,6 +110,7 @@ defmodule BlogWeb.BlogLive do
   @impl Phoenix.LiveView
   def mount(params, _session, socket) do
     Phoenix.PubSub.subscribe(Blog.PubSub, "post:reload")
+    Phoenix.PubSub.subscribe(Blog.PubSub, "image:reload")
 
     posts = Posts.list_posts(order_by: [desc: :published_at])
     post = Posts.get_post(slug: params["slug"] || "hello_world")
@@ -127,9 +128,16 @@ defmodule BlogWeb.BlogLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_info(:post_reload, socket) do
+  def handle_info({:resource_reload, Blog.Resource.Post, _post_id}, socket) do
     posts = Posts.list_posts(order_by: [desc: :published_at])
-    post = Posts.get_post(id: socket.assigns.post.id)
+
+    # Reload current post if viewing a specific post
+    post =
+      if socket.assigns.post do
+        Posts.get_post(id: socket.assigns.post.id)
+      else
+        socket.assigns.post
+      end
 
     socket =
       socket
@@ -137,6 +145,27 @@ defmodule BlogWeb.BlogLive do
       |> assign(:post, post)
       |> assign(:page_title, (post && post.title) || nil)
 
+    {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({:resource_reload, Blog.Resource.Image, _image_id}, socket) do
+    # For images, we might need to reload the current post if it contains images
+    # For now, just reload the current post if we're viewing one
+    post =
+      if socket.assigns.post do
+        Posts.get_post(id: socket.assigns.post.id)
+      else
+        socket.assigns.post
+      end
+
+    socket = assign(socket, :post, post)
+    {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({:resource_reload, _resource_type, _id}, socket) do
+    # Handle other resource types generically
     {:noreply, socket}
   end
 

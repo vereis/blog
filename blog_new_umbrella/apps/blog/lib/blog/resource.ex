@@ -20,24 +20,64 @@ defmodule Blog.Resource do
   @doc """
   Import a list of parsed resource maps into the database.
   Handles the database-level operations for bulk importing.
+  Returns a list of imported resources with their IDs.
   """
-  @callback import(parsed_resources :: [map()]) :: :ok | {:error, term()}
+  @callback import(parsed_resources :: [map()]) :: {:ok, [map()]} | {:error, term()}
+
+  @doc """
+  Returns the PubSub topic for resource reload notifications.
+  Defaults to the module's final segment downcased with ":reload" suffix.
+  Can be overridden by implementing modules.
+  """
+  @callback pubsub_topic() :: String.t()
+
+  @optional_callbacks pubsub_topic: 0
 
   @doc """
   Generic import function that orchestrates the import process.
 
   1. Gets the source path from the callback module
   2. Lists all files in the source directory
-  3. Parses each file using Task.async_stream for concurrency
-  4. Passes the parsed results to the callback module's import function
+  3. Parses each file
+  4. Passes the parsed results to the callback module's import function to persist
   """
   @spec import(module()) :: :ok | {:error, term()}
   def import(callback_module) do
-    callback_module.source()
-    |> File.ls!()
-    |> Task.async_stream(&callback_module.parse/1)
-    |> Stream.map(fn {:ok, attrs} -> attrs end)
-    |> Enum.to_list()
-    |> callback_module.import()
+    parsed_resources =
+      callback_module.source()
+      |> File.ls!()
+      |> Task.async_stream(&callback_module.parse/1)
+      |> Stream.map(fn {:ok, attrs} -> attrs end)
+      |> Enum.to_list()
+
+    case callback_module.import(parsed_resources) do
+      {:ok, imported_resources} ->
+        # Broadcast reload message
+        topic = get_pubsub_topic(callback_module)
+
+        # Send reload message for each imported resource
+        for resource <- imported_resources do
+          message = {:resource_reload, callback_module, resource.id}
+          Phoenix.PubSub.broadcast(Blog.PubSub, topic, message)
+        end
+
+        :ok
+
+      {:error, _reason} = error ->
+        error
+    end
+  end
+
+  defp get_pubsub_topic(callback_module) do
+    if function_exported?(callback_module, :pubsub_topic, 0) do
+      callback_module.pubsub_topic()
+    else
+      # Default: extract final module segment, downcase, and add ":reload"
+      callback_module
+      |> Module.split()
+      |> List.last()
+      |> String.downcase()
+      |> Kernel.<>(":reload")
+    end
   end
 end

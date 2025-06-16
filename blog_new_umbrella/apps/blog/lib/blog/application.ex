@@ -11,7 +11,8 @@ defmodule Blog.Application do
       Blog.Repo.Postgres,
       Blog.Repo.SQLite,
       {DNSCluster, query: Application.get_env(:blog, :dns_cluster_query) || :ignore},
-      {Phoenix.PubSub, name: Blog.PubSub}
+      {Phoenix.PubSub, name: Blog.PubSub},
+      Blog.Resource.Watcher
     ]
 
     Supervisor.start_link(children, strategy: :one_for_one, name: Blog.Supervisor)

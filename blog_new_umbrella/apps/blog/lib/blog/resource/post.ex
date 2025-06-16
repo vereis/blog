@@ -87,12 +87,14 @@ defmodule Blog.Resource.Post do
 
     tag_lookup_table = Map.new(tags, fn tag -> {tag.label, tag.id} end)
 
-    # Import posts with tag associations
-    for post <- post_attrs,
-        post = Map.put(post, :tag_ids, Enum.map(post.tags, &tag_lookup_table[&1])) do
-      {:ok, %Post{}} = Posts.upsert_post(post)
-    end
+    # Import posts with tag associations and collect results
+    imported_posts =
+      for post <- post_attrs,
+          post = Map.put(post, :tag_ids, Enum.map(post.tags, &tag_lookup_table[&1])) do
+        {:ok, %Post{} = imported_post} = Posts.upsert_post(post)
+        imported_post
+      end
 
-    :ok
+    {:ok, imported_posts}
   end
 end
