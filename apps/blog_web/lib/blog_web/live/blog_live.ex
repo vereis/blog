@@ -1,7 +1,6 @@
 defmodule BlogWeb.BlogLive do
   @moduledoc false
-  use Phoenix.LiveView
-  use BlogWeb, :verified_routes
+  use BlogWeb, :live_view
 
   import BlogWeb.CoreComponents, only: [input: 1]
 
@@ -111,12 +110,16 @@ defmodule BlogWeb.BlogLive do
   @impl Phoenix.LiveView
   def mount(params, _session, socket) do
     Phoenix.PubSub.subscribe(Blog.PubSub, "post:reload")
+    Phoenix.PubSub.subscribe(Blog.PubSub, "image:reload")
+
+    posts = Posts.list_posts(order_by: [desc: :published_at])
+    post = Posts.get_post(slug: params["slug"] || "hello_world")
 
     socket =
       socket
       |> assign_new(:is_release?, fn -> :code.get_mode() == :embedded end)
-      |> assign_new(:posts, fn -> Posts.list_posts(order_by: [desc: :published_at]) end)
-      |> assign_new(:post, fn -> Posts.get_post(slug: params["slug"] || "hello_world") end)
+      |> assign_new(:posts, fn -> posts end)
+      |> assign_new(:post, fn -> post end)
       |> assign_new(:projects, fn -> @projects end)
       |> assign_new(:tag, fn -> nil end)
       |> assign_new(:search, fn -> %{} end)
@@ -125,12 +128,44 @@ defmodule BlogWeb.BlogLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_info(:post_reload, socket) do
+  def handle_info({:resource_reload, Blog.Resource.Post, _post_id}, socket) do
+    posts = Posts.list_posts(order_by: [desc: :published_at])
+
+    # Reload current post if viewing a specific post
+    post =
+      if socket.assigns.post do
+        Posts.get_post(id: socket.assigns.post.id)
+      else
+        socket.assigns.post
+      end
+
     socket =
       socket
-      |> assign(:posts, Posts.list_posts(order_by: [desc: :published_at]))
-      |> assign(:post, Posts.get_post(id: socket.assigns.post.id))
+      |> assign(:posts, posts)
+      |> assign(:post, post)
+      |> assign(:page_title, (post && post.title) || nil)
 
+    {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({:resource_reload, Blog.Resource.Image, _image_id}, socket) do
+    # For images, we might need to reload the current post if it contains images
+    # For now, just reload the current post if we're viewing one
+    post =
+      if socket.assigns.post do
+        Posts.get_post(id: socket.assigns.post.id)
+      else
+        socket.assigns.post
+      end
+
+    socket = assign(socket, :post, post)
+    {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({:resource_reload, _resource_type, _id}, socket) do
+    # Handle other resource types generically
     {:noreply, socket}
   end
 
@@ -141,26 +176,44 @@ defmodule BlogWeb.BlogLive do
 
   @impl Phoenix.LiveView
   def handle_event("home", _params, socket) do
-    socket = assign(socket, :post, Posts.get_post(1))
-    {:noreply, push_patch(socket, to: ~p"/")}
+    post = Posts.get_post(1)
+
+    {:noreply,
+     socket
+     |> assign(:post, post)
+     |> assign(:page_title, (post && post.title) || nil)
+     |> push_patch(to: ~p"/")}
   end
 
   @impl Phoenix.LiveView
   def handle_event("projects", _params, socket) do
-    socket = socket |> assign(:tag, nil) |> assign(:post, nil)
-    {:noreply, push_patch(socket, to: ~p"/projects")}
+    {:noreply,
+     socket
+     |> assign(:tag, nil)
+     |> assign(:post, nil)
+     |> assign(:page_title, "Projects")
+     |> push_patch(to: ~p"/projects")}
   end
 
   @impl Phoenix.LiveView
   def handle_event("posts", _params, socket) do
-    socket = socket |> assign(:tag, nil) |> assign(:post, nil)
-    {:noreply, push_patch(socket, to: ~p"/posts")}
+    {:noreply,
+     socket
+     |> assign(:tag, nil)
+     |> assign(:post, nil)
+     |> assign(:page_title, "Blog Posts")
+     |> push_patch(to: ~p"/posts")}
   end
 
   @impl Phoenix.LiveView
   def handle_event("post", %{"post" => post}, socket) do
-    socket = assign(socket, :post, Posts.get_post(slug: post))
-    {:noreply, push_patch(socket, to: ~p"/posts/#{post}")}
+    post = Posts.get_post(slug: post)
+
+    {:noreply,
+     socket
+     |> assign(:post, post)
+     |> assign(:page_title, (post && post.title) || nil)
+     |> push_patch(to: ~p"/posts/#{post.slug}")}
   end
 
   @impl Phoenix.LiveView
@@ -206,7 +259,7 @@ defmodule BlogWeb.BlogLive do
         </span>
       </header>
 
-      <%= if is_struct(@post) do %>
+      <%= if is_struct(@post) and @post.headings do %>
         <aside aria-label="Table of contents" class="table-of-contents-container">
           <p><strong>Table of Contents</strong></p>
           <%= for {header, index} <- Enum.with_index(@post.headings) do %>
@@ -215,7 +268,7 @@ defmodule BlogWeb.BlogLive do
               href={header.link}
               class={if index == 0, do: "active", else: ""}
             >
-              <%= header.title %>
+              {header.title}
             </a>
           <% end %>
         </aside>
@@ -225,7 +278,7 @@ defmodule BlogWeb.BlogLive do
         <main>
           <div>
             <h1>
-              All Projects <%= if @tag, do: "(##{@tag})", else: "" %>
+              All Projects {if @tag, do: "(##{@tag})", else: ""}
             </h1>
             <%= if @tag do %>
               <a phx-click="projects">x</a>
@@ -259,7 +312,7 @@ defmodule BlogWeb.BlogLive do
               <div class="tags">
                 <%= for tag <- Enum.flat_map(@projects, & &1.tags) |> Enum.uniq() |> Enum.sort() do %>
                   <.button phx-click="proj-tag" phx-value-tag={tag.label}>
-                    <%= "#" <> tag.label %>
+                    {"#" <> tag.label}
                   </.button>
                 <% end %>
                 <%= if @tag do %>
@@ -272,17 +325,17 @@ defmodule BlogWeb.BlogLive do
           <div class="projects">
             <%= for {project, idx} <- Enum.reverse(Enum.with_index(@projects)), is_nil(@tag) or Enum.any?(project.tags, & &1.label == @tag) do %>
               <div class="project">
-                <div class="project-id"><%= "##{idx}" %></div>
+                <div class="project-id">{"##{idx}"}</div>
                 <div class="project-title-container">
                   <a class="project-name" href={project.url}>
-                    <%= project.name %>
+                    {project.name}
                   </a>
-                  <p class="project-description"><%= project.description %></p>
+                  <p class="project-description">{project.description}</p>
                 </div>
                 <div class="tags">
                   <%= for tag <- project.tags do %>
                     <span class="tag" phx-click="proj-tag" phx-value-tag={tag.label}>
-                      <%= "#" <> tag.label %>
+                      {"#" <> tag.label}
                     </span>
                   <% end %>
                 </div>
@@ -296,7 +349,7 @@ defmodule BlogWeb.BlogLive do
         <main>
           <div>
             <h1>
-              Blog Posts <%= if @tag, do: "(##{@tag})", else: "" %>
+              Blog Posts {if @tag, do: "(##{@tag})", else: ""}
             </h1>
             <%= if @tag do %>
               <a phx-click="posts">x</a>
@@ -330,7 +383,7 @@ defmodule BlogWeb.BlogLive do
               <div class="tags">
                 <%= for tag <- Enum.flat_map(@posts, & &1.tags) |> Enum.uniq() |> Enum.sort() do %>
                   <.button phx-click="tag" phx-value-tag={tag.label}>
-                    <%= "#" <> tag.label %>
+                    {"#" <> tag.label}
                   </.button>
                 <% end %>
                 <%= if @tag do %>
@@ -343,17 +396,17 @@ defmodule BlogWeb.BlogLive do
           <div class="posts">
             <%= for post <- @posts, is_nil(@tag) or Enum.any?(post.tags, & &1.label == @tag), not @is_release? or not post.is_draft do %>
               <div class="post" phx-click="post" phx-value-post={post.slug}>
-                <div class="post-id"><%= "##{post.id}" %></div>
+                <div class="post-id">{"##{post.id}"}</div>
                 <div class="post-title-container">
-                  <div class="post-title"><%= post.title %></div>
+                  <div class="post-title">{post.title}</div>
                   <div class="post-reading-time">
-                    <%= Calendar.strftime(post.published_at, "%B %d %Y, %H:%M:%S") %>
+                    {Calendar.strftime(post.published_at, "%B %d %Y, %H:%M:%S")}
                   </div>
                 </div>
                 <div class="tags">
                   <%= for tag <- post.tags do %>
                     <span class="tag" phx-click="tag" phx-value-tag={tag.label}>
-                      <%= "#" <> tag.label %>
+                      {"#" <> tag.label}
                     </span>
                   <% end %>
                 </div>
@@ -363,35 +416,43 @@ defmodule BlogWeb.BlogLive do
         </main>
       <% end %>
 
-      <%= if @live_action in [:show_post, :home] do %>
+      <%= if @live_action in [:show_post, :home] and is_struct(@post) do %>
         <main>
           <div class="post-metadata">
             <div class="post-title">
-              <h1 id={hd(@post.headings).id}><%= @post.title %></h1>
+              <h1 id={
+                if @post.headings != [] and hd(@post.headings),
+                  do: hd(@post.headings).id,
+                  else: "post-title"
+              }>
+                {@post.title}
+              </h1>
               <div class="tags">
                 <%= for tag <- @post.tags do %>
                   <.button phx-click="tag" phx-value-tag={tag.label}>
-                    <%= "#" <> tag.label %>
+                    {"#" <> tag.label}
                   </.button>
                 <% end %>
               </div>
             </div>
             <div class="post-published">
-              <%= Calendar.strftime(@post.published_at, "%B %d %Y, %H:%M:%S") %>
+              {Calendar.strftime(@post.published_at, "%B %d %Y, %H:%M:%S")}
             </div>
             <div class="post-read-time">
-              Approx. <%= @post.reading_time_minutes %> minute read
+              Approx. {@post.reading_time_minutes} minute read
             </div>
           </div>
 
-          <nav class="table-of-contents-container">
-            <p><strong>Table of Contents</strong></p>
-            <%= for header <- @post.headings do %>
-              <a data-level={header.level} href={header.link}><%= header.title %></a>
-            <% end %>
-          </nav>
+          <%= if @post.headings != [] do %>
+            <nav class="table-of-contents-container">
+              <p><strong>Table of Contents</strong></p>
+              <%= for header <- @post.headings do %>
+                <a data-level={header.level} href={header.link}>{header.title}</a>
+              <% end %>
+            </nav>
+          <% end %>
 
-          <%= {:safe, @post.body} %>
+          {{:safe, @post.body}}
         </main>
       <% end %>
 
@@ -414,7 +475,7 @@ defmodule BlogWeb.BlogLive do
 
   def button(assigns) do
     ~H"""
-    <a {@rest} href={@href}><%= render_slot(@inner_block) %></a>
+    <a {@rest} href={@href}>{render_slot(@inner_block)}</a>
     """
   end
 end

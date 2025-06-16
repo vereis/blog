@@ -1,11 +1,20 @@
 import Config
 
 # Configure your database
-config :blog, Blog.Repo,
-  database: Path.expand("../blog_dev.db", Path.dirname(__ENV__.file)),
-  pool_size: 5,
+config :blog, Blog.Repo.Postgres,
+  username: System.fetch_env!("POSTGRES_USER"),
+  password: System.fetch_env!("POSTGRES_PASSWORD"),
+  hostname: "localhost",
+  port: String.to_integer(System.fetch_env!("POSTGRES_PORT")),
+  database: System.fetch_env!("POSTGRES_DB"),
   stacktrace: true,
-  show_sensitive_data_on_connection_error: true
+  show_sensitive_data_on_connection_error: true,
+  pool_size: 10
+
+# Configure SQLite database
+config :blog, Blog.Repo.SQLite,
+  database: System.fetch_env!("DATABASE_PATH"),
+  pool_size: 5
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
@@ -20,10 +29,9 @@ config :blog_web, BlogWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "rmqmgA0aGUrzNEbyIkl7cFN94dCEbzVZ2Fpx4QG5D9/Cz7lu3otG59RQB8gNCyws",
+  secret_key_base: "TiVTBP/kpIpVT9sa8QnKjQN6/uNptx2M9KfAdp6ANIN0tcPyqAgW8wa/S6wxmFPm",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
+    esbuild: {Esbuild, :install_and_run, [:blog_web, ~w(--sourcemap=inline --watch)]}
   ]
 
 # ## SSL Support
@@ -53,7 +61,7 @@ config :blog_web, BlogWeb.Endpoint,
 config :blog_web, BlogWeb.Endpoint,
   live_reload: [
     patterns: [
-      ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
+      ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/blog_web/(controllers|live|components)/.*(ex|heex)$"
     ]
@@ -67,6 +75,12 @@ config :logger, :console, format: "[$level] $message\n"
 
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
+
+config :phoenix_live_view,
+  # Include HEEx debug annotations as HTML comments in rendered markup
+  debug_heex_annotations: true,
+  # Enable helpful, but potentially expensive runtime checks
+  enable_expensive_runtime_checks: true
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.

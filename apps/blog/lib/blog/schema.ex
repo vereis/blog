@@ -1,10 +1,10 @@
 defmodule Blog.Schema do
   @moduledoc "Module for extended ecto, shared schema, functionality."
 
-  defmacro __using__(_) do
+  defmacro __using__(_opts) do
     quote do
       use Ecto.Schema
-      use EctoUtils.Schema, repo: Blog.Repo
+      use EctoUtils.Schema, repo: Blog.Repo.SQLite
       use EctoUtils.Queryable
 
       import Ecto.Changeset

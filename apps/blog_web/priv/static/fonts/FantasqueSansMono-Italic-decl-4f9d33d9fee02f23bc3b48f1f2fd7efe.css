@@ -1,9 +1,0 @@
-@font-face {
-  font-family: 'Fantasque Sans Mono';
-  src: url('./FantasqueSansMono-Italic-12ad2cecd66a42a80f9c2a6c3fcc820b.woff2?vsn=d') format('woff2'),
-       url('./FantasqueSansMono-Italic-14219b6a5cc8fb63a3796f439e476d89.woff?vsn=d') format('woff'), /* Firefox >= 3.6, any other modern browser */
-       url('FantasqueSansMono-Italic.ttf') format('truetype'), /* Safari, Android, iOS */
-       url('FantasqueSansMono-Italic.svg#FantasqueSansMono-Italic') format('svg'); /* Chrome < 4, Legacy iOS */
-  font-weight: 400;
-  font-style: italic;
-}

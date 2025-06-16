@@ -34,7 +34,7 @@ defmodule Blog.Posts.Post do
   end
 
   @spec changeset(t(), attrs :: map()) :: Ecto.Changeset.t()
-  def changeset(%Post{} = post, attrs) do
+  def changeset(%__MODULE__{} = post, attrs) do
     post
     |> cast(attrs, fields() -- [:headings])
     |> generate_body()
@@ -69,7 +69,7 @@ defmodule Blog.Posts.Post do
     body = Ecto.Changeset.get_field(changeset, :body)
 
     normalize = fn heading ->
-      heading
+      (heading || "N/A")
       |> String.downcase()
       |> String.replace(~r/\s+/, "-")
     end

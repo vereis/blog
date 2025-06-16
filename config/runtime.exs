@@ -7,16 +7,27 @@ import Config
 # any compile-time configuration in here, as it won't be applied.
 # The block below contains prod specific runtime configuration.
 if config_env() == :prod do
-  database_path =
-    System.get_env("DATABASE_PATH") ||
+  import Config
+
+  database_url =
+    System.get_env("DATABASE_URL") ||
       raise """
-      environment variable DATABASE_PATH is missing.
-      For example: /etc/blog/blog.db
+      environment variable DATABASE_URL is missing.
+      For example: ecto://USER:PASS@HOST/DATABASE
       """
 
-  config :blog, Blog.Repo,
-    database: database_path,
-    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "5")
+  maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
+
+  config :blog, Blog.Repo.Postgres,
+    # ssl: true,
+    url: database_url,
+    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
+    socket_options: maybe_ipv6
+
+  # Configure SQLite database for production
+  config :blog, Blog.Repo.SQLite,
+    database: System.fetch_env!("DATABASE_PATH"),
+    pool_size: String.to_integer(System.fetch_env!("SQLITE_POOL_SIZE"))
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
@@ -73,11 +84,13 @@ if config_env() == :prod do
   # "priv/ssl/server.key". For all supported SSL configuration
   # options, see https://hexdocs.pm/plug/Plug.SSL.html#configure/1
   #
-  # We also recommend setting `force_ssl` in your endpoint, ensuring
-  # no data is ever sent via http, always redirecting to https:
+  # We also recommend setting `force_ssl` in your config/prod.exs,
+  # ensuring no data is ever sent via http, always redirecting to https:
   #
   #     config :blog_web, BlogWeb.Endpoint,
   #       force_ssl: [hsts: true]
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.
+
+  config :blog, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 end

@@ -8,13 +8,11 @@ defmodule Blog.Application do
   @impl Application
   def start(_type, _args) do
     children = [
-      # Start the Ecto repository
-      Blog.Repo,
-      Blog.Posts.Reloader,
-      # Start the PubSub system
-      {Phoenix.PubSub, name: Blog.PubSub}
-      # Start a worker by calling: Blog.Worker.start_link(arg)
-      # {Blog.Worker, arg}
+      Blog.Repo.Postgres,
+      Blog.Repo.SQLite,
+      {DNSCluster, query: Application.get_env(:blog, :dns_cluster_query) || :ignore},
+      {Phoenix.PubSub, name: Blog.PubSub},
+      Blog.Resource.Watcher
     ]
 
     Supervisor.start_link(children, strategy: :one_for_one, name: Blog.Supervisor)

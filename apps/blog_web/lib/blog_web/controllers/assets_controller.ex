@@ -1,11 +1,11 @@
 defmodule BlogWeb.AssetsController do
   use BlogWeb, :controller
 
-  alias Blog.Posts
-  alias Blog.Posts.Image
+  alias Blog.Images
+  alias Blog.Images.Image
 
   def show(conn, %{"name" => name}) do
-    case Posts.get_image(name: name) do
+    case Images.get_image(name: name) do
       %Image{} = image ->
         conn
         |> put_resp_content_type(image.content_type)

@@ -6,8 +6,7 @@ import Config
 # which you should run after static files are built and
 # before starting your production server.
 config :blog_web, BlogWeb.Endpoint,
-  server: true,
-  url: [host: System.get_env("BLOG_HOST"), port: System.get_env("BLOG_PORT")],
+  url: [host: "example.com", port: 80],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 # Do not print debug messages in production

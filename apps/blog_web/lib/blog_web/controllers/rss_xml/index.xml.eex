@@ -10,7 +10,7 @@
 
     <%= for post <- Enum.reverse(@posts), not post.is_draft do %>
       <item>
-        <title><%= post.title %></title>
+        <title><%= post.title |> Phoenix.HTML.html_escape() |> elem(1) %></title>
         <description><![CDATA[ <%= post.description %> ]]></description>
         <link><%= "https://vereis.com/posts/#{post.slug}" %></link>
         <guid isPermaLink="false"><%= post.slug %></guid>

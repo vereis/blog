@@ -7,19 +7,19 @@
 	--bg-primary: #21202e;
 	--bg-code: #21202e;
 	--bg-selection: #403d52;
-	
+
 	/* Text colors */
 	--text-primary: #e0def4;
 	--text-muted: #908caa;
 	--text-subtle: #6e6a86;
 	--text-code: #eb6f92;
-	
+
 	/* Interactive colors */
 	--link-color: #9ccfd8;
 	--heading-color: var(--accent-color);
 	--heading-bg: var(--accent-color);
 	--accent-color: #31748f;
-	
+
 	/* UI colors */
 	--border-color: var(--accent-color);
 	--hover-bg: #6e6a86;
@@ -321,10 +321,11 @@ blockquote {
 		display: inline-block;
 	}
 
-	footer &>* {
-		color: var(--text-muted) !important;
-		text-decoration: none;
-	}
+}
+
+footer .button-container > * {
+	color: var(--text-muted) !important;
+	text-decoration: none;
 }
 
 .tags {
