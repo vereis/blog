@@ -15,14 +15,15 @@ defmodule Blog.Resource.Post do
 
   @impl Blog.Resource
   def source do
-    # credo:disable-for-next-line Credo.Check.Refactor.Apply
-    :dev = apply(Mix, :env, [])
-    "apps/blog/priv/posts"
-  rescue
-    _e ->
-      :blog
-      |> :code.priv_dir()
-      |> Path.join("posts")
+    case Blog.env() do
+      :dev ->
+        "apps/blog/priv/posts"
+
+      _other ->
+        :blog
+        |> :code.priv_dir()
+        |> Path.join("posts")
+    end
   end
 
   @impl Blog.Resource
