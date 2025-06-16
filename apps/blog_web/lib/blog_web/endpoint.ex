@@ -7,13 +7,13 @@ defmodule BlogWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_blog_web_key",
-    signing_salt: "gubI8ScG",
+    signing_salt: "2wFTTXjA",
     same_site: "Lax"
   ]
 
-  plug BlogWeb.Plugs.Redirect
-
-  socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
+  socket "/live", Phoenix.LiveView.Socket,
+    websocket: [connect_info: [session: @session_options]],
+    longpoll: [connect_info: [session: @session_options]]
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -22,7 +22,7 @@ defmodule BlogWeb.Endpoint do
   plug Plug.Static,
     at: "/",
     from: :blog_web,
-    gzip: true,
+    gzip: false,
     only: BlogWeb.static_paths()
 
   # Code reloading can be explicitly enabled under the

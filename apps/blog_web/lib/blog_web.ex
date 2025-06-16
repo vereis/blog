@@ -39,10 +39,11 @@ defmodule BlogWeb do
   def controller do
     quote do
       use Phoenix.Controller,
-        formats: [:html, :json, :xml],
+        formats: [:html, :json],
         layouts: [html: BlogWeb.Layouts]
 
-      import BlogWeb.Gettext
+      use Gettext, backend: BlogWeb.Gettext
+
       import Plug.Conn
 
       unquote(verified_routes())
@@ -83,17 +84,25 @@ defmodule BlogWeb do
     quote do
       use Phoenix.Component
 
+      # Import convenience functions from controllers
+      import Phoenix.Controller,
+        only: [get_csrf_token: 0, view_module: 1, view_template: 1]
+
+      # Include general helpers for rendering XML/HTML
       unquote(html_helpers())
     end
   end
 
   defp html_helpers do
     quote do
-      # HTML escaping functionality
-      # Core UI components and translation
+      # Translation
+      use Gettext, backend: BlogWeb.Gettext
+
       import BlogWeb.CoreComponents
-      import BlogWeb.Gettext
+
+      # HTML escaping functionality
       import Phoenix.HTML
+      # Core UI components
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS

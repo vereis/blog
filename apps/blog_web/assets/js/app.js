@@ -15,6 +15,9 @@
 //     import "some-package"
 //
 
+// We need to import the CSS so that esbuild will bundle it
+import "../css/app.css";
+
 // Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
 import "phoenix_html";
 // Establish Phoenix Socket and LiveView configuration.
@@ -73,6 +76,10 @@ const dataHrefAll = () => {
           let dataHref = "";
 
           switch (url.host) {
+            case "localhost:4000":
+              dataHref = `/posts/${slugs[slugs.length - 1]}`;
+              break;
+
             case "audible.com":
             case "www.audible.com":
               // Grab the book title

@@ -9,12 +9,18 @@ defmodule Blog.MixProject do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.17",
+      elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      test_coverage: [tool: ExCoveralls]
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ]
     ]
   end
 
@@ -37,14 +43,20 @@ defmodule Blog.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:ecto_utils, "~> 0.2"},
+      {:dns_cluster, "~> 0.1.1"},
       {:phoenix_pubsub, "~> 2.1"},
       {:ecto_sql, "~> 3.10"},
-      {:ecto_sqlite3, ">= 0.0.0"},
+      {:postgrex, ">= 0.0.0"},
+      {:ecto_sqlite3, "~> 0.17"},
       {:jason, "~> 1.2"},
+      {:ecto_utils, "~> 0.2"},
       {:yaml_elixir, "~> 2.9"},
       {:mdex, "~> 0.7"},
-      {:vix, "~> 0.33.1"}
+      {:vix, "~> 0.33.1"},
+      {:file_system, "~> 1.0"},
+      {:ex_machina, "~> 2.7", only: :test},
+      {:briefly, "~> 0.3", only: :test},
+      {:mimic, "~> 1.7", only: :test}
     ]
   end
 
@@ -54,7 +66,7 @@ defmodule Blog.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "ecto.setup"],
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.setup": ["ecto.create", "ecto.migrate", "run #{__DIR__}/priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
     ]

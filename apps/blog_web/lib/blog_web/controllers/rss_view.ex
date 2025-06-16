@@ -10,11 +10,15 @@ defmodule BlogWeb.RssView do
     DateTime.from_unix!(unix)
   end
 
-  def pub_date(post) when is_list(post) do
+  def pub_date(post) when is_list(post) and length(post) > 0 do
     DateTime.utc_now()
     |> DateTime.to_unix()
     |> min(Enum.max_by(post, &DateTime.to_unix(&1.published_at)))
     |> pub_date()
+  end
+
+  def pub_date(post) when is_list(post) do
+    format_rfc822(DateTime.utc_now())
   end
 
   def pub_date(post) do

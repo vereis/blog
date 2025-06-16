@@ -16,7 +16,7 @@ defmodule Blog.Posts.Tag do
   end
 
   @spec changeset(t, attrs :: map) :: Ecto.Changeset.t()
-  def changeset(%Tag{} = tag, attrs) do
+  def changeset(%__MODULE__{} = tag, attrs) do
     tag
     |> cast(attrs, fields())
     |> validate_required([:label])

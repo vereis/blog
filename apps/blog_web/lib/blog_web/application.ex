@@ -8,12 +8,11 @@ defmodule BlogWeb.Application do
   @impl Application
   def start(_type, _args) do
     children = [
-      # Start the Telemetry supervisor
       BlogWeb.Telemetry,
-      # Start the Endpoint (http/https)
-      BlogWeb.Endpoint
       # Start a worker by calling: BlogWeb.Worker.start_link(arg)
-      # {BlogWeb.Worker, arg}
+      # {BlogWeb.Worker, arg},
+      # Start to serve requests, typically the last entry
+      BlogWeb.Endpoint
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

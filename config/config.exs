@@ -11,41 +11,36 @@ import Config
 
 # Configure Mix tasks and generators
 config :blog,
-  ecto_repos: [Blog.Repo]
+  ecto_repos: [Blog.Repo.Postgres, Blog.Repo.SQLite]
+
+# Configure Blog.Repo.Postgres defaults
+config :blog, Blog.Repo.Postgres, priv: "priv/repo/postgres"
+
+# Configure Blog.Repo.SQLite defaults
+config :blog, Blog.Repo.SQLite, priv: "priv/repo/sqlite"
 
 config :blog_web,
-  ecto_repos: [Blog.Repo],
-  generators: [context_app: :blog, binary_id: true]
+  ecto_repos: [Blog.Repo.Postgres, Blog.Repo.SQLite],
+  generators: [context_app: :blog]
 
 # Configures the endpoint
 config :blog_web, BlogWeb.Endpoint,
   url: [host: "localhost"],
+  adapter: Bandit.PhoenixAdapter,
   render_errors: [
     formats: [html: BlogWeb.ErrorHTML, json: BlogWeb.ErrorJSON],
     layout: false
   ],
   pubsub_server: Blog.PubSub,
-  live_view: [signing_salt: "Je8AtPe+"]
+  live_view: [signing_salt: "p/kZlopb"]
 
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",
-  default: [
+  blog_web: [
     args: ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
     cd: Path.expand("../apps/blog_web/assets", __DIR__),
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
-  ]
-
-# Configure tailwind (the version is required)
-config :tailwind,
-  version: "3.2.7",
-  default: [
-    args: ~w(
-      --config=tailwind.config.js
-      --input=css/app.css
-      --output=../priv/static/assets/app.css
-    ),
-    cd: Path.expand("../apps/blog_web/assets", __DIR__)
   ]
 
 # Configures Elixir's Logger
