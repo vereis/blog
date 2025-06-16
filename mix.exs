@@ -8,9 +8,21 @@ defmodule Blog.Umbrella.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases(),
+      releases: releases(),
       test_coverage: [tool: ExCoveralls],
       dialyzer: [
         plt_add_apps: [:mix]
+      ]
+    ]
+  end
+
+  defp releases do
+    [
+      blog: [
+        applications: [
+          blog: :permanent,
+          blog_web: :permanent
+        ]
       ]
     ]
   end
