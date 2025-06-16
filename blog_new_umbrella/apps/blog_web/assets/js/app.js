@@ -76,6 +76,10 @@ const dataHrefAll = () => {
           let dataHref = "";
 
           switch (url.host) {
+            case "localhost:4000":
+              dataHref = `/posts/${slugs[slugs.length - 1]}`;
+              break;
+
             case "audible.com":
             case "www.audible.com":
               // Grab the book title
