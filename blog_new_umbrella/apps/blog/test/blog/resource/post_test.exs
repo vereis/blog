@@ -126,7 +126,8 @@ defmodule Blog.Resource.PostTest do
         }
       ]
 
-      assert :ok = PostResource.import(parsed_posts)
+      assert {:ok, imported_posts} = PostResource.import(parsed_posts)
+      assert length(imported_posts) == 2
 
       # Verify tags were created
       tags = SQLite.all(Tag)
@@ -155,7 +156,7 @@ defmodule Blog.Resource.PostTest do
     end
 
     test "handles empty list" do
-      assert :ok = PostResource.import([])
+      assert {:ok, []} = PostResource.import([])
 
       assert SQLite.all(Tag) == []
       assert SQLite.all(Post) == []
@@ -181,7 +182,8 @@ defmodule Blog.Resource.PostTest do
         }
       ]
 
-      assert :ok = PostResource.import(parsed_posts)
+      assert {:ok, imported_posts} = PostResource.import(parsed_posts)
+      assert length(imported_posts) == 2
 
       posts = SQLite.all(Post)
       earlier_post = Enum.find(posts, &(&1.slug == "earlier-post"))
@@ -213,7 +215,8 @@ defmodule Blog.Resource.PostTest do
         }
       ]
 
-      assert :ok = PostResource.import(parsed_posts)
+      assert {:ok, imported_posts} = PostResource.import(parsed_posts)
+      assert length(imported_posts) == 2
 
       # Should only create 3 unique tags
       tags = SQLite.all(Tag)

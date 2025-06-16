@@ -293,12 +293,12 @@ defmodule BlogWeb.BlogLiveTest do
     end
 
     test "handles post reload event", %{conn: conn} do
-      _post = insert(:post, slug: "hello_world", title: "Original Title")
+      post = insert(:post, slug: "hello_world", title: "Original Title")
 
       {:ok, view, _html} = live(conn, ~p"/")
 
-      # Simulate post reload broadcast
-      send(view.pid, :post_reload)
+      # Simulate resource reload broadcast with new format
+      send(view.pid, {:resource_reload, Blog.Resource.Post, post.id})
 
       # View should handle the message without crashing
       assert render(view) =~ "root@vereis.com"

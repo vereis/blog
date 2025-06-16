@@ -151,7 +151,8 @@ defmodule Blog.Resource.ImageTest do
         %{path: image2_path}
       ]
 
-      assert :ok = ImageResource.import(parsed_images)
+      assert {:ok, imported_images} = ImageResource.import(parsed_images)
+      assert length(imported_images) == 2
 
       # Verify images were created
       images = SQLite.all(Image)
@@ -172,7 +173,7 @@ defmodule Blog.Resource.ImageTest do
     end
 
     test "handles empty list" do
-      assert :ok = ImageResource.import([])
+      assert {:ok, []} = ImageResource.import([])
       assert SQLite.all(Image) == []
     end
 
@@ -267,7 +268,8 @@ defmodule Blog.Resource.ImageTest do
         %{path: duplicate_path}
       ]
 
-      assert :ok = ImageResource.import(parsed_images)
+      assert {:ok, imported_images} = ImageResource.import(parsed_images)
+      assert length(imported_images) == 2
 
       # Should only create one image (upsert behavior)
       images = SQLite.all(Image)

@@ -53,6 +53,7 @@ defmodule Blog.MixProject do
       {:yaml_elixir, "~> 2.9"},
       {:mdex, "~> 0.7"},
       {:vix, "~> 0.33.1"},
+      {:file_system, "~> 1.0"},
       {:ex_machina, "~> 2.7", only: :test},
       {:briefly, "~> 0.3", only: :test},
       {:mimic, "~> 1.7", only: :test}

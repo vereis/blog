@@ -31,10 +31,12 @@ defmodule Blog.Resource.Image do
 
   @impl Blog.Resource
   def import(parsed_images) do
-    for parsed_image <- parsed_images do
-      {:ok, %Image{}} = Images.upsert_image(parsed_image)
-    end
+    imported_images =
+      for parsed_image <- parsed_images do
+        {:ok, %Image{} = imported_image} = Images.upsert_image(parsed_image)
+        imported_image
+      end
 
-    :ok
+    {:ok, imported_images}
   end
 end

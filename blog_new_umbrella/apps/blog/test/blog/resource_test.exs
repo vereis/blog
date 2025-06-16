@@ -18,7 +18,7 @@ defmodule Blog.ResourceTest do
     def import(parsed_resources) do
       # Store in process dictionary for testing
       Process.put(:imported_resources, parsed_resources)
-      :ok
+      {:ok, parsed_resources}
     end
   end
 
