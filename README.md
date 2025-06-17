@@ -1,6 +1,6 @@
-# 🚀 vereis's Blog
+# vereis' Blog 😇🌟💖
 
-This is my personal blog where I write about Elixir, functional programming, and whatever else I feel like sharing.
+This is my personal blog where I write about tech, philosophy, and whatever else I feel like sharing.
 
 It's built to be relatively minimal and easy to extend.
 
@@ -148,7 +148,7 @@ GitHub Actions handles testing and deployment to Fly.io.
 I consolidate all code quality tools into one command:
 
 - **[Styler](https://github.com/adobe/styler)** - Opinionated code formatting beyond `mix format`
-- **[Credo](https://github.com/rrrene/credo)** - Static analysis for design issues  
+- **[Credo](https://github.com/rrrene/credo)** - Static analysis for design issues
 - **[Dialyzer](https://www.erlang.org/doc/man/dialyzer.html)** - Type checking and discrepancy detection
 
 Check the `lint` alias in `mix.exs` to see how they're chained together.
@@ -157,6 +157,40 @@ Check the `lint` alias in `mix.exs` to see how they're chained together.
 
 Deploys to Fly.io using Docker. The umbrella release includes both apps in a single container.
 
+## 🎯 TODO: Fun Features to Build
+
+Because a blog is never really "done," here are some wild ideas I want to implement:
+
+### 💬 Social Features
+- [ ] **Comments system** - Stored in `Blog.Repo.Postgres`, backed up regularly and seeded from on boot.
+- [ ] **Reactions** - Like/dislike, maybe with fun emoji reactions, need to think about how to match the terminal theme.
+- [ ] **Live viewer count** - "X people are reading this post right now"
+- [ ] **Persistent viewer counter** - 2000's vibes
+
+### 📊 Analytics & Metrics
+- [ ] **Public analytics dashboard** - Because transparency is cool
+- [ ] **Reading progress indicators** - How far through a post you are, would be cool to do it in ascii
+- [ ] **Real-time visitor map** - Where in a post people actively are reading (multiplayer scrollspy)
+
+### 🔌 Integrations & APIs
+- [ ] **GraphQL API** - Just to demonstrate that GraphQL is **easy** despite what Theo says...
+- [ ] **Discord Rich Presence** - This is just super duper cool.
+- [ ] **Social media integration** - New posts automatically shared, some tweets/whatnot sync'd as `Blog.Resource`s.
+
+### ⚡ Fun Features
+- [ ] **Live collaborative editing** - Maybe let people suggest edits?
+- [ ] **Terminal-style command palette** - Navigate the site like a power user
+- [ ] **Live chat integration** - IRC-style chat omg!!
+- [ ] **Embedded code playground** - Run code snippets directly in posts
+- [ ] **Colorscheme changes on load** - More visual options
+- [ ] **Bitmap Font Toggle** - EVEN more visual options
+
+### 🚀 Technical Improvements
+- [ ] **Post scheduling** - Write now, publish later, would be trivial to do.
+- [ ] **Search improvements** - Expose FTS because right now it crashes under certain circumstances.
+
+Most of these are probably overkill, but that's what makes them fun to build! 🤓
+
 ---
 
-*This blog is built with ❤️, lots of ☕, and probably too much ⏰ spent tweaking CSS animations. Issues and PRs welcome, but please be nice - my feelings are surprisingly fragile for someone who chose to work with computers.*
+*Built with _genki_ 😇✌️*
