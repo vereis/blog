@@ -21,12 +21,12 @@ defmodule BlogWeb.ConnCase do
     quote do
       # The default endpoint for testing
       use BlogWeb, :verified_routes
+      use Mimic
 
       # Import conveniences for testing with connections
       import BlogWeb.ConnCase
       import Phoenix.ConnTest
       import Plug.Conn
-      use Mimic
 
       @endpoint BlogWeb.Endpoint
     end
