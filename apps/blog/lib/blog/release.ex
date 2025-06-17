@@ -5,22 +5,17 @@ defmodule Blog.Release do
   """
   @app :blog
 
-  @spec migrate() :: :ok
   def migrate do
     load_app()
 
     for repo <- repos() do
-      {:ok, _repo_pid, _migrated_versions} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
+      {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
     end
-
-    :ok
   end
 
-  @spec rollback(Ecto.Repo.t(), integer()) :: :ok
   def rollback(repo, version) do
     load_app()
-    {:ok, _repo_pid, _migrated_versions} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :down, to: version))
-    :ok
+    {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :down, to: version))
   end
 
   defp repos do
