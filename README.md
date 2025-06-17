@@ -12,9 +12,9 @@ I built this as a real-world example of how I like to structure Elixir projects,
 
 ## 🛠️ Getting Started
 
-I use [nix](nixos.org) so this app is very much built around that. I also recommend using [direnv](https://direnv.net/).
+This project can be run with or without Nix! Environment variables are stored in `.env` for easy setup.
 
-### Setup (if you're already using Nix/Direnv):
+### Setup with Nix + Direnv (recommended):
 ```bash
 cd blog/  # direnv automagically sets everything up
 docker-compose up -d # Start Postgres
@@ -24,13 +24,37 @@ mix test
 iex -S mix phx.server
 ```
 
-Alternatively, if you don't use direnv:
-
+### Setup with Nix (without direnv):
 ```bash
 cd blog/
 nix develop
+source .env  # Load environment variables
 docker-compose up -d
-# Make sure to export the env vars from .envrc (or just source it)
+mix deps.get
+mix lint
+mix test
+iex -S mix phx.server
+```
+
+### Setup without Nix (using [asdf](https://asdf-vm.com/)):
+Make sure you have the versions specified in `.tool-versions`:
+- Elixir 1.18.3-otp-27
+- Erlang 27.3.4
+- Node.js 20.18.1
+
+```bash
+cd blog/
+# Install versions with asdf
+asdf install
+
+# Load environment variables
+source .env
+
+# Install system dependencies (varies by OS):
+# - SQLite
+# - Docker + Docker Compose
+
+docker-compose up -d
 mix deps.get
 mix lint
 mix test
