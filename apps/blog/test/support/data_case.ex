@@ -18,12 +18,13 @@ defmodule Blog.DataCase do
 
   using do
     quote do
+      use Mimic
+
       import Blog.DataCase
       import Blog.Factory
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      use Mimic
 
       alias Blog.Repo.Postgres, as: Repo
     end
