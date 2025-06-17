@@ -1,6 +1,5 @@
 defmodule Blog.Resource.PostTest do
   use Blog.DataCase, async: true
-  use Mimic
 
   alias Blog.Posts.Post
   alias Blog.Posts.Tag

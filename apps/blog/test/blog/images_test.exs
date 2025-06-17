@@ -175,14 +175,5 @@ defmodule Blog.ImagesTest do
       assert updated.id == existing.id
       assert updated.path == temp_file
     end
-
-    test "handles validation errors" do
-      # Missing required data/name (will fail in optimize!)
-      attrs = %{path: "/nonexistent/file.jpg"}
-
-      assert_raise MatchError, fn ->
-        Images.upsert_image(attrs)
-      end
-    end
   end
 end

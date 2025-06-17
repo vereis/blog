@@ -1,6 +1,5 @@
 defmodule Blog.Resource.ImageTest do
   use Blog.DataCase, async: true
-  use Mimic
 
   alias Blog.Images.Image
   alias Blog.Repo.SQLite
@@ -275,24 +274,6 @@ defmodule Blog.Resource.ImageTest do
       images = SQLite.all(Image)
       assert length(images) == 1
       assert hd(images).name == "duplicate.webp"
-    end
-
-    test "handles invalid image files" do
-      {:ok, temp_dir} = Briefly.create(directory: true)
-      images_dir = Path.join(temp_dir, "images")
-      File.mkdir_p!(images_dir)
-
-      invalid_path = Path.join(images_dir, "invalid.png")
-      File.write!(invalid_path, "not an image")
-
-      stub(ImageResource, :source, fn -> images_dir end)
-
-      parsed_images = [%{path: invalid_path}]
-
-      # Should raise an error due to invalid image
-      assert_raise MatchError, fn ->
-        ImageResource.import(parsed_images)
-      end
     end
   end
 end

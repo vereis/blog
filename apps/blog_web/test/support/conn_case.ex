@@ -26,6 +26,7 @@ defmodule BlogWeb.ConnCase do
       import BlogWeb.ConnCase
       import Phoenix.ConnTest
       import Plug.Conn
+      use Mimic
 
       @endpoint BlogWeb.Endpoint
     end
@@ -33,6 +34,24 @@ defmodule BlogWeb.ConnCase do
 
   setup tags do
     Blog.DataCase.setup_sandbox(tags)
+
+    Mimic.stub(Vix.Vips.Image, :new_from_file, fn _file ->
+      {:ok, %Vix.Vips.Image{}}
+    end)
+
+    Mimic.stub(Vix.Vips.Image, :write_to_buffer, fn _image, _format, _opts ->
+      # Return a dummy binary for testing
+      {:ok, <<0>>}
+    end)
+
+    Mimic.stub(Vix.Vips.Image, :width, fn _image ->
+      1
+    end)
+
+    Mimic.stub(Vix.Vips.Image, :height, fn _image ->
+      1
+    end)
+
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 end
