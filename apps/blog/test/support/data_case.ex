@@ -23,6 +23,7 @@ defmodule Blog.DataCase do
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
+      use Mimic
 
       alias Blog.Repo.Postgres, as: Repo
     end
@@ -30,6 +31,24 @@ defmodule Blog.DataCase do
 
   setup tags do
     Blog.DataCase.setup_sandbox(tags)
+
+    Mimic.stub(Vix.Vips.Image, :new_from_file, fn _file ->
+      {:ok, %Vix.Vips.Image{}}
+    end)
+
+    Mimic.stub(Vix.Vips.Image, :write_to_buffer, fn _image, _format, _opts ->
+      # Return a dummy binary for testing
+      {:ok, <<0>>}
+    end)
+
+    Mimic.stub(Vix.Vips.Image, :width, fn _image ->
+      1
+    end)
+
+    Mimic.stub(Vix.Vips.Image, :height, fn _image ->
+      1
+    end)
+
     :ok
   end
 

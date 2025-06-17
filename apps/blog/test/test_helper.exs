@@ -5,5 +5,6 @@ Ecto.Adapters.SQL.Sandbox.mode(Blog.Repo.SQLite, :manual)
 
 Mimic.copy(Blog.Resource.Post)
 Mimic.copy(Blog.Resource.Image)
+Mimic.copy(Vix.Vips.Image)
 
 {:ok, _} = Application.ensure_all_started(:ex_machina)

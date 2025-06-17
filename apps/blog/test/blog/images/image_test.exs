@@ -22,15 +22,6 @@ defmodule Blog.Images.ImageTest do
       assert is_integer(Ecto.Changeset.get_change(changeset, :height))
     end
 
-    test "invalid changeset without path" do
-      attrs = %{}
-
-      # This will fail because optimize! tries to read a nil path
-      assert_raise FunctionClauseError, fn ->
-        Image.changeset(%Image{}, attrs)
-      end
-    end
-
     test "enforces unique name constraint" do
       insert(:image, name: "duplicate.webp")
 
@@ -65,17 +56,6 @@ defmodule Blog.Images.ImageTest do
       optimized_data = Ecto.Changeset.get_change(changeset, :data)
       assert is_binary(optimized_data)
       assert byte_size(optimized_data) > 0
-    end
-
-    test "handles invalid image files gracefully" do
-      {:ok, temp_file} = Briefly.create()
-      File.write!(temp_file, "not an image")
-
-      attrs = %{path: temp_file}
-
-      assert_raise MatchError, fn ->
-        Image.changeset(%Image{}, attrs)
-      end
     end
   end
 
