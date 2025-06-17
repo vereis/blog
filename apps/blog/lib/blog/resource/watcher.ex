@@ -27,7 +27,7 @@ defmodule Blog.Resource.Watcher do
   def init(_opts) do
     env = Blog.env()
 
-    for module <- @resource_modules, env == :dev do
+    for module <- @resource_modules, env != :test do
       send(self(), {:do_import, module})
     end
 

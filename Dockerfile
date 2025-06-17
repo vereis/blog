@@ -58,14 +58,8 @@ ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
 ENV REPLACE_OS_VARS=true
-ENV PORT=4000
-ENV DB=4000
-
-ENV DATABASE_PATH="./blog.db"
+ENV ERL_AFLAGS="-proto_dist inet6_tcp"
 ENV SECRET_KEY_BASE="rTpAPJVKdBlNC5XxpJRNOPSX7F9900z50riy1JCY0BVkvSEyzJlOwpco8m2ieorn"
-ENV BLOG_HOST="localhost"
-ENV BLOG_PORT="4000"
-
 
 WORKDIR /opt/app
 RUN chown -R nobody /opt/app

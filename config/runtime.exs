@@ -16,13 +16,13 @@ if config_env() == :prod do
       For example: ecto://USER:PASS@HOST/DATABASE
       """
 
-  maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
+  # maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
   config :blog, Blog.Repo.Postgres,
-    # ssl: true,
+    ssl: false,
+    socket_options: [:inet6],
     url: database_url,
-    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
-    socket_options: maybe_ipv6
+    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
 
   # Configure SQLite database for production
   config :blog, Blog.Repo.SQLite,
@@ -46,8 +46,9 @@ if config_env() == :prod do
       # Enable IPv6 and bind on all interfaces.
       # Set it to  {0, 0, 0, 0, 0, 0, 0, 1} for local network only access.
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
-      port: String.to_integer(System.get_env("PORT") || "4000")
+      port: String.to_integer(System.get_env("BLOG_PORT") || "4000")
     ],
+    url: [host: System.fetch_env!("BLOG_HOST"), port: System.fetch_env!("BLOG_PORT")],
     secret_key_base: secret_key_base
 
   # ## Using releases
