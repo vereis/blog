@@ -10,6 +10,10 @@ defmodule Blog.Umbrella.MixProject do
       aliases: aliases(),
       releases: releases(),
       test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        lint: :dev,
+        dialyzer: :dev
+      ],
       dialyzer: [
         plt_add_apps: [:mix]
       ]
