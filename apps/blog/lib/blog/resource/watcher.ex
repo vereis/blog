@@ -25,20 +25,22 @@ defmodule Blog.Resource.Watcher do
 
   @impl GenServer
   def init(_opts) do
-    if Blog.env() == :test do
-      {:ok, %{watchers: []}}
-    else
+    env = Blog.env()
+
+    for module <- @resource_modules, env == :dev do
+      send(self(), {:do_import, module})
+    end
+
+    if env == :dev do
       watchers =
         @resource_modules
         |> Enum.map(&init_watcher/1)
         |> Enum.reject(&is_nil/1)
         |> Map.new(fn {module, pid, _source_dir} -> {pid, module} end)
 
-      for module <- @resource_modules do
-        send(self(), {:do_import, module})
-      end
-
       {:ok, %{watchers: watchers}}
+    else
+      {:ok, %{watchers: []}}
     end
   end
 
@@ -106,8 +108,8 @@ defmodule Blog.Resource.Watcher do
         Logger.info("Started filesystem watcher for #{module} on #{source_dir}")
         {module, watcher_pid, source_dir}
 
-      {:error, reason} ->
-        Logger.warning("Failed to start filesystem watcher for #{module}: #{inspect(reason)}")
+      otherwise ->
+        Logger.warning("Failed to start filesystem watcher for #{module}: #{inspect(otherwise)}")
         nil
     end
   end
