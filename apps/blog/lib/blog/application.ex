@@ -10,6 +10,7 @@ defmodule Blog.Application do
     children = [
       Blog.Repo.Postgres,
       Blog.Repo.SQLite,
+      Blog.Release.Migrator,
       {DNSCluster, query: Application.get_env(:blog, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Blog.PubSub},
       Blog.Resource.Watcher

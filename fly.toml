@@ -11,7 +11,10 @@ kill_signal = 'SIGTERM'
 
 [env]
   PHX_HOST = 'blog-web-quiet-tree-8033.fly.dev'
-  PORT = '8080'
+  DATABASE_PATH="./blog.db"
+  BLOG_HOST="vereis.com"
+  BLOG_PORT="8080"
+  ECTO_IPV6="true"
 
 [http_service]
   internal_port = 8080
