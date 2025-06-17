@@ -4,6 +4,8 @@ This is my personal blog where I write about Elixir, functional programming, and
 
 It's built to be relatively minimal and easy to extend.
 
+![Screenshot](./screenshot.png)
+
 I built this as a real-world example of how I like to structure Elixir projects, namely:
 
 - Using Umbrella apps to split responsibilities
@@ -128,6 +130,32 @@ This is where Phoenix LiveView shines like the real-time star it is:
 **SQLite as the primary database** because it's stupidly fast if you're not trying to do write heavy workflows.
 
 **Real-time everything** because page refreshing is so 2010.
+
+## 🚀 Deployment & CI/CD
+
+GitHub Actions handles testing and deployment to Fly.io.
+
+### Workflows
+
+**CI** (`.github/workflows/ci.yml`) - Runs on PRs:
+- `mix lint` and `mix test`
+
+**Deploy** (`.github/workflows/deploy.yml`) - Runs on main branch:
+- Same lint/test steps, then deploys to Fly.io
+
+### The `mix lint` Command
+
+I consolidate all code quality tools into one command:
+
+- **[Styler](https://github.com/adobe/styler)** - Opinionated code formatting beyond `mix format`
+- **[Credo](https://github.com/rrrene/credo)** - Static analysis for design issues  
+- **[Dialyzer](https://www.erlang.org/doc/man/dialyzer.html)** - Type checking and discrepancy detection
+
+Check the `lint` alias in `mix.exs` to see how they're chained together.
+
+### Deployment
+
+Deploys to Fly.io using Docker. The umbrella release includes both apps in a single container.
 
 ---
 
