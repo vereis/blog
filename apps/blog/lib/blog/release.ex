@@ -24,6 +24,7 @@ defmodule Blog.Release do
     :ok
   end
 
+  @spec rollback(Ecto.Repo.t(), integer()) :: :ok
   def rollback(repo, version) do
     load_app()
 
