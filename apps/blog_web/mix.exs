@@ -56,7 +56,8 @@ defmodule BlogWeb.MixProject do
       {:gettext, "~> 0.26"},
       {:blog, in_umbrella: true},
       {:jason, "~> 1.2"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:tidewave, "~> 0.1", only: :dev}
     ]
   end
 
