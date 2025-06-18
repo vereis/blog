@@ -1,6 +1,8 @@
 defmodule Blog.PostsTest do
   use Blog.DataCase, async: true
 
+  import ExUnit.CaptureLog
+
   alias Blog.Posts
 
   describe "get_post/1" do
@@ -180,6 +182,28 @@ defmodule Blog.PostsTest do
 
     test "returns empty list when no tags exist" do
       assert Posts.list_tags() == []
+    end
+  end
+
+  describe "FTS error handling" do
+    test "list_posts/1 gracefully handles FTS syntax errors and logs warning" do
+      log =
+        capture_log(fn ->
+          # These would normally crash with Exqlite.Error, but should return empty list
+          assert Posts.list_posts(search: "elixir ||| invalid") == []
+        end)
+
+      assert log =~ "FTS query error in list_posts/1"
+    end
+
+    test "get_post/1 gracefully handles FTS syntax errors and logs warning" do
+      log =
+        capture_log(fn ->
+          # Should return nil instead of crashing
+          assert Posts.get_post(search: "\"unterminated quote") == nil
+        end)
+
+      assert log =~ "FTS query error in get_post/1"
     end
   end
 

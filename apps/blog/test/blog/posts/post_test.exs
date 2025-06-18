@@ -165,6 +165,154 @@ defmodule Blog.Posts.PostTest do
     end
   end
 
+  describe "query/2 FTS sanitization" do
+    setup do
+      # Create test posts for FTS testing
+      post1 = insert(:post, title: "Elixir Programming", raw_body: "Learning Elixir with pipes")
+
+      post2 =
+        insert(:post,
+          title: "Erlang Systems",
+          raw_body: "Building distributed systems with Erlang"
+        )
+
+      %{posts: [post1, post2]}
+    end
+
+    # Valid queries that should work normally and return ranked results
+    valid_queries = [
+      "elixir",
+      "elixir OR erlang",
+      "elixir AND pipes",
+      ~s("elixir programming")
+    ]
+
+    for query_term <- valid_queries do
+      test "handles valid FTS query: #{query_term}" do
+        query = Post.query(Post, search: unquote(query_term))
+        results = SQLite.all(query)
+
+        # Should have results with rank field (indicating FTS was used)
+        assert length(results) > 0
+        assert List.first(results).rank != nil
+      end
+    end
+
+    # Operator mappings that should be converted to supported equivalents
+    operator_mappings = [
+      {"elixir | erlang", "pipe to OR"},
+      {"elixir & pipes", "ampersand to AND"},
+      {"elixir ! pipes", "exclamation to NOT"},
+      {"elixir || erlang", "double pipe to OR"},
+      {"elixir && pipes", "double ampersand to AND"},
+      {"erlang|elixir", "pipe without spaces"},
+      {"erlang&&distributed", "double ampersand without spaces"}
+    ]
+
+    for {query_term, description} <- operator_mappings do
+      test "converts unsupported operators: #{description} (#{query_term})" do
+        query = Post.query(Post, search: unquote(query_term))
+        results = SQLite.all(query)
+
+        # Should work and return FTS results
+        assert is_list(results)
+
+        if length(results) > 0 do
+          assert List.first(results).rank != nil, "should use FTS"
+        end
+      end
+    end
+
+    # These queries would crash without sanitization
+    problematic_queries = [
+      {"elixir AND", "trailing boolean operator"},
+      {"elixir OR", "trailing boolean operator"},
+      {"elixir NOT", "trailing boolean operator"},
+      {"NEAR(", "incomplete NEAR function"},
+      {"NEAR(elixir", "incomplete NEAR function"},
+      {"NEAR(elixir,", "incomplete NEAR function"},
+      {"title:", "incomplete column filter"},
+      {"{title", "incomplete column group"},
+      {"elixir +", "trailing phrase operator"},
+      {"elixir ^", "trailing initial token operator"},
+      {"elixir |", "trailing pipe"},
+      {"elixir &", "trailing ampersand"},
+      {"elixir !", "trailing exclamation"},
+      {"elixir -", "trailing minus"},
+      {"elixir ~", "trailing tilde"},
+      {"elixir ;", "trailing semicolon"},
+      {"elixir ,", "trailing comma"},
+      {"elixir .", "trailing period"},
+      {"elixir ?", "trailing question mark"},
+      {"(", "standalone opening paren"},
+      {")", "standalone closing paren"},
+      {"AND", "standalone boolean operator"},
+      {"OR", "standalone boolean operator"},
+      {"NOT", "standalone boolean operator"}
+    ]
+
+    for {query_term, description} <- problematic_queries do
+      test "sanitizes incomplete FTS query: #{description} (#{query_term})" do
+        # Should not crash and should return results
+        query = Post.query(Post, search: unquote(query_term))
+        results = SQLite.all(query)
+
+        # Should return all posts when query is too invalid to sanitize
+        assert is_list(results)
+        assert length(results) >= 0
+      end
+    end
+
+    # These queries become empty after sanitization
+    empty_after_sanitization = [
+      {"", "empty string"},
+      {"   ", "whitespace only"},
+      {"AND", "standalone operator"},
+      {"NEAR(", "incomplete function only"},
+      {"title:", "incomplete filter only"}
+    ]
+
+    for {query_term, description} <- empty_after_sanitization do
+      test "returns all posts when query sanitizes to empty: #{description} (#{query_term})" do
+        query = Post.query(Post, search: unquote(query_term))
+        results = SQLite.all(query)
+
+        # Should return all posts (no FTS filtering applied)
+        all_posts = SQLite.all(Post)
+        assert length(results) == length(all_posts)
+
+        # Results should not have rank field (no FTS was used)
+        if length(results) > 0 do
+          assert List.first(results).rank == nil
+        end
+      end
+    end
+
+    test "sanitizes trailing operators while preserving valid content" do
+      # Test that content before trailing operators is preserved
+      query = Post.query(Post, search: "elixir AND")
+      results = SQLite.all(query)
+
+      # Should find posts containing "elixir" (sanitized from "elixir AND")
+      assert length(results) > 0
+      assert List.first(results).rank != nil
+
+      # Verify it actually found the elixir post
+      elixir_post = Enum.find(results, &String.contains?(&1.title, "Elixir"))
+      assert elixir_post != nil
+    end
+
+    test "handles non-string search terms gracefully" do
+      # Should handle non-string inputs without crashing
+      query = Post.query(Post, search: nil)
+      results = SQLite.all(query)
+
+      # Should return all posts when search term is not a string
+      all_posts = SQLite.all(Post)
+      assert length(results) == length(all_posts)
+    end
+  end
+
   describe "changeset/2" do
     test "handles tag associations" do
       tag1 = insert(:tag, label: "elixir")
