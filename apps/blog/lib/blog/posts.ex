@@ -5,6 +5,8 @@ defmodule Blog.Posts do
   alias Blog.Posts.Tag
   alias Blog.Repo.SQLite
 
+  require Logger
+
   @doc """
   Gets a single post by ID or filters.
   """
@@ -19,6 +21,14 @@ defmodule Blog.Posts do
     |> Post.query()
     |> SQLite.one()
     |> SQLite.preload(:tags)
+  rescue
+    exception ->
+      if fts_error?(exception) do
+        Logger.warning("FTS query error in get_post/1", error: Exception.message(exception))
+        nil
+      else
+        reraise(exception, __STACKTRACE__)
+      end
   end
 
   @doc """
@@ -31,6 +41,14 @@ defmodule Blog.Posts do
     |> Post.query()
     |> SQLite.all()
     |> SQLite.preload(:tags)
+  rescue
+    exception ->
+      if fts_error?(exception) do
+        Logger.warning("FTS query error in list_posts/1", error: Exception.message(exception))
+        []
+      else
+        reraise(exception, __STACKTRACE__)
+      end
   end
 
   @doc """
@@ -77,4 +95,11 @@ defmodule Blog.Posts do
     |> Tag.changeset(attrs)
     |> SQLite.insert_or_update()
   end
+
+  # Check if an exception is related to FTS queries
+  defp fts_error?(%Exqlite.Error{statement: statement}) when is_binary(statement) do
+    String.contains?(statement, "posts_fts") and String.contains?(statement, "MATCH")
+  end
+
+  defp fts_error?(_exception), do: false
 end

@@ -23,6 +23,7 @@
 	/* UI colors */
 	--border-color: var(--accent-color);
 	--hover-bg: #6e6a86;
+	--warning-color: #f6c177;
 }
 
 @font-face {
@@ -295,6 +296,10 @@ blockquote {
 
 	& *+* {
 		margin-top: 1ex;
+	}
+
+	&.warning {
+		border-left-color: var(--warning-color);
 	}
 }
 
@@ -624,6 +629,7 @@ main .table-of-contents-container {
 		padding: 1ex 2ex;
 	}
 }
+
 
 /* ============ Utility Classes ============ */
 .hidden {

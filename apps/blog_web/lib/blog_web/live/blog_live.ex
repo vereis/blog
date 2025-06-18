@@ -230,12 +230,18 @@ defmodule BlogWeb.BlogLive do
 
   @impl Phoenix.LiveView
   def handle_event("search", %{"search" => search_term}, socket) when byte_size(search_term) > 0 do
-    socket = assign(socket, :posts, Posts.list_posts(search: search_term))
+    socket =
+      assign(
+        socket,
+        :posts,
+        Posts.list_posts(search: search_term, order_by: [desc: :published_at])
+      )
+
     {:noreply, socket}
   end
 
   def handle_event("search", _params, socket) do
-    socket = assign(socket, :posts, Posts.list_posts())
+    socket = assign(socket, :posts, Posts.list_posts(order_by: [desc: :published_at]))
     {:noreply, socket}
   end
 
@@ -296,7 +302,7 @@ defmodule BlogWeb.BlogLive do
 
           <div class="component-container">
             <label class="search-container hidden">
-              <span>search :: ~ >></span>
+              <span>search:</span>
               <span class="input-container">
                 <input
                   type="text"
@@ -365,9 +371,9 @@ defmodule BlogWeb.BlogLive do
 
           <h2>Index</h2>
 
-          <.form class="component-container" for={@search} phx-change="search">
-            <label class="search-container hidden">
-              <span>search :: ~ >></span>
+          <.form class="component-container" for={@search} phx-change="search" phx-debounce="300">
+            <label class="search-container">
+              <span>search:</span>
               <.input
                 field={@search[:value]}
                 name="search"
@@ -375,42 +381,59 @@ defmodule BlogWeb.BlogLive do
                 type="text"
                 size="1"
                 placeholder=""
+                phx-debounce="300"
               />
             </label>
 
-            <div>
-              tags:
-              <div class="tags">
-                <%= for tag <- Enum.flat_map(@posts, & &1.tags) |> Enum.uniq() |> Enum.sort() do %>
-                  <.button phx-click="tag" phx-value-tag={tag.label}>
-                    {"#" <> tag.label}
-                  </.button>
-                <% end %>
-                <%= if @tag do %>
-                  <a phx-click="posts">(clear)</a>
-                <% end %>
-              </div>
-            </div>
-          </.form>
-
-          <div class="posts">
-            <%= for post <- @posts, is_nil(@tag) or Enum.any?(post.tags, & &1.label == @tag), not @is_release? or not post.is_draft do %>
-              <div class="post" phx-click="post" phx-value-post={post.slug}>
-                <div class="post-id">{"##{post.id}"}</div>
-                <div class="post-title-container">
-                  <div class="post-title">{post.title}</div>
-                  <div class="post-reading-time">
-                    {Calendar.strftime(post.published_at, "%B %d %Y, %H:%M:%S")}
-                  </div>
-                </div>
+            <% all_tags = Enum.flat_map(@posts, & &1.tags) |> Enum.uniq() |> Enum.sort() %>
+            <%= if not Enum.empty?(all_tags) do %>
+              <div>
+                tags:
                 <div class="tags">
-                  <%= for tag <- post.tags do %>
-                    <span class="tag" phx-click="tag" phx-value-tag={tag.label}>
+                  <%= for tag <- all_tags do %>
+                    <.button phx-click="tag" phx-value-tag={tag.label}>
                       {"#" <> tag.label}
-                    </span>
+                    </.button>
+                  <% end %>
+                  <%= if @tag do %>
+                    <a phx-click="posts">(clear)</a>
                   <% end %>
                 </div>
               </div>
+            <% end %>
+          </.form>
+
+          <div class="posts">
+            <% filtered_posts =
+              Enum.filter(@posts, fn post ->
+                (is_nil(@tag) or Enum.any?(post.tags, &(&1.label == @tag))) and
+                  (not @is_release? or not post.is_draft)
+              end) %>
+
+            <%= if Enum.empty?(filtered_posts) do %>
+              <blockquote class="warning" style="margin-top: 1ex;">
+                <p><strong>Warning:</strong> No content found</p>
+                <p><a href="/posts">Reset page</a></p>
+              </blockquote>
+            <% else %>
+              <%= for post <- filtered_posts do %>
+                <div class="post" phx-click="post" phx-value-post={post.slug}>
+                  <div class="post-id">{"##{post.id}"}</div>
+                  <div class="post-title-container">
+                    <div class="post-title">{post.title}</div>
+                    <div class="post-reading-time">
+                      {Calendar.strftime(post.published_at, "%B %d %Y, %H:%M:%S")}
+                    </div>
+                  </div>
+                  <div class="tags">
+                    <%= for tag <- post.tags do %>
+                      <span class="tag" phx-click="tag" phx-value-tag={tag.label}>
+                        {"#" <> tag.label}
+                      </span>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
             <% end %>
           </div>
         </main>
