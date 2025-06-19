@@ -3,6 +3,14 @@ defmodule Blog.Lanyard do
   Lanyard Discord presence integration context.
   """
 
+  alias Blog.Lanyard.Connection
+  alias Blog.Lanyard.Presence
+
+  # Delegate presence functions to the Presence module
+  defdelegate get_presence(), to: Presence
+  defdelegate has_presence?(), to: Presence
+  defdelegate refresh_presence(), to: Connection
+
   @doc """
   Get the configured Discord user ID.
   """

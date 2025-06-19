@@ -4,6 +4,7 @@ defmodule Blog.Lanyard.ConnectionTest do
   import Mimic
 
   alias Blog.Lanyard.Connection
+  alias Blog.Lanyard.Presence
 
   @valid_presence_response %{
     "success" => true,
@@ -32,9 +33,6 @@ defmodule Blog.Lanyard.ConnectionTest do
   }
 
   setup do
-    # Copy the module we want to mock
-    Mimic.copy(Req)
-
     # Mock default successful response to prevent startup interference
     stub(Req, :get, fn _url ->
       {:ok, %{status: 200, body: @valid_presence_response}}
@@ -148,6 +146,50 @@ defmodule Blog.Lanyard.ConnectionTest do
       pid = start_supervised!(Connection)
       send(pid, :poll)
       :timer.sleep(50)
+    end
+  end
+
+  describe "refresh_presence/0" do
+    @tag :refresh_presence
+    test "forces immediate refresh and returns updated presence" do
+      expect(Req, :get, fn _url ->
+        {:ok, %{status: 200, body: @valid_presence_response}}
+      end)
+
+      expect(Presence, :update_presence, fn presence_data ->
+        assert presence_data == @valid_presence_response["data"]
+        {:ok, %Presence{connected?: true}}
+      end)
+
+      expect(Presence, :get_presence, fn ->
+        %Presence{connected?: true, discord_status: "online"}
+      end)
+
+      _presence_pid = start_supervised!(Presence)
+      _connection_pid = start_supervised!(Connection)
+
+      assert {:ok, presence} = Connection.refresh_presence()
+      assert %Presence{} = presence
+      assert presence.connected? == true
+      assert presence.discord_status == "online"
+    end
+
+    @tag :refresh_presence
+    test "returns ok even when fetch fails" do
+      expect(Req, :get, fn _url ->
+        {:error, :timeout}
+      end)
+
+      expect(Presence, :get_presence, fn ->
+        %Presence{connected?: false}
+      end)
+
+      _presence_pid = start_supervised!(Presence)
+      _connection_pid = start_supervised!(Connection)
+
+      assert {:ok, presence} = Connection.refresh_presence()
+      assert %Presence{} = presence
+      assert presence.connected? == false
     end
   end
 
