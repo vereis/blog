@@ -273,18 +273,23 @@ defmodule BlogWeb.BlogLive do
         </span>
       </header>
 
-      <%= if is_struct(@post) and @post.headings do %>
-        <aside aria-label="Table of contents" class="table-of-contents-container">
-          <p><strong>Table of Contents</strong></p>
-          <%= for {header, index} <- Enum.with_index(@post.headings) do %>
-            <a
-              data-level={header.level}
-              href={header.link}
-              class={if index == 0, do: "active", else: ""}
-            >
-              {header.title}
-            </a>
-          <% end %>
+      <%= if is_struct(@post) and @post.headings != [] do %>
+        <aside aria-label="Navigation" class="aside-navigation">
+          <.online_status_section presence={@presence} />
+          <.listening_to_section presence={@presence} />
+
+          <div class="table-of-contents-container">
+            <p><strong>Table of Contents</strong></p>
+            <%= for {header, index} <- Enum.with_index(@post.headings) do %>
+              <a
+                data-level={header.level}
+                href={header.link}
+                class={if index == 0, do: "active", else: ""}
+              >
+                {header.title}
+              </a>
+            <% end %>
+          </div>
         </aside>
       <% end %>
 
@@ -502,19 +507,19 @@ defmodule BlogWeb.BlogLive do
 
   attr(:presence, :map, required: true)
 
-  def status_indicator(%{presence: %Blog.Lanyard.Presence{} = _presence} = assigns) do
+  def status_indicator(%{presence: %Lanyard.Presence{} = _presence} = assigns) do
     {status, tooltip} =
       case assigns.presence do
-        %Blog.Lanyard.Presence{connected?: true, discord_status: "online"} ->
+        %Lanyard.Presence{connected?: true, discord_status: "online"} ->
           {"status-online", "Online"}
 
-        %Blog.Lanyard.Presence{connected?: true, discord_status: "idle"} ->
+        %Lanyard.Presence{connected?: true, discord_status: "idle"} ->
           {"status-idle", "Idle"}
 
-        %Blog.Lanyard.Presence{connected?: true, discord_status: "dnd"} ->
+        %Lanyard.Presence{connected?: true, discord_status: "dnd"} ->
           {"status-dnd", "Do Not Disturb"}
 
-        %Blog.Lanyard.Presence{connected?: true, discord_status: "offline"} ->
+        %Lanyard.Presence{connected?: true, discord_status: "offline"} ->
           {"status-offline", "Offline"}
 
         _disconnected ->
@@ -535,6 +540,36 @@ defmodule BlogWeb.BlogLive do
   def button(assigns) do
     ~H"""
     <a {@rest} href={@href}>{render_slot(@inner_block)}</a>
+    """
+  end
+
+  attr(:presence, :map, required: true)
+
+  def online_status_section(assigns) do
+    ~H"""
+    <div class="presence-section online-status-section">
+      <p><strong>Online Status</strong> <.status_indicator presence={@presence} /></p>
+      <%= if @presence.connected? do %>
+        <p class="presence-content">
+          {Enum.find(@presence.activities || [], %{}, &(&1["id"] == "custom"))["state"]}
+        </p>
+      <% end %>
+    </div>
+    """
+  end
+
+  attr(:presence, :map, required: true)
+
+  def listening_to_section(assigns) do
+    ~H"""
+    <div class="presence-section">
+      <p><strong>Listening To</strong></p>
+      <%= if @presence.connected? and @presence.listening_to_spotify and @presence.spotify do %>
+        <p class="presence-content">{@presence.spotify["song"]} - {@presence.spotify["artist"]}</p>
+      <% else %>
+        <p class="presence-content">N/A</p>
+      <% end %>
+    </div>
     """
   end
 end
