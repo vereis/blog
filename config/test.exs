@@ -39,4 +39,4 @@ config :phoenix_live_view,
 # Configure Lanyard with test values
 config :blog,
   lanyard_discord_user_id: "382588737441497088",
-  lanyard_poll_interval: 120_000
+  lanyard_poll_interval: 10_000
