@@ -23,6 +23,15 @@ defmodule Blog.Lanyard.Connection do
     GenServer.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
+  @doc """
+  Force an immediate refresh of presence data.
+  """
+  @spec refresh_presence() :: {:ok, Presence.t()}
+  def refresh_presence do
+    :ok = GenServer.call(__MODULE__, :refresh_presence)
+    {:ok, Presence.get_presence()}
+  end
+
   @impl GenServer
   def init(_opts) do
     Logger.info("Starting Lanyard HTTP polling client")
@@ -68,6 +77,21 @@ defmodule Blog.Lanyard.Connection do
   def handle_info(message, state) do
     Logger.debug("Unhandled message: #{inspect(message)}")
     {:noreply, state}
+  end
+
+  @impl GenServer
+  def handle_call(:refresh_presence, _from, state) do
+    Logger.info("Manual presence refresh requested")
+
+    case fetch_presence() do
+      {:ok, presence_data} ->
+        update_state(presence_data)
+        {:reply, :ok, %{state | last_presence: presence_data}}
+
+      {:error, reason} ->
+        Logger.error("Failed to refresh presence data: #{inspect(reason)}")
+        {:reply, :ok, state}
+    end
   end
 
   # Private functions

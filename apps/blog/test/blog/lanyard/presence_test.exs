@@ -1,8 +1,9 @@
 defmodule Blog.Lanyard.PresenceTest do
   use ExUnit.Case, async: true
 
-  alias Blog.Lanyard.Presence
   import ExUnit.CaptureLog
+
+  alias Blog.Lanyard.Presence
 
   @sample_api_data %{
     "discord_user" => %{
