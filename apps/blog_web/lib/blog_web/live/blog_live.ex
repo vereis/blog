@@ -237,8 +237,7 @@ defmodule BlogWeb.BlogLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_event("search", %{"search" => search_term}, socket)
-      when byte_size(search_term) > 0 do
+  def handle_event("search", %{"search" => search_term}, socket) when byte_size(search_term) > 0 do
     socket =
       assign(
         socket,
