@@ -89,6 +89,10 @@ defmodule Blog.Lanyard.Presence do
       [{@presence_key, presence_data}] -> presence_data
       [] -> disconnected()
     end
+  rescue
+    ArgumentError ->
+      # ETS table doesn't exist (e.g., in tests)
+      disconnected()
   end
 
   @doc """

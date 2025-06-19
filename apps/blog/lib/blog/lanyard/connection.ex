@@ -122,6 +122,9 @@ defmodule Blog.Lanyard.Connection do
   end
 
   defp update_state(presence_data) do
-    {:ok, _presence} = Presence.update_presence(presence_data)
+    {:ok, presence} = Presence.update_presence(presence_data)
+
+    # Broadcast presence update to subscribers
+    Phoenix.PubSub.broadcast(Blog.PubSub, "lanyard:presence", {:presence_updated, presence})
   end
 end
