@@ -273,11 +273,11 @@ defmodule BlogWeb.BlogLive do
         </span>
       </header>
 
-      <%= if is_struct(@post) and @post.headings != [] do %>
-        <aside aria-label="Navigation" class="aside-navigation">
-          <.online_status_section presence={@presence} />
-          <.listening_to_section presence={@presence} />
-          <!-- TODO: Add Rich Presence for Activities -->
+      <aside aria-label="Navigation" class="aside-navigation">
+        <.online_status_section presence={@presence} />
+        <.listening_to_section presence={@presence} />
+
+        <%= if @live_action in [:show_post, :home] and is_struct(@post) and @post.headings != [] do %>
           <div class="table-of-contents-container">
             <p><strong>Table of Contents</strong></p>
             <%= for {header, index} <- Enum.with_index(@post.headings) do %>
@@ -290,8 +290,8 @@ defmodule BlogWeb.BlogLive do
               </a>
             <% end %>
           </div>
-        </aside>
-      <% end %>
+        <% end %>
+      </aside>
 
       <%= if @live_action == :list_projects do %>
         <main>
