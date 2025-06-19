@@ -7,7 +7,7 @@ defmodule Blog.Application do
 
   @impl Application
   def start(_type, _args) do
-    children = [
+    base_children = [
       Blog.Repo.Postgres,
       Blog.Repo.SQLite,
       Blog.Release.Migrator,
@@ -15,6 +15,12 @@ defmodule Blog.Application do
       {Phoenix.PubSub, name: Blog.PubSub},
       Blog.Resource.Watcher
     ]
+
+    children =
+      case Blog.env() do
+        :test -> base_children
+        _env -> base_children ++ [Blog.Lanyard.Supervisor]
+      end
 
     Supervisor.start_link(children, strategy: :one_for_one, name: Blog.Supervisor)
   end

@@ -27,7 +27,6 @@ config :blog_web, BlogWeb.Endpoint,
   secret_key_base: "WQ6Qx69Cigy0gmaPFyzlQxCOeIiIQFpR5XsdJert0ESc4FKfiQ37i1tw+8gMLLbQ",
   server: false
 
-# Print only warnings and errors during test
 config :logger, level: :warning
 
 # Initialize plugs at runtime for faster test compilation
@@ -36,3 +35,8 @@ config :phoenix, :plug_init_mode, :runtime
 # Enable helpful, but potentially expensive runtime checks
 config :phoenix_live_view,
   enable_expensive_runtime_checks: true
+
+# Configure Lanyard with test values
+config :blog,
+  lanyard_discord_user_id: "382588737441497088",
+  lanyard_poll_interval: 120_000
