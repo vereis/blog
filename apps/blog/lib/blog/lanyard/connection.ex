@@ -5,6 +5,7 @@ defmodule Blog.Lanyard.Connection do
   use GenServer
 
   alias Blog.Lanyard
+  alias Blog.Lanyard.Presence
 
   require Logger
 
@@ -96,8 +97,7 @@ defmodule Blog.Lanyard.Connection do
     end
   end
 
-  defp update_state(_presence_data) do
-    # Stub function - no-op for now
-    :ok
+  defp update_state(presence_data) do
+    {:ok, _presence} = Presence.update_presence(presence_data)
   end
 end
