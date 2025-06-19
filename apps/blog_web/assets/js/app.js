@@ -140,14 +140,14 @@ const initScrollspy = () => {
       }
 
       const headings = document.querySelectorAll('main h1, main h2, main h3, main h4, main h5, main h6');
-      const tocLinks = document.querySelectorAll('aside.table-of-contents-container a');
+      const tocLinks = document.querySelectorAll('aside .table-of-contents-container a');
 
       if (headings.length === 0 || tocLinks.length === 0) return;
 
       scrollspyObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           const id = entry.target.id;
-          const tocLink = document.querySelector(`aside.table-of-contents-container a[href="#${id}"]`);
+          const tocLink = document.querySelector(`aside .table-of-contents-container a[href="#${id}"]`);
 
           if (tocLink) {
             if (entry.isIntersecting) {
