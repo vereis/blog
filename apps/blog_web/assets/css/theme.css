@@ -87,8 +87,8 @@ body {
 		padding: 2ex;
 
 		/* Padding only when user scrolls and its sticky */
-		margin-top: -4ex;
-		padding-top: 4ex;
+		margin-top: -3ex;
+		padding-top: 3ex;
 	}
 }
 
@@ -111,6 +111,15 @@ main {
 
 aside {
 	grid-area: aside;
+
+	& > *:not(:first-child) {
+		margin-top: 1ex;
+		margin-bottom: 0;
+	}
+
+	& .presence-content {
+		color: var(--text-muted);
+	}
 }
 
 footer {
@@ -591,6 +600,9 @@ footer .button-container > * {
 main .table-of-contents-container {
 	display: none;
 
+	margin-top: -1ex;
+	margin-bottom: 1ex;
+
 	/* Always show active styling for inline TOC since it's just navigation */
 	& a {
 		color: #9ccfd8 !important;
@@ -601,9 +613,6 @@ main .table-of-contents-container {
 	display: flex;
 	flex-direction: column;
 	grid-area: aside;
-
-	margin-top: -1ex;
-	margin-bottom: 1ex;
 
 	& a[data-level="2"] {
 		margin-left: 2ex;
@@ -715,7 +724,6 @@ main .table-of-contents-container {
 		padding: 1ex 2ex;
 	}
 }
-
 
 /* ============ Utility Classes ============ */
 .hidden {
