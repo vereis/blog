@@ -372,9 +372,8 @@ defmodule BlogWeb.BlogLiveTest do
   end
 
   describe "presence sections" do
-    test "shows online status section when post has headings", %{conn: conn} do
-      headings = [%{id: "test", link: "#test", title: "Test", level: 1}]
-      insert(:post, slug: "hello_world", headings: headings)
+    test "shows online status section always", %{conn: conn} do
+      insert(:post, slug: "hello_world", headings: [])
 
       {:ok, _view, html} = live(conn, ~p"/")
 
@@ -383,9 +382,8 @@ defmodule BlogWeb.BlogLiveTest do
       assert html =~ "status-indicator"
     end
 
-    test "shows listening to section when post has headings", %{conn: conn} do
-      headings = [%{id: "test", link: "#test", title: "Test", level: 1}]
-      insert(:post, slug: "hello_world", headings: headings)
+    test "shows listening to section always", %{conn: conn} do
+      insert(:post, slug: "hello_world", headings: [])
 
       {:ok, _view, html} = live(conn, ~p"/")
 
@@ -461,14 +459,18 @@ defmodule BlogWeb.BlogLiveTest do
       assert updated_html =~ "presence-content"
     end
 
-    test "presence sections not shown when no headings", %{conn: conn} do
+    test "table of contents not shown when no headings but presence sections still shown", %{conn: conn} do
       insert(:post, slug: "hello_world", headings: [])
 
       {:ok, _view, html} = live(conn, ~p"/")
 
-      refute html =~ "Online Status"
-      refute html =~ "Listening To"
-      refute html =~ "online-status-section"
+      # Presence sections should always be shown
+      assert html =~ "Online Status"
+      assert html =~ "Listening To"
+      assert html =~ "online-status-section"
+
+      # But table of contents should not be shown
+      refute html =~ "Table of Contents"
     end
 
     test "presence sections have proper CSS classes", %{conn: conn} do
@@ -516,6 +518,20 @@ defmodule BlogWeb.BlogLiveTest do
 
       # Check they appear before table of contents
       assert html =~ ~r/Online Status.*?Listening To.*?Table of Contents/s
+    end
+
+    test "presence sections shown on posts list page but no table of contents", %{conn: conn} do
+      insert(:post, title: "Test Post", is_draft: false)
+
+      {:ok, _view, html} = live(conn, ~p"/posts/")
+
+      # Presence sections should always be shown
+      assert html =~ "Online Status"
+      assert html =~ "Listening To"
+      assert html =~ "aside-navigation"
+
+      # But table of contents should not be shown on posts list
+      refute html =~ "Table of Contents"
     end
   end
 end
