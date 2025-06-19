@@ -191,6 +191,29 @@ defmodule Blog.Lanyard.ConnectionTest do
       assert %Presence{} = presence
       assert presence.connected? == false
     end
+
+    test "broadcasts presence updates via PubSub when data changes" do
+      expect(Req, :get, fn _url ->
+        {:ok, %{status: 200, body: @valid_presence_response}}
+      end)
+
+      expect(Presence, :update_presence, fn presence_data ->
+        assert presence_data == @valid_presence_response["data"]
+        {:ok, %Presence{connected?: true, discord_status: "online"}}
+      end)
+
+      # Subscribe to PubSub events
+      Phoenix.PubSub.subscribe(Blog.PubSub, "lanyard:presence")
+
+      _presence_pid = start_supervised!(Presence)
+      _connection_pid = start_supervised!(Connection)
+
+      # Force a refresh which should broadcast
+      Connection.refresh_presence()
+
+      # Should receive PubSub message
+      assert_receive {:presence_updated, %Presence{connected?: true}}, 100
+    end
   end
 
   describe "message handling" do

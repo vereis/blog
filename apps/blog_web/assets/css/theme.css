@@ -24,6 +24,13 @@
 	--border-color: var(--accent-color);
 	--hover-bg: #6e6a86;
 	--warning-color: #f6c177;
+
+	/* Status indicator colors */
+	--status-online: #56a56a;
+	--status-idle: #f6c177;
+	--status-dnd: #eb6f92;
+	--status-offline: #6e6a86;
+	--status-disconnected: #6e6a86;
 }
 
 @font-face {
@@ -121,7 +128,6 @@ footer {
 		padding-left: 1ex;
 		padding-right: 1ex;
 	}
-
 }
 
 h1 {
@@ -312,6 +318,86 @@ blockquote {
 }
 
 /* ============ Component Styles ============ */
+.status-indicator {
+	display: inline-block;
+	width: 1ex;
+	height: 1ex;
+	border-radius: 100%;
+	margin-left: 0.5ex;
+	margin-right: 0.5ex;
+	vertical-align: middle;
+	box-shadow: 0 0 1ex currentColor, 0 0 2ex currentColor;
+	transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+	position: relative;
+	cursor: help;
+
+	&.status-online {
+		background-color: var(--status-online);
+		color: var(--status-online);
+	}
+
+	&.status-idle {
+		background-color: var(--status-idle);
+		color: var(--status-idle);
+	}
+
+	&.status-dnd {
+		background-color: var(--status-dnd);
+		color: var(--status-dnd);
+	}
+
+	&.status-offline {
+		background-color: var(--status-offline);
+		color: var(--status-offline);
+	}
+
+	&.status-disconnected {
+		background-color: var(--status-disconnected);
+		color: var(--status-disconnected);
+	}
+
+	&::after {
+		content: attr(data-tooltip);
+		position: absolute;
+		bottom: 120%;
+		left: 50%;
+		transform: translateX(-50%);
+		background-color: var(--bg-primary);
+		color: var(--text-primary);
+		padding: 1ex 2ex;
+		font-size: 0.8em;
+		white-space: nowrap;
+		z-index: 1000;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.2s ease-in-out;
+	}
+
+	&::before {
+		content: '';
+		position: absolute;
+		bottom: 110%;
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 1000;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	&:hover::after,
+	&:hover::before {
+		opacity: 1;
+	}
+}
+
+/* Touch devices support */
+@media (hover: none) and (pointer: coarse) {
+	.status-indicator:active::after,
+	.status-indicator:active::before {
+		opacity: 1;
+	}
+}
+
 .button {
 	cursor: pointer;
 }

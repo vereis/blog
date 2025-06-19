@@ -324,5 +324,50 @@ defmodule BlogWeb.BlogLiveTest do
       assert html =~ "source code"
       assert html =~ "https://github.com/vereis/blog"
     end
+
+    test "includes Discord presence status indicator", %{conn: conn} do
+      insert(:post, slug: "hello_world")
+
+      {:ok, _view, html} = live(conn, ~p"/")
+
+      assert html =~ "status-indicator status-disconnected"
+      assert html =~ "data-tooltip=\"Disconnected\""
+    end
+
+    test "updates status indicator when presence changes", %{conn: conn} do
+      insert(:post, slug: "hello_world")
+
+      {:ok, view, html} = live(conn, ~p"/")
+
+      # Initially shows disconnected
+      assert html =~ "data-tooltip=\"Disconnected\""
+      assert html =~ "status-disconnected"
+
+      # Simulate presence update via PubSub
+      online_presence = %Blog.Lanyard.Presence{
+        connected?: true,
+        discord_status: "online",
+        discord_user: %{"username" => "vereis"}
+      }
+
+      send(view.pid, {:presence_updated, online_presence})
+
+      # Should update to online status
+      updated_html = render(view)
+      assert updated_html =~ "data-tooltip=\"Online\""
+      assert updated_html =~ "status-online"
+    end
+
+    test "includes custom tooltip with CSS styling", %{conn: conn} do
+      insert(:post, slug: "hello_world")
+
+      {:ok, _view, html} = live(conn, ~p"/")
+
+      # Should have the tooltip data attribute for CSS ::after content
+      assert html =~ "data-tooltip=\"Disconnected\""
+
+      # Should have help cursor and positioning for tooltip
+      assert html =~ "status-indicator"
+    end
   end
 end
