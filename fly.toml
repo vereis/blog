@@ -15,6 +15,7 @@ kill_signal = 'SIGTERM'
   BLOG_HOST="vereis.com"
   BLOG_PORT="8080"
   ECTO_IPV6="true"
+  LANYARD_POLL_INTERVAL="5"
 
 [http_service]
   internal_port = 8080
