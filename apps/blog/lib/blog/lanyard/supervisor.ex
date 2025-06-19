@@ -12,6 +12,8 @@ defmodule Blog.Lanyard.Supervisor do
   @impl Supervisor
   def init(_opts) do
     children = [
+      # Presence manager must start first as Connection depends on it
+      Blog.Lanyard.Presence,
       Blog.Lanyard.Connection
     ]
 
