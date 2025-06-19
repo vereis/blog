@@ -237,7 +237,8 @@ defmodule BlogWeb.BlogLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_event("search", %{"search" => search_term}, socket) when byte_size(search_term) > 0 do
+  def handle_event("search", %{"search" => search_term}, socket)
+      when byte_size(search_term) > 0 do
     socket =
       assign(
         socket,
@@ -277,7 +278,7 @@ defmodule BlogWeb.BlogLive do
         <aside aria-label="Navigation" class="aside-navigation">
           <.online_status_section presence={@presence} />
           <.listening_to_section presence={@presence} />
-
+          <!-- TODO: Add Rich Presence for Activities -->
           <div class="table-of-contents-container">
             <p><strong>Table of Contents</strong></p>
             <%= for {header, index} <- Enum.with_index(@post.headings) do %>
