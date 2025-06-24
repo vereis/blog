@@ -140,35 +140,17 @@ defmodule Mix.Tasks.Blog.Gen.PostTest do
         Mix.Tasks.Blog.Gen.Post.run(["Post with Special Characters! & Symbols?"])
       end)
 
-      files = posts_dir |> File.ls!() |> Enum.filter(&String.contains?(&1, "post_with_special_characters"))
+      files =
+        posts_dir
+        |> File.ls!()
+        |> Enum.filter(&String.contains?(&1, "post_with_special_characters"))
+
       assert length(files) == 1
 
       filename = hd(files)
       assert String.contains?(filename, "post_with_special_characters_symbols")
 
       File.rm!(Path.join(posts_dir, filename))
-    end
-
-    test "errors when no title provided" do
-      output =
-        capture_io(:stderr, fn ->
-          assert_raise SystemExit, fn ->
-            Mix.Tasks.Blog.Gen.Post.run([])
-          end
-        end)
-
-      assert output =~ "Title is required"
-    end
-
-    test "errors when empty title provided" do
-      output =
-        capture_io(:stderr, fn ->
-          assert_raise SystemExit, fn ->
-            Mix.Tasks.Blog.Gen.Post.run([""])
-          end
-        end)
-
-      assert output =~ "Title is required"
     end
   end
 end

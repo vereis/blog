@@ -25,9 +25,11 @@ defmodule Mix.Tasks.Blog.Gen.Post do
 
   use Mix.Task
 
+  alias Blog.Resource.Post
+
   @impl Mix.Task
   def run(args) do
-    {opts, positional_args, _} =
+    {opts, positional_args, _invalid} =
       OptionParser.parse(args,
         switches: [
           draft: :boolean,
@@ -43,7 +45,7 @@ defmodule Mix.Tasks.Blog.Gen.Post do
 
     title =
       case positional_args do
-        [title | _] -> title
+        [title | _rest] -> title
         [] -> nil
       end
 
@@ -57,7 +59,7 @@ defmodule Mix.Tasks.Blog.Gen.Post do
     filename = "#{timestamp}_#{slug}.md"
 
     # Use the same directory resolution as Blog.Resource.Post
-    posts_dir = Blog.Resource.Post.source()
+    posts_dir = Post.source()
     file_path = Path.join([posts_dir, filename])
 
     tags = parse_tags(opts[:tags])
