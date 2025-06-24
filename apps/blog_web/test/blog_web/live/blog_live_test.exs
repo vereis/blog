@@ -324,5 +324,214 @@ defmodule BlogWeb.BlogLiveTest do
       assert html =~ "source code"
       assert html =~ "https://github.com/vereis/blog"
     end
+
+    test "includes Discord presence status indicator", %{conn: conn} do
+      insert(:post, slug: "hello_world")
+
+      {:ok, _view, html} = live(conn, ~p"/")
+
+      assert html =~ "status-indicator status-disconnected"
+      assert html =~ "data-tooltip=\"Disconnected\""
+    end
+
+    test "updates status indicator when presence changes", %{conn: conn} do
+      insert(:post, slug: "hello_world")
+
+      {:ok, view, html} = live(conn, ~p"/")
+
+      # Initially shows disconnected
+      assert html =~ "data-tooltip=\"Disconnected\""
+      assert html =~ "status-disconnected"
+
+      # Simulate presence update via PubSub
+      online_presence = %Blog.Lanyard.Presence{
+        connected?: true,
+        discord_status: "online",
+        discord_user: %{"username" => "vereis"}
+      }
+
+      send(view.pid, {:presence_updated, online_presence})
+
+      # Should update to online status
+      updated_html = render(view)
+      assert updated_html =~ "data-tooltip=\"Online\""
+      assert updated_html =~ "status-online"
+    end
+
+    test "includes custom tooltip with CSS styling", %{conn: conn} do
+      insert(:post, slug: "hello_world")
+
+      {:ok, _view, html} = live(conn, ~p"/")
+
+      # Should have the tooltip data attribute for CSS ::after content
+      assert html =~ "data-tooltip=\"Disconnected\""
+
+      # Should have help cursor and positioning for tooltip
+      assert html =~ "status-indicator"
+    end
+  end
+
+  describe "presence sections" do
+    test "shows online status section always", %{conn: conn} do
+      insert(:post, slug: "hello_world", headings: [])
+
+      {:ok, _view, html} = live(conn, ~p"/")
+
+      assert html =~ "Online Status"
+      assert html =~ "online-status-section"
+      assert html =~ "status-indicator"
+    end
+
+    test "shows listening to section always", %{conn: conn} do
+      insert(:post, slug: "hello_world", headings: [])
+
+      {:ok, _view, html} = live(conn, ~p"/")
+
+      assert html =~ "Listening To"
+      assert html =~ "presence-content"
+      assert html =~ "N/A"
+    end
+
+    test "shows spotify info when connected and listening", %{conn: conn} do
+      headings = [%{id: "test", link: "#test", title: "Test", level: 1}]
+      insert(:post, slug: "hello_world", headings: headings)
+
+      {:ok, view, _html} = live(conn, ~p"/")
+
+      # Simulate presence update with Spotify data
+      spotify_presence = %Blog.Lanyard.Presence{
+        connected?: true,
+        discord_status: "online",
+        listening_to_spotify: true,
+        spotify: %{
+          "song" => "Test Song",
+          "artist" => "Test Artist",
+          "album" => "Test Album"
+        }
+      }
+
+      send(view.pid, {:presence_updated, spotify_presence})
+
+      updated_html = render(view)
+      assert updated_html =~ "Test Song - Test Artist"
+      refute updated_html =~ "N/A"
+    end
+
+    test "shows N/A when not listening to spotify", %{conn: conn} do
+      headings = [%{id: "test", link: "#test", title: "Test", level: 1}]
+      insert(:post, slug: "hello_world", headings: headings)
+
+      {:ok, view, _html} = live(conn, ~p"/")
+
+      # Simulate presence update without Spotify
+      no_spotify_presence = %Blog.Lanyard.Presence{
+        connected?: true,
+        discord_status: "online",
+        listening_to_spotify: false,
+        spotify: nil
+      }
+
+      send(view.pid, {:presence_updated, no_spotify_presence})
+
+      updated_html = render(view)
+      assert updated_html =~ "N/A"
+    end
+
+    test "shows custom status message when available", %{conn: conn} do
+      headings = [%{id: "test", link: "#test", title: "Test", level: 1}]
+      insert(:post, slug: "hello_world", headings: headings)
+
+      {:ok, view, _html} = live(conn, ~p"/")
+
+      # Simulate presence with custom status
+      custom_status_presence = %Blog.Lanyard.Presence{
+        connected?: true,
+        discord_status: "online",
+        activities: [
+          %{"id" => "custom", "state" => "Working on blog", "type" => 4}
+        ]
+      }
+
+      send(view.pid, {:presence_updated, custom_status_presence})
+
+      updated_html = render(view)
+      assert updated_html =~ "Working on blog"
+      assert updated_html =~ "presence-content"
+    end
+
+    test "table of contents not shown when no headings but presence sections still shown", %{conn: conn} do
+      insert(:post, slug: "hello_world", headings: [])
+
+      {:ok, _view, html} = live(conn, ~p"/")
+
+      # Presence sections should always be shown
+      assert html =~ "Online Status"
+      assert html =~ "Listening To"
+      assert html =~ "online-status-section"
+
+      # But table of contents should not be shown
+      refute html =~ "Table of Contents"
+    end
+
+    test "presence sections have proper CSS classes", %{conn: conn} do
+      headings = [%{id: "test", link: "#test", title: "Test", level: 1}]
+      insert(:post, slug: "hello_world", headings: headings)
+
+      {:ok, _view, html} = live(conn, ~p"/")
+
+      assert html =~ "presence-section online-status-section"
+      assert html =~ "presence-section"
+      assert html =~ "presence-content"
+    end
+
+    test "status indicator updates with presence changes", %{conn: conn} do
+      headings = [%{id: "test", link: "#test", title: "Test", level: 1}]
+      insert(:post, slug: "hello_world", headings: headings)
+
+      {:ok, view, html} = live(conn, ~p"/")
+
+      # Initially disconnected
+      assert html =~ "status-disconnected"
+
+      # Update to DND status
+      dnd_presence = %Blog.Lanyard.Presence{
+        connected?: true,
+        discord_status: "dnd"
+      }
+
+      send(view.pid, {:presence_updated, dnd_presence})
+
+      updated_html = render(view)
+      assert updated_html =~ "status-dnd"
+      assert updated_html =~ "data-tooltip=\"Do Not Disturb\""
+    end
+
+    test "presence sections maintain proper spacing and structure", %{conn: conn} do
+      headings = [%{id: "test", link: "#test", title: "Test", level: 1}]
+      insert(:post, slug: "hello_world", headings: headings)
+
+      {:ok, _view, html} = live(conn, ~p"/")
+
+      # Check that both sections exist and are properly structured
+      assert html =~ ~r/<div class="presence-section online-status-section">.*?<\/div>/s
+      assert html =~ ~r/<div class="presence-section">.*?Listening To.*?<\/div>/s
+
+      # Check they appear before table of contents
+      assert html =~ ~r/Online Status.*?Listening To.*?Table of Contents/s
+    end
+
+    test "presence sections shown on posts list page but no table of contents", %{conn: conn} do
+      insert(:post, title: "Test Post", is_draft: false)
+
+      {:ok, _view, html} = live(conn, ~p"/posts/")
+
+      # Presence sections should always be shown
+      assert html =~ "Online Status"
+      assert html =~ "Listening To"
+      assert html =~ "aside-navigation"
+
+      # But table of contents should not be shown on posts list
+      refute html =~ "Table of Contents"
+    end
   end
 end

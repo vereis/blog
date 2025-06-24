@@ -4,6 +4,7 @@ defmodule BlogWeb.BlogLive do
 
   import BlogWeb.CoreComponents, only: [input: 1]
 
+  alias Blog.Lanyard
   alias Blog.Posts
   alias Phoenix.LiveView.JS
 
@@ -111,6 +112,7 @@ defmodule BlogWeb.BlogLive do
   def mount(params, _session, socket) do
     Phoenix.PubSub.subscribe(Blog.PubSub, "post:reload")
     Phoenix.PubSub.subscribe(Blog.PubSub, "image:reload")
+    Phoenix.PubSub.subscribe(Blog.PubSub, "lanyard:presence")
 
     posts = Posts.list_posts(order_by: [desc: :published_at])
     post = Posts.get_post(slug: params["slug"] || "hello_world")
@@ -123,6 +125,7 @@ defmodule BlogWeb.BlogLive do
       |> assign_new(:projects, fn -> @projects end)
       |> assign_new(:tag, fn -> nil end)
       |> assign_new(:search, fn -> %{} end)
+      |> assign_new(:presence, fn -> Lanyard.get_presence() end)
 
     {:ok, socket}
   end
@@ -167,6 +170,11 @@ defmodule BlogWeb.BlogLive do
   def handle_info({:resource_reload, _resource_type, _id}, socket) do
     # Handle other resource types generically
     {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({:presence_updated, presence}, socket) do
+    {:noreply, assign(socket, :presence, presence)}
   end
 
   @impl Phoenix.LiveView
@@ -252,7 +260,7 @@ defmodule BlogWeb.BlogLive do
       <header>
         <span class="button-container">
           <.button phx-click="home">
-            root@vereis.com ~
+            <.status_indicator presence={@presence} /> root@vereis.com ~
             <blink>█</blink>
           </.button>
         </span>
@@ -265,20 +273,25 @@ defmodule BlogWeb.BlogLive do
         </span>
       </header>
 
-      <%= if is_struct(@post) and @post.headings do %>
-        <aside aria-label="Table of contents" class="table-of-contents-container">
-          <p><strong>Table of Contents</strong></p>
-          <%= for {header, index} <- Enum.with_index(@post.headings) do %>
-            <a
-              data-level={header.level}
-              href={header.link}
-              class={if index == 0, do: "active", else: ""}
-            >
-              {header.title}
-            </a>
-          <% end %>
-        </aside>
-      <% end %>
+      <aside aria-label="Navigation" class="aside-navigation">
+        <.online_status_section presence={@presence} />
+        <.listening_to_section presence={@presence} />
+
+        <%= if @live_action in [:show_post, :home] and is_struct(@post) and @post.headings != [] do %>
+          <div class="table-of-contents-container">
+            <p><strong>Table of Contents</strong></p>
+            <%= for {header, index} <- Enum.with_index(@post.headings) do %>
+              <a
+                data-level={header.level}
+                href={header.link}
+                class={if index == 0, do: "active", else: ""}
+              >
+                {header.title}
+              </a>
+            <% end %>
+          </div>
+        <% end %>
+      </aside>
 
       <%= if @live_action == :list_projects do %>
         <main>
@@ -492,6 +505,34 @@ defmodule BlogWeb.BlogLive do
     """
   end
 
+  attr(:presence, :map, required: true)
+
+  def status_indicator(%{presence: %Lanyard.Presence{} = _presence} = assigns) do
+    {status, tooltip} =
+      case assigns.presence do
+        %Lanyard.Presence{connected?: true, discord_status: "online"} ->
+          {"status-online", "Online"}
+
+        %Lanyard.Presence{connected?: true, discord_status: "idle"} ->
+          {"status-idle", "Idle"}
+
+        %Lanyard.Presence{connected?: true, discord_status: "dnd"} ->
+          {"status-dnd", "Do Not Disturb"}
+
+        %Lanyard.Presence{connected?: true, discord_status: "offline"} ->
+          {"status-offline", "Offline"}
+
+        _disconnected ->
+          {"status-disconnected", "Disconnected"}
+      end
+
+    assigns = assign(assigns, status: status, tooltip: tooltip)
+
+    ~H"""
+    <span class={["status-indicator", @status]} data-tooltip={@tooltip}></span>
+    """
+  end
+
   attr(:href, :string, default: nil)
   slot(:inner_block, required: true)
   attr(:rest, :global, include: ~w(disabled form name value))
@@ -499,6 +540,36 @@ defmodule BlogWeb.BlogLive do
   def button(assigns) do
     ~H"""
     <a {@rest} href={@href}>{render_slot(@inner_block)}</a>
+    """
+  end
+
+  attr(:presence, :map, required: true)
+
+  def online_status_section(assigns) do
+    ~H"""
+    <div class="presence-section online-status-section">
+      <p><strong>Online Status</strong> <.status_indicator presence={@presence} /></p>
+      <%= if @presence.connected? do %>
+        <p class="presence-content">
+          {Enum.find(@presence.activities || [], %{}, &(&1["id"] == "custom"))["state"]}
+        </p>
+      <% end %>
+    </div>
+    """
+  end
+
+  attr(:presence, :map, required: true)
+
+  def listening_to_section(assigns) do
+    ~H"""
+    <div class="presence-section">
+      <p><strong>Listening To</strong></p>
+      <%= if @presence.connected? and @presence.listening_to_spotify and @presence.spotify do %>
+        <p class="presence-content">{@presence.spotify["song"]} - {@presence.spotify["artist"]}</p>
+      <% else %>
+        <p class="presence-content">N/A</p>
+      <% end %>
+    </div>
     """
   end
 end

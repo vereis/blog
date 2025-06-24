@@ -15,7 +15,7 @@ defmodule Blog.Umbrella.MixProject do
         dialyzer: :dev
       ],
       dialyzer: [
-        plt_add_apps: [:mix, :ex_unit]
+        plt_add_apps: [:mix, :ex_unit, :req]
       ]
     ]
   end
