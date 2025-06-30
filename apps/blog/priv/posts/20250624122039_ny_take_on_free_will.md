@@ -1,7 +1,7 @@
 ---
 title: My Take On Free Will
 slug: my_take_on_free_will
-is_draft: true
+is_draft: false
 is_redacted: false
 reading_time_minutes:
 published_at: 2025-06-24 12:20:39.340751Z
@@ -386,19 +386,19 @@ One beautiful aspect of determinism is how it explains the persistence and evolu
 
 -record(society, {
     laws,
-    education, 
+    education,
     individuals,
     future_state
 }).
 
 evolve(#society{individuals = Individuals} = Society) ->
     % Some individuals are determined to uphold traditions
-    % Others are determined to rebel and change things  
+    % Others are determined to rebel and change things
     % The tension between these creates societal evolution
-    Contributions = lists:map(fun(Person) -> 
-        contribute_to_society(Person, Society) 
+    Contributions = lists:map(fun(Person) ->
+        contribute_to_society(Person, Society)
     end, Individuals),
-    
+
     FutureState = lists:foldl(fun merge_social_forces/2, #{}, Contributions),
     Society#society{future_state = FutureState}.
 
@@ -435,15 +435,15 @@ new(InitialConditions) ->
 
 next_generation(#cultural_evolution{generation = Gen, cultural_values = Values} = State) ->
     NewGen = Gen + 1,
-    
+
     % Each generation is shaped by the previous
     Educators = select_educators(Values),
-    Rebels = select_rebels(Values), 
+    Rebels = select_rebels(Values),
     Conformists = select_conformists(Values),
-    
+
     % The new values emerge from the tension between these groups
     NewValues = synthesize(Educators, Rebels, Conformists),
-    
+
     % But this synthesis is itself determined by the personalities
     % and circumstances that were determined by previous generations
     State#cultural_evolution{
@@ -511,14 +511,14 @@ This is doubly true per the above section on `Systems Determining Systems`.
 punish_criminal(Criminal, Crime) ->
     % Not because they "chose" evil
     % But because punishment serves multiple functions:
-    
+
     Punishment = determine_punishment(Crime),
-    
+
     % These all serve the system's purpose
     deter_others(Punishment),          % Biases future behavior
-    protect_society(Criminal),         % Removes dangerous individuals  
+    protect_society(Criminal),         % Removes dangerous individuals
     satisfy_victims(Punishment),       % Maintains social cohesion
-    
+
     % The criminal was determined to commit the crime
     % Society is determined to respond with punishment
     % Both are playing their roles in a larger system
