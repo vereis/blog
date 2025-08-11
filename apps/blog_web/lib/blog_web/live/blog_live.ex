@@ -268,7 +268,8 @@ defmodule BlogWeb.BlogLive do
           <.button phx-click="posts">blog</.button>
           <.button phx-click="projects">projects</.button>
           <label class="button">
-            crt <input id="crtFilter" phx-click={JS.dispatch("toggle-crt-filter")} type="checkbox" />
+            <span>crt</span>
+            <input id="crtFilter" phx-click={JS.dispatch("toggle-crt-filter")} type="checkbox" />
           </label>
         </span>
       </header>
