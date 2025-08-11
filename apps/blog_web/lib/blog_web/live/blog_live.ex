@@ -479,16 +479,6 @@ defmodule BlogWeb.BlogLive do
               Approx. {@post.reading_time_minutes} minute read
             </div>
           </div>
-
-          <%= if @post.headings != [] do %>
-            <nav class="table-of-contents-container">
-              <p><strong>Table of Contents</strong></p>
-              <%= for header <- @post.headings do %>
-                <a data-level={header.level} href={header.link}>{header.title}</a>
-              <% end %>
-            </nav>
-          <% end %>
-
           {{:safe, @post.body}}
         </main>
       <% end %>
