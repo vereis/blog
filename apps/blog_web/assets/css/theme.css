@@ -144,8 +144,7 @@ body {
   font-family: "Custom", monospace !important;
   letter-spacing: 1px;
   font-size: 15px;
-  /* Default: Tamzen8x15 native height */
-  line-height: 1.5;
+  line-height: 1.4;
   padding: 48px;
   min-height: 100vh;
 
@@ -162,7 +161,7 @@ body {
       "header ."
       "main aside"
       "footer .";
-    grid-template-columns: minmax(0, 90ex) 1fr;
+    grid-template-columns: minmax(0, 100ex) 1fr;
     grid-template-rows: auto 1fr auto;
     gap: 2ex;
     min-height: 100vh;
@@ -244,10 +243,6 @@ h5,
 h6 {
   color: var(--heading-color);
   font-weight: bold;
-
-  *:not(h1, h2, h3, h4, h5, h6)+& {
-    margin-top: 2ex;
-  }
 }
 
 h2:before {
@@ -317,6 +312,10 @@ blink {
   animation: blink 1.25s step-start infinite;
 }
 
+main p+p {
+  margin-top: 1ex;
+}
+
 code {
   background-color: var(--bg-code);
   color: var(--text-code);
@@ -333,17 +332,6 @@ main a,
     background-color: transparent !important;
     text-decoration: underline;
   }
-
-  &:after {
-    content: attr(href);
-    color: var(--accent-color);
-    text-decoration: underline;
-    margin-left: 1ex;
-  }
-
-  &[data-href]:after {
-    content: attr(data-href);
-  }
 }
 
 pre {
@@ -351,21 +339,21 @@ pre {
   overflow: hidden;
   overflow-x: auto;
 
+  /* Hide scrollbars but keep scroll functionality */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* Internet Explorer 10+ */
+
+  &::-webkit-scrollbar {
+    display: none;
+    /* WebKit */
+  }
+
   & code {
     color: var(--text-muted) !important;
     background-color: transparent !important;
     padding: 0 !important;
-  }
-
-  &:before,
-  &:after {
-    content: '```';
-    color: var(--text-muted);
-    display: block;
-  }
-
-  &[data-lang]:before {
-    content: '```' attr(data-lang);
   }
 }
 
@@ -392,17 +380,9 @@ ul li {
 blockquote {
   border-left: 1px solid var(--border-color);
   margin-left: -1px;
-  padding-left: 3ex;
-  padding-top: 1ex;
-  padding-bottom: 1ex;
-
-  *:not(nav)+& {
-    margin-top: 1ex;
-  }
-
-  & *+* {
-    margin-top: 1ex;
-  }
+  padding-left: 2ex;
+  margin-top: 1ex;
+  margin-bottom: 1ex;
 
   &.warning {
     border-left-color: var(--warning-color);
@@ -465,7 +445,6 @@ blockquote {
     background-color: var(--bg-primary);
     color: var(--text-primary);
     padding: 1ex 2ex;
-    font-size: 0.8em;
     white-space: nowrap;
     z-index: 1000;
     opacity: 0;
