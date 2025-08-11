@@ -277,6 +277,7 @@ defmodule BlogWeb.BlogLive do
       <aside aria-label="Navigation" class="aside-navigation">
         <.online_status_section presence={@presence} />
         <.listening_to_section presence={@presence} />
+        <.activity_section presence={@presence} />
 
         <%= if @live_action in [:show_post, :home] and is_struct(@post) and @post.headings != [] do %>
           <div class="table-of-contents-container">
@@ -559,6 +560,33 @@ defmodule BlogWeb.BlogLive do
         <p class="presence-content">{@presence.spotify["song"]} - {@presence.spotify["artist"]}</p>
       <% else %>
         <p class="presence-content">N/A</p>
+      <% end %>
+    </div>
+    """
+  end
+
+  attr(:presence, :map, required: true)
+
+  def activity_section(assigns) do
+    activity = Enum.find(assigns[:presence].activities || [], &(&1["type"] not in [2, 4]))
+
+    action = case activity do
+      nil -> "Current Activity"
+      %{"type" => 0} -> "Currently Playing"
+      %{"type" => 1} -> "Currently Streaming"
+      %{"type" => 3} -> "Currently Watching"
+      %{"type" => 5} -> "Currently Competing"
+    end
+
+    ~H"""
+    <div class="presence-section">
+      <p><strong>{action}</strong></p>
+      <%= if is_nil(activity) || activity["name"] in ["",  nil] do %>
+        <p class="presence-content">N/A</p>
+      <% else %>
+        <p class="presence-content">
+          {activity["name"]}
+        </p>
       <% end %>
     </div>
     """
