@@ -570,23 +570,33 @@ defmodule BlogWeb.BlogLive do
   def activity_section(assigns) do
     activity = Enum.find(assigns[:presence].activities || [], &(&1["type"] not in [2, 4]))
 
-    action = case activity do
-      nil -> "Current Activity"
-      %{"type" => 0} -> "Currently Playing"
-      %{"type" => 1} -> "Currently Streaming"
-      %{"type" => 3} -> "Currently Watching"
-      %{"type" => 5} -> "Currently Competing"
-    end
+    action =
+      case activity do
+        nil -> "Current Activity"
+        %{"name" => "Neovim"} -> "Neovim, BTW"
+        %{"type" => 0} -> "Currently Playing"
+        %{"type" => 1} -> "Currently Streaming"
+        %{"type" => 3} -> "Currently Watching"
+        %{"type" => 5} -> "Currently Competing"
+      end
 
     ~H"""
     <div class="presence-section">
       <p><strong>{action}</strong></p>
-      <%= if is_nil(activity) || activity["name"] in ["",  nil] do %>
-        <p class="presence-content">N/A</p>
-      <% else %>
-        <p class="presence-content">
-          {activity["name"]}
-        </p>
+      <%= cond do %>
+        <% is_nil(activity) || activity["name"] in ["",  nil] -> %>
+          <p class="presence-content">N/A</p>
+        <% action =~ "vim" -> %>
+          <p class="presence-content">
+            {Enum.join(
+              Enum.reject([activity["state"], activity["details"]], &(&1 in [nil, ""])),
+              ", "
+            )}
+          </p>
+        <% true -> %>
+          <p class="presence-content">
+            {activity["name"]}
+          </p>
       <% end %>
     </div>
     """
