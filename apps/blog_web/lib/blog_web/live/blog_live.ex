@@ -343,26 +343,42 @@ defmodule BlogWeb.BlogLive do
             </div>
           </div>
 
-          <div class="projects">
-            <%= for {project, idx} <- Enum.reverse(Enum.with_index(@projects)), is_nil(@tag) or Enum.any?(project.tags, & &1.label == @tag) do %>
-              <div class="project">
-                <div class="project-id">{"##{idx}"}</div>
-                <div class="project-title-container">
-                  <a class="project-name" href={project.url}>
-                    {project.name}
-                  </a>
-                  <p class="project-description">{project.description}</p>
-                </div>
-                <div class="tags">
-                  <%= for tag <- project.tags do %>
-                    <span class="tag" phx-click="proj-tag" phx-value-tag={tag.label}>
-                      {"#" <> tag.label}
-                    </span>
-                  <% end %>
-                </div>
-              </div>
-            <% end %>
-          </div>
+          <table class="projects-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Project</th>
+                <th>Tags</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%= for {project, idx} <- Enum.reverse(Enum.with_index(@projects)), is_nil(@tag) or Enum.any?(project.tags, & &1.label == @tag) do %>
+                <tr class="project-row">
+                  <td class="project-id">{"##{idx}"}</td>
+                  <td class="project-title-cell">
+                    <a class="project-name" href={project.url}>
+                      {project.name}
+                    </a>
+                    <div class="project-description">{project.description}</div>
+                    <div class="project-tags-mobile">
+                      <%= for tag <- project.tags do %>
+                        <span class="tag" phx-click="proj-tag" phx-value-tag={tag.label}>
+                          {"#" <> tag.label}
+                        </span>
+                      <% end %>
+                    </div>
+                  </td>
+                  <td class="project-tags">
+                    <%= for tag <- project.tags do %>
+                      <span class="tag" phx-click="proj-tag" phx-value-tag={tag.label}>
+                        {"#" <> tag.label}
+                      </span>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
         </main>
       <% end %>
 
@@ -418,39 +434,55 @@ defmodule BlogWeb.BlogLive do
             <% end %>
           </.form>
 
-          <div class="posts">
-            <% filtered_posts =
-              Enum.filter(@posts, fn post ->
-                (is_nil(@tag) or Enum.any?(post.tags, &(&1.label == @tag))) and
-                  (not @is_release? or not post.is_draft)
-              end) %>
+          <% filtered_posts =
+            Enum.filter(@posts, fn post ->
+              (is_nil(@tag) or Enum.any?(post.tags, &(&1.label == @tag))) and
+                (not @is_release? or not post.is_draft)
+            end) %>
 
-            <%= if Enum.empty?(filtered_posts) do %>
-              <blockquote class="warning" style="margin-top: 1ex;">
-                <p><strong>Warning:</strong> No content found</p>
-                <p><a href="/posts">Reset page</a></p>
-              </blockquote>
-            <% else %>
-              <%= for post <- filtered_posts do %>
-                <div class="post" phx-click="post" phx-value-post={post.slug}>
-                  <div class="post-id">{"##{post.id}"}</div>
-                  <div class="post-title-container">
-                    <div class="post-title">{post.title}</div>
-                    <div class="post-reading-time">
-                      {Calendar.strftime(post.published_at, "%B %d %Y, %H:%M:%S")}
-                    </div>
-                  </div>
-                  <div class="tags">
-                    <%= for tag <- post.tags do %>
-                      <span class="tag" phx-click="tag" phx-value-tag={tag.label}>
-                        {"#" <> tag.label}
-                      </span>
-                    <% end %>
-                  </div>
-                </div>
-              <% end %>
-            <% end %>
-          </div>
+          <%= if Enum.empty?(filtered_posts) do %>
+            <blockquote class="warning" style="margin-top: 1ex;">
+              <p><strong>Warning:</strong> No content found</p>
+              <p><a href="/posts">Reset page</a></p>
+            </blockquote>
+          <% else %>
+            <table class="posts-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Title</th>
+                  <th>Tags</th>
+                </tr>
+              </thead>
+              <tbody>
+                <%= for post <- filtered_posts do %>
+                  <tr class="post-row" phx-click="post" phx-value-post={post.slug}>
+                    <td class="post-id">{"##{post.id}"}</td>
+                    <td class="post-title-cell">
+                      <div class="post-title">{post.title}</div>
+                      <div class="post-date">
+                        {Calendar.strftime(post.published_at, "%B %d %Y")}
+                      </div>
+                      <div class="post-tags-mobile">
+                        <%= for tag <- post.tags do %>
+                          <span class="tag" phx-click="tag" phx-value-tag={tag.label}>
+                            {"#" <> tag.label}
+                          </span>
+                        <% end %>
+                      </div>
+                    </td>
+                    <td class="post-tags">
+                      <%= for tag <- post.tags do %>
+                        <span class="tag" phx-click="tag" phx-value-tag={tag.label}>
+                          {"#" <> tag.label}
+                        </span>
+                      <% end %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          <% end %>
         </main>
       <% end %>
 
