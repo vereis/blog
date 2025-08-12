@@ -286,12 +286,36 @@ img {
   }
 }
 
-table {
+/* Display block approach for regular tables to enable horizontal scroll */
+main table:not(.posts-table):not(.projects-table) {
+  display: block;
   overflow-x: auto;
-  table-layout: fixed;
+  max-width: 100%;
   width: max-content;
-  max-width: max-content;
 
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  & thead,
+  & tbody,
+  & tr,
+  & th,
+  & td {
+    display: revert;
+  }
+
+  & th,
+  & td {
+    white-space: nowrap;
+    padding-right: 2ex;
+  }
+}
+
+table {
   & th {
     text-align: left;
     font-weight: bold;
