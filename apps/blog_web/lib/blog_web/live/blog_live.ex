@@ -588,10 +588,7 @@ defmodule BlogWeb.BlogLive do
           <p class="presence-content">N/A</p>
         <% action =~ "vim" -> %>
           <p class="presence-content">
-            {Enum.join(
-              Enum.reject([activity["state"], activity["details"]], &(&1 in [nil, ""])),
-              ", "
-            )}
+            {activity["details"] || activity["state"] || "Idling"}
           </p>
         <% true -> %>
           <p class="presence-content">
