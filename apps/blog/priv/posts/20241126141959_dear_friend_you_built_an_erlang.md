@@ -23,7 +23,7 @@ You just needed a `simple` way to notify services when data changed.
 
 > No big deal, right?
 
-- A full-blown message bug? Eugh, **overkill**.
+- A full-blown message bus? Eugh, **overkill**.
 - A background job? **YAGNI**, the koans scoffed...
 
 So you started small:
@@ -112,7 +112,7 @@ Services just poll from our queue? How did this even pass code review?
 Hmm.. `git blame`... *"Oh, that was me."*... the shame.
 
 - Our pods scale dynamically.
-- Too many exhausts our database connections and add too load...
+- Too many exhausts our database connections and adds too much load...
 - Our queues are full of retries.
 - Our services are deadlocked.
 

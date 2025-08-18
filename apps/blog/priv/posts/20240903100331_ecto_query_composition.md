@@ -147,7 +147,7 @@ So, while this pattern is useful, if not better, it's definitely still somewhat 
 
 Another one of Elixir's superpowers is metaprogramming. Now, the actual metaprogramming here is optional, but it's a pretty cool way to solve the problems we've outlined above.
 
-> At my current job, we started doing this without any macros and it still worked.
+> We started doing this without any macros and it still worked.
 >
 > We iterated on this pattern until we felt comfortable with it, and then we started using macros to:
 >
@@ -260,7 +260,7 @@ Now that we've got a basic compositional query pattern, we can start to build on
 
 We noticed that we generally always want to be able to query based on the values of our schema fields. This isn't _all_ we need, but it's a good start.
 
-At my current job, we added a function in our `MyApp.Queryable` module that we delegate to in our `query/2` callback:
+We added a function in our `MyApp.Queryable` module that we delegate to in our `query/2` callback:
 
 ```elixir
 defmodule MyApp.Queryable do
@@ -307,7 +307,7 @@ This is a small change, but it makes our queryable schemas even more powerful an
 
 ### Rolling it Out
 
-Once we started implementing this behaviour all over the place at my current job, we agreed that this was how we wanted to write queries going forwards.
+Once we started implementing this behaviour everywhere, we agreed that this was how we wanted to write queries going forward.
 
 We noticed the following things in our usage:
 
@@ -363,7 +363,7 @@ This automatically injects the code inside the `quote` block into a function tha
 
 ## Additional Benefits
 
-At my current job, we heavily rely on [Absinthe](https://absinthe-graphql.org) for our GraphQL API. We've found that this pattern of queryable schemas has a few additional benefits when used in conjunction with Absinthe.
+We heavily rely on [Absinthe](https://absinthe-graphql.org) for our GraphQL API. We've found that this pattern of queryable schemas has a few additional benefits when used in conjunction with Absinthe.
 
 Typically, when you write a resolver, everything's great because you end up just delegating business logic to some core context function, which can follow whatever patterns you've subscribed to for your application.
 

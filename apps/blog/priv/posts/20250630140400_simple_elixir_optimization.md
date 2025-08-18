@@ -509,9 +509,9 @@ But when you start using multiple processes, you need to be careful. Lambdas sti
 
 What this boils down to is that if you try to access a variable in the surrounding scope, it will be copied into the process's memory space, which can lead to performance issues if you're accessing large data structures.
 
-I accidentally ran into this by trying to parallelize a function that was reading data out of a "lifed" map for fast lookups. The map was large, and the act of copying it into each process's memory space was caused our BEAM instances to run out of memory.
+I accidentally ran into this by trying to parallelize a function that was reading data out of a "lifted" map for fast lookups. The map was large, and the act of copying it into each process's memory space caused our BEAM instances to run out of memory.
 
-This is a common footgun, and thankfully, Elixir provides a simple way to avoid this.
+This is a common footgun. Thankfully, Elixir provides a simple way to avoid this.
 
 ### ETS Tables
 
