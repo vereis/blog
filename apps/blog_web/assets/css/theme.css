@@ -31,6 +31,10 @@
   --status-dnd: #eb6f92;
   --status-offline: #6e6a86;
   --status-disconnected: #6e6a86;
+
+  /* Layout dimensions */
+  --main-content-max-width: 100ex;
+  --aside-max-width: 70ex;
 }
 
 /* Default (1x zoom): 8x15 as smallest readable size */
@@ -160,7 +164,7 @@ body {
       "header ."
       "main aside"
       "footer .";
-    grid-template-columns: minmax(0, 100ex) 1fr;
+    grid-template-columns: minmax(0, var(--main-content-max-width)) 1fr;
     grid-template-rows: auto 1fr auto;
     gap: 2ex;
     min-height: 100vh;
@@ -175,6 +179,7 @@ body {
     height: fit-content;
     overflow-y: auto;
     padding: 2ex;
+    max-width: var(--aside-max-width);
 
     /* Padding only when user scrolls and its sticky */
     margin-top: -3ex;
@@ -209,6 +214,10 @@ aside {
 
   & .presence-content {
     color: var(--text-muted);
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    max-width: 100%;
   }
 }
 
