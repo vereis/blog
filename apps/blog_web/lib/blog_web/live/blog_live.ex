@@ -6,6 +6,7 @@ defmodule BlogWeb.BlogLive do
 
   alias Blog.Lanyard
   alias Blog.Posts
+  alias BlogWeb.Presence
   alias Phoenix.LiveView.JS
 
   # TODO: source these from some `Blog` context.
@@ -126,6 +127,7 @@ defmodule BlogWeb.BlogLive do
       |> assign_new(:tag, fn -> nil end)
       |> assign_new(:search, fn -> %{} end)
       |> assign_new(:presence, fn -> Lanyard.get_presence() end)
+      |> track_viewer_presence(params)
 
     {:ok, socket}
   end
@@ -178,7 +180,24 @@ defmodule BlogWeb.BlogLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_params(_params, _uri, socket) do
+  def handle_info(%Phoenix.Socket.Broadcast{event: "presence_diff"}, socket) do
+    case Presence.refresh_counts(socket.assigns[:page_topic]) do
+      {site_count, page_count} ->
+        socket =
+          socket
+          |> assign(:site_viewers, site_count)
+          |> assign(:page_viewers, page_count)
+
+        {:noreply, socket}
+
+      nil ->
+        {:noreply, socket}
+    end
+  end
+
+  @impl Phoenix.LiveView
+  def handle_params(params, _uri, socket) do
+    socket = update_presence_tracking(socket, params)
     {:noreply, socket}
   end
 
@@ -278,6 +297,7 @@ defmodule BlogWeb.BlogLive do
         <.online_status_section presence={@presence} />
         <.listening_to_section presence={@presence} />
         <.activity_section presence={@presence} />
+        <.current_viewers_section site_viewers={@site_viewers || 0} page_viewers={@page_viewers || 0} />
 
         <%= if @live_action in [:show_post, :home] and is_struct(@post) and @post.headings != [] do %>
           <div class="table-of-contents-container">
@@ -629,5 +649,73 @@ defmodule BlogWeb.BlogLive do
       <% end %>
     </div>
     """
+  end
+
+  attr(:site_viewers, :any, required: true)
+  attr(:page_viewers, :any, required: true)
+
+  def current_viewers_section(assigns) do
+    ~H"""
+    <div class="presence-section">
+      <p><strong>Current Viewers</strong></p>
+      <p class="presence-content">
+        <%= if @site_viewers == "Failed to load" do %>
+          Failed to load
+        <% else %>
+          Total: {@site_viewers} | Current Page: {@page_viewers}
+        <% end %>
+      </p>
+    </div>
+    """
+  end
+
+  defp track_viewer_presence(socket, params) do
+    if connected?(socket) do
+      case Presence.init_viewer(self(), socket.id, socket.assigns.live_action, params) do
+        {:ok, %Presence.NavigationResult{} = result} ->
+          socket
+          |> assign(:site_viewers, result.site_viewers)
+          |> assign(:page_viewers, result.page_viewers)
+          |> assign(:page_topic, result.page_topic)
+
+        {:error, _reason} ->
+          socket
+          |> assign(:site_viewers, "Failed to load")
+          |> assign(:page_viewers, "Failed to load")
+          |> assign(:page_topic, nil)
+      end
+    else
+      socket
+      |> assign(:site_viewers, 0)
+      |> assign(:page_viewers, 0)
+      |> assign(:page_topic, nil)
+    end
+  end
+
+  defp update_presence_tracking(socket, params) do
+    if connected?(socket) do
+      old_page_topic = socket.assigns[:page_topic]
+
+      {:ok, %Presence.NavigationResult{} = result} =
+        Presence.handle_page_navigation(
+          self(),
+          socket.id,
+          socket.assigns.live_action,
+          params,
+          old_page_topic
+        )
+
+      # Only update socket if page topic changed
+      if result.page_topic != old_page_topic do
+        socket
+        |> assign(:page_topic, result.page_topic)
+        |> assign(:site_viewers, result.site_viewers)
+        |> assign(:page_viewers, result.page_viewers)
+      else
+        socket
+      end
+    else
+      socket
+    end
   end
 end

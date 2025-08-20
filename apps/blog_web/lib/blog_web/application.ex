@@ -9,6 +9,7 @@ defmodule BlogWeb.Application do
   def start(_type, _args) do
     children = [
       BlogWeb.Telemetry,
+      BlogWeb.Presence,
       # Start a worker by calling: BlogWeb.Worker.start_link(arg)
       # {BlogWeb.Worker, arg},
       # Start to serve requests, typically the last entry
