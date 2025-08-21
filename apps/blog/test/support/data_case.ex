@@ -91,16 +91,16 @@ defmodule Blog.DataCase do
   def eventually(fun, opts \\ []) do
     timeout = Keyword.get(opts, :timeout, 1000)
     interval = Keyword.get(opts, :interval, 50)
-    
+
     end_time = System.monotonic_time(:millisecond) + timeout
     do_eventually(fun, end_time, interval)
   end
-  
+
   defp do_eventually(fun, end_time, interval) do
     case fun.() do
       truthy when truthy not in [nil, false] ->
         truthy
-      
+
       _falsy ->
         if System.monotonic_time(:millisecond) >= end_time do
           raise "Eventually timeout: condition was never met"

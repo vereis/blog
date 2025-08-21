@@ -207,7 +207,7 @@ defmodule Blog.Lanyard.PresenceTest do
     test "handles unknown cast messages gracefully" do
       # Send unknown cast - should not crash
       GenServer.cast(Presence, :unknown_message)
-      
+
       # Give it time to process the cast message
       :timer.sleep(100)
 
@@ -218,10 +218,9 @@ defmodule Blog.Lanyard.PresenceTest do
     test "handles unknown info messages gracefully" do
       # Send unknown info message - should not crash
       assert eventually(fn ->
-        log = capture_log(fn -> send(Process.whereis(Presence), :unknown_message) end)
-        String.contains?(log, "Unhandled info message")
-      end)
-
+               log = capture_log(fn -> send(Process.whereis(Presence), :unknown_message) end)
+               String.contains?(log, "Unhandled info message")
+             end)
 
       # GenServer should still be alive
       assert Process.alive?(Process.whereis(Presence))

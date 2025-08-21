@@ -41,7 +41,7 @@ defmodule Blog.Lanyard.ConnectionTest do
       end)
 
       pid = start_supervised!(Connection)
-      
+
       # Allow the GenServer process to access mocks
       Mimic.allow(Req, self(), pid)
       Mimic.allow(Blog.Lanyard.Presence, self(), pid)
@@ -58,7 +58,7 @@ defmodule Blog.Lanyard.ConnectionTest do
       end)
 
       pid = start_supervised!(Connection)
-      
+
       # Allow the GenServer process to access mocks
       Mimic.allow(Req, self(), pid)
 
@@ -74,7 +74,7 @@ defmodule Blog.Lanyard.ConnectionTest do
       end)
 
       pid = start_supervised!(Connection)
-      
+
       # Allow the GenServer process to access mocks
       Mimic.allow(Req, self(), pid)
 
@@ -90,7 +90,7 @@ defmodule Blog.Lanyard.ConnectionTest do
       end)
 
       pid = start_supervised!(Connection)
-      
+
       # Allow the GenServer process to access mocks
       Mimic.allow(Req, self(), pid)
 
@@ -104,13 +104,13 @@ defmodule Blog.Lanyard.ConnectionTest do
       expect(Req, :get, 2, fn _url ->
         {:ok, %{status: 200, body: @valid_presence_response}}
       end)
-      
+
       expect(Blog.Lanyard.Presence, :update_presence, fn _data ->
         {:ok, %Presence{}}
       end)
 
       pid = start_supervised!(Connection)
-      
+
       # Allow the GenServer process to access mocks
       Mimic.allow(Req, self(), pid)
       Mimic.allow(Blog.Lanyard.Presence, self(), pid)
@@ -127,13 +127,13 @@ defmodule Blog.Lanyard.ConnectionTest do
       expect(Req, :get, fn _url ->
         {:ok, %{status: 200, body: @valid_presence_response}}
       end)
-      
+
       expect(Blog.Lanyard.Presence, :update_presence, fn _data ->
         {:ok, %Presence{}}
       end)
 
       pid = start_supervised!(Connection)
-      
+
       # Allow the GenServer process to access mocks
       Mimic.allow(Req, self(), pid)
       Mimic.allow(Blog.Lanyard.Presence, self(), pid)
@@ -151,7 +151,7 @@ defmodule Blog.Lanyard.ConnectionTest do
       end)
 
       pid = start_supervised!(Connection)
-      
+
       # Allow the GenServer process to access mocks
       Mimic.allow(Req, self(), pid)
 
@@ -172,17 +172,17 @@ defmodule Blog.Lanyard.ConnectionTest do
         assert url == expected_url
         {:ok, %{status: 200, body: @valid_presence_response}}
       end)
-      
+
       expect(Blog.Lanyard.Presence, :update_presence, fn _data ->
         {:ok, %Presence{}}
       end)
 
       pid = start_supervised!(Connection)
-      
+
       # Allow the GenServer process to access mocks
       Mimic.allow(Req, self(), pid)
       Mimic.allow(Blog.Lanyard.Presence, self(), pid)
-      
+
       send(pid, :poll)
       :timer.sleep(50)
     end
@@ -206,7 +206,7 @@ defmodule Blog.Lanyard.ConnectionTest do
 
       presence_pid = start_supervised!(Presence)
       connection_pid = start_supervised!(Connection)
-      
+
       # Allow both processes to access mocks
       Mimic.allow(Req, self(), connection_pid)
       Mimic.allow(Blog.Lanyard.Presence, self(), connection_pid)
@@ -230,7 +230,7 @@ defmodule Blog.Lanyard.ConnectionTest do
 
       presence_pid = start_supervised!(Presence)
       connection_pid = start_supervised!(Connection)
-      
+
       # Allow both processes to access mocks
       Mimic.allow(Req, self(), connection_pid)
       Mimic.allow(Blog.Lanyard.Presence, self(), connection_pid)
@@ -256,7 +256,7 @@ defmodule Blog.Lanyard.ConnectionTest do
 
       presence_pid = start_supervised!(Presence)
       connection_pid = start_supervised!(Connection)
-      
+
       # Allow both processes to access mocks
       Mimic.allow(Req, self(), connection_pid)
       Mimic.allow(Blog.Lanyard.Presence, self(), connection_pid)

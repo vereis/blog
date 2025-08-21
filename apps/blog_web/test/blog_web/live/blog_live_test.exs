@@ -414,9 +414,9 @@ defmodule BlogWeb.BlogLiveTest do
       initial_html = render(view)
       assert initial_html =~ "N/A"
       refute initial_html =~ "Test Song - Test Artist"
-      
+
       send(view.pid, {:presence_updated, spotify_presence})
-      
+
       updated_html = render(view)
       assert updated_html =~ "Test Song - Test Artist"
     end
