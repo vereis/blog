@@ -632,19 +632,21 @@ defmodule BlogWeb.BlogLive do
         %{"type" => 5} -> "Currently Competing"
       end
 
+    assigns = assign(assigns, activity: activity, action: action)
+
     ~H"""
     <div class="presence-section">
-      <p><strong>{action}</strong></p>
+      <p><strong>{@action}</strong></p>
       <%= cond do %>
-        <% is_nil(activity) || activity["name"] in ["",  nil] -> %>
+        <% is_nil(@activity) || @activity["name"] in ["",  nil] -> %>
           <p class="presence-content">N/A</p>
-        <% action =~ "vim" -> %>
+        <% @action =~ "vim" -> %>
           <p class="presence-content">
-            {activity["details"] || activity["state"] || "Idling"}
+            {@activity["details"] || @activity["state"] || "Idling"}
           </p>
         <% true -> %>
           <p class="presence-content">
-            {activity["name"]}
+            {@activity["name"]}
           </p>
       <% end %>
     </div>

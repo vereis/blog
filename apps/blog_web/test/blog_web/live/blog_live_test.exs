@@ -182,7 +182,7 @@ defmodule BlogWeb.BlogLiveTest do
 
       {:ok, view, _html} = live(conn, ~p"/posts/")
 
-      view |> element(".post[phx-value-post='#{post.slug}']") |> render_click()
+      view |> element(".post-row[phx-value-post='#{post.slug}']") |> render_click()
       assert_patch(view, ~p"/posts/#{post.slug}")
     end
 
@@ -410,11 +410,15 @@ defmodule BlogWeb.BlogLiveTest do
         }
       }
 
+      # Check initial state shows N/A
+      initial_html = render(view)
+      assert initial_html =~ "N/A"
+      refute initial_html =~ "Test Song - Test Artist"
+      
       send(view.pid, {:presence_updated, spotify_presence})
-
+      
       updated_html = render(view)
       assert updated_html =~ "Test Song - Test Artist"
-      refute updated_html =~ "N/A"
     end
 
     test "shows N/A when not listening to spotify", %{conn: conn} do
