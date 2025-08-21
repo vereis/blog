@@ -13,9 +13,9 @@ defmodule Blog.Resource do
   @callback source() :: Path.t()
 
   @doc """
-  Parse a single resource file and return its attributes as a map.
+  Parse a single resource file and return its attributes as a map or list of maps.
   """
-  @callback parse(filename :: String.t()) :: map()
+  @callback parse(filename :: String.t()) :: map() | [map()]
 
   @doc """
   Import a list of parsed resource maps into the database.
@@ -47,7 +47,7 @@ defmodule Blog.Resource do
       callback_module.source()
       |> File.ls!()
       |> Task.async_stream(&callback_module.parse/1)
-      |> Stream.map(fn {:ok, attrs} -> attrs end)
+      |> Stream.flat_map(fn {:ok, attrs} -> List.wrap(attrs) end)
       |> Enum.to_list()
 
     case callback_module.import(parsed_resources) do
