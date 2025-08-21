@@ -11,6 +11,7 @@ defmodule Blog.Umbrella.MixProject do
       releases: releases(),
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
+        test: :test,
         lint: :dev,
         dialyzer: :dev
       ],
@@ -71,7 +72,6 @@ defmodule Blog.Umbrella.MixProject do
     [
       # run `mix setup` in all child apps
       setup: ["cmd mix setup"],
-      test: ["coveralls.html --trace --slowest 10"],
       lint: [
         "format --check-formatted --dry-run",
         "credo --strict",
