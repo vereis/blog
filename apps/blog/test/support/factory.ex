@@ -6,6 +6,7 @@ defmodule Blog.Factory do
   alias Blog.Images.Image
   alias Blog.Posts.Post
   alias Blog.Posts.Tag
+  alias Blog.Projects.Project
 
   def tag_factory do
     %Tag{
@@ -169,6 +170,14 @@ defmodule Blog.Factory do
       published_at: ~U[2023-07-22 14:03:00.000000Z],
       reading_time_minutes: 2,
       tags: build_list(2, :tag)
+    }
+  end
+
+  def project_factory do
+    %Project{
+      name: sequence(:project_name, &"Project #{&1}"),
+      url: sequence(:project_url, &"https://example.com/project-#{&1}"),
+      description: sequence(:project_description, &"Description for project #{&1}")
     }
   end
 end
