@@ -1,0 +1,16 @@
+projects:
+  - name: "Neovim Config"
+    url: "https://github.com/vereis/nix-config/tree/master/modules/home/neovim/lua"
+    description: "Personal Neovim configuration based on Lazy, with LSP support, Treesitter, and custom Lua plugins."
+
+  - name: "Nix Config"
+    url: "https://github.com/vereis/nix-config"
+    description: "Personal Nix configuration utilizing flakes and building regularly for Windows (WSL), Linux, and MacOS."
+
+  - name: "Toggle"
+    url: "https://github.com/vereis/toggle"
+    description: "Minimalistic and stupid-simple Feature Flagging Library for Elixir, with cache support and hooking capabilities."
+
+  - name: "Blog"
+    url: "https://github.com/vereis/blog"
+    description: "My personal blog and playground for Phoenix LiveView and other technologies."

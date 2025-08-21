@@ -13,7 +13,8 @@ defmodule Blog.Resource.Watcher do
   # TODO: as we add more resources, we can dynamically discover them
   @resource_modules [
     Blog.Resource.Post,
-    Blog.Resource.Image
+    Blog.Resource.Image,
+    Blog.Resource.Project
   ]
 
   @debounce_time 100
