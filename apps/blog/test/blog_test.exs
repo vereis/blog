@@ -1,5 +1,5 @@
 defmodule BlogTest do
-  use ExUnit.Case, async: true
+  use Blog.DataCase, async: true
 
   describe "env/0" do
     test "returns the current Mix environment when Mix is available" do

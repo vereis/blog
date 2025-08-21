@@ -1,5 +1,5 @@
 defmodule Mix.Tasks.Blog.Gen.PostTest do
-  use ExUnit.Case, async: true
+  use Blog.DataCase, async: true
 
   import ExUnit.CaptureIO
 

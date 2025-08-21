@@ -1,5 +1,5 @@
 defmodule Blog.ResourceTest do
-  use ExUnit.Case, async: true
+  use Blog.DataCase, async: true
 
   # Mock implementation for testing the generic import function
   defmodule MockResource do

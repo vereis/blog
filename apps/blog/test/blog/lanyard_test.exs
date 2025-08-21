@@ -1,5 +1,5 @@
 defmodule Blog.LanyardTest do
-  use ExUnit.Case, async: true
+  use Blog.DataCase, async: true
 
   describe "get_user_id/0" do
     test "returns configured Discord user ID" do
