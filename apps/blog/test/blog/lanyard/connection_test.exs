@@ -1,7 +1,5 @@
 defmodule Blog.Lanyard.ConnectionTest do
-  use ExUnit.Case, async: true
-
-  import Mimic
+  use Blog.DataCase, async: true
 
   alias Blog.Lanyard.Connection
   alias Blog.Lanyard.Presence
@@ -32,29 +30,21 @@ defmodule Blog.Lanyard.ConnectionTest do
     "error" => "User not found"
   }
 
-  setup do
-    # Mock default successful response to prevent startup interference
-    stub(Req, :get, fn _url ->
-      {:ok, %{status: 200, body: @valid_presence_response}}
-    end)
-
-    :ok
-  end
-
   describe "polling behavior" do
-    setup do
-      pid = start_supervised!(Connection)
-
-      # Allow initial poll to complete
-      :timer.sleep(50)
-
-      %{pid: pid}
-    end
-
-    test "handles successful API response", %{pid: pid} do
+    test "handles successful API response" do
       expect(Req, :get, fn _url ->
         {:ok, %{status: 200, body: @valid_presence_response}}
       end)
+
+      expect(Blog.Lanyard.Presence, :update_presence, fn _data ->
+        {:ok, %Presence{}}
+      end)
+
+      pid = start_supervised!(Connection)
+      
+      # Allow the GenServer process to access mocks
+      Mimic.allow(Req, self(), pid)
+      Mimic.allow(Blog.Lanyard.Presence, self(), pid)
 
       send(pid, :poll)
       :timer.sleep(50)
@@ -62,43 +52,68 @@ defmodule Blog.Lanyard.ConnectionTest do
       assert Process.alive?(pid)
     end
 
-    test "handles API error response gracefully", %{pid: pid} do
+    test "handles API error response gracefully" do
       expect(Req, :get, fn _url ->
         {:ok, %{status: 200, body: @api_error_response}}
       end)
 
+      pid = start_supervised!(Connection)
+      
+      # Allow the GenServer process to access mocks
+      Mimic.allow(Req, self(), pid)
+
       send(pid, :poll)
       :timer.sleep(50)
 
       assert Process.alive?(pid)
     end
 
-    test "handles HTTP error response gracefully", %{pid: pid} do
+    test "handles HTTP error response gracefully" do
       expect(Req, :get, fn _url ->
         {:ok, %{status: 404, body: "Not Found"}}
       end)
 
+      pid = start_supervised!(Connection)
+      
+      # Allow the GenServer process to access mocks
+      Mimic.allow(Req, self(), pid)
+
       send(pid, :poll)
       :timer.sleep(50)
 
       assert Process.alive?(pid)
     end
 
-    test "handles network/request failure gracefully", %{pid: pid} do
+    test "handles network/request failure gracefully" do
       expect(Req, :get, fn _url ->
         {:error, :timeout}
       end)
 
+      pid = start_supervised!(Connection)
+      
+      # Allow the GenServer process to access mocks
+      Mimic.allow(Req, self(), pid)
+
       send(pid, :poll)
       :timer.sleep(50)
 
       assert Process.alive?(pid)
     end
 
-    test "handles multiple polls with same data", %{pid: pid} do
+    test "handles multiple polls with same data" do
       expect(Req, :get, 2, fn _url ->
         {:ok, %{status: 200, body: @valid_presence_response}}
       end)
+      
+      expect(Blog.Lanyard.Presence, :update_presence, fn _data ->
+        {:ok, %Presence{}}
+      end)
+
+      pid = start_supervised!(Connection)
+      
+      # Allow the GenServer process to access mocks
+      Mimic.allow(Req, self(), pid)
+      Mimic.allow(Blog.Lanyard.Presence, self(), pid)
 
       send(pid, :poll)
       :timer.sleep(25)
@@ -108,10 +123,20 @@ defmodule Blog.Lanyard.ConnectionTest do
       assert Process.alive?(pid)
     end
 
-    test "schedules next poll after successful response", %{pid: pid} do
+    test "schedules next poll after successful response" do
       expect(Req, :get, fn _url ->
         {:ok, %{status: 200, body: @valid_presence_response}}
       end)
+      
+      expect(Blog.Lanyard.Presence, :update_presence, fn _data ->
+        {:ok, %Presence{}}
+      end)
+
+      pid = start_supervised!(Connection)
+      
+      # Allow the GenServer process to access mocks
+      Mimic.allow(Req, self(), pid)
+      Mimic.allow(Blog.Lanyard.Presence, self(), pid)
 
       send(pid, :poll)
       :timer.sleep(50)
@@ -120,10 +145,15 @@ defmodule Blog.Lanyard.ConnectionTest do
       assert Process.alive?(pid)
     end
 
-    test "schedules retry on error", %{pid: pid} do
+    test "schedules retry on error" do
       expect(Req, :get, fn _url ->
         {:error, :timeout}
       end)
+
+      pid = start_supervised!(Connection)
+      
+      # Allow the GenServer process to access mocks
+      Mimic.allow(Req, self(), pid)
 
       send(pid, :poll)
       :timer.sleep(50)
@@ -138,12 +168,21 @@ defmodule Blog.Lanyard.ConnectionTest do
       expected_user_id = Blog.Lanyard.get_user_id()
       expected_url = Blog.Lanyard.api_url(expected_user_id)
 
-      expect(Req, :get, 2, fn url ->
+      expect(Req, :get, fn url ->
         assert url == expected_url
         {:ok, %{status: 200, body: @valid_presence_response}}
       end)
+      
+      expect(Blog.Lanyard.Presence, :update_presence, fn _data ->
+        {:ok, %Presence{}}
+      end)
 
       pid = start_supervised!(Connection)
+      
+      # Allow the GenServer process to access mocks
+      Mimic.allow(Req, self(), pid)
+      Mimic.allow(Blog.Lanyard.Presence, self(), pid)
+      
       send(pid, :poll)
       :timer.sleep(50)
     end
@@ -165,8 +204,13 @@ defmodule Blog.Lanyard.ConnectionTest do
         %Presence{connected?: true, discord_status: "online"}
       end)
 
-      _presence_pid = start_supervised!(Presence)
-      _connection_pid = start_supervised!(Connection)
+      presence_pid = start_supervised!(Presence)
+      connection_pid = start_supervised!(Connection)
+      
+      # Allow both processes to access mocks
+      Mimic.allow(Req, self(), connection_pid)
+      Mimic.allow(Blog.Lanyard.Presence, self(), connection_pid)
+      Mimic.allow(Blog.Lanyard.Presence, self(), presence_pid)
 
       assert {:ok, presence} = Connection.refresh_presence()
       assert %Presence{} = presence
@@ -184,8 +228,13 @@ defmodule Blog.Lanyard.ConnectionTest do
         %Presence{connected?: false}
       end)
 
-      _presence_pid = start_supervised!(Presence)
-      _connection_pid = start_supervised!(Connection)
+      presence_pid = start_supervised!(Presence)
+      connection_pid = start_supervised!(Connection)
+      
+      # Allow both processes to access mocks
+      Mimic.allow(Req, self(), connection_pid)
+      Mimic.allow(Blog.Lanyard.Presence, self(), connection_pid)
+      Mimic.allow(Blog.Lanyard.Presence, self(), presence_pid)
 
       assert {:ok, presence} = Connection.refresh_presence()
       assert %Presence{} = presence
@@ -205,8 +254,13 @@ defmodule Blog.Lanyard.ConnectionTest do
       # Subscribe to PubSub events
       Phoenix.PubSub.subscribe(Blog.PubSub, "lanyard:presence")
 
-      _presence_pid = start_supervised!(Presence)
-      _connection_pid = start_supervised!(Connection)
+      presence_pid = start_supervised!(Presence)
+      connection_pid = start_supervised!(Connection)
+      
+      # Allow both processes to access mocks
+      Mimic.allow(Req, self(), connection_pid)
+      Mimic.allow(Blog.Lanyard.Presence, self(), connection_pid)
+      Mimic.allow(Blog.Lanyard.Presence, self(), presence_pid)
 
       # Force a refresh which should broadcast
       Connection.refresh_presence()
@@ -218,10 +272,6 @@ defmodule Blog.Lanyard.ConnectionTest do
 
   describe "message handling" do
     test "handles unknown messages gracefully" do
-      expect(Req, :get, fn _url ->
-        {:ok, %{status: 200, body: @valid_presence_response}}
-      end)
-
       pid = start_supervised!(Connection)
 
       send(pid, :unknown_message)
