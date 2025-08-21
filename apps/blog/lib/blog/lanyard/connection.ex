@@ -38,8 +38,10 @@ defmodule Blog.Lanyard.Connection do
 
     state = %State{}
 
-    # Start polling immediately
-    send(self(), :poll)
+    # Start polling immediately unless in test environment
+    unless Blog.env() == :test do
+      send(self(), :poll)
+    end
 
     {:ok, state}
   end
