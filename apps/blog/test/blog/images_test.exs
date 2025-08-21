@@ -1,5 +1,5 @@
 defmodule Blog.ImagesTest do
-  use Blog.DataCase, async: true
+  use Blog.DataCase, async: false
 
   import Blog.Factory
 

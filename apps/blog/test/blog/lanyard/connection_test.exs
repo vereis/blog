@@ -1,5 +1,5 @@
 defmodule Blog.Lanyard.ConnectionTest do
-  use Blog.DataCase, async: true
+  use Blog.DataCase, async: false
 
   alias Blog.Lanyard.Connection
   alias Blog.Lanyard.Presence

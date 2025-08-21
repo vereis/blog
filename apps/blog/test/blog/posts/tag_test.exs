@@ -1,5 +1,5 @@
 defmodule Blog.Posts.TagTest do
-  use Blog.DataCase, async: true
+  use Blog.DataCase, async: false
 
   alias Blog.Posts.Tag
   alias Blog.Repo.SQLite

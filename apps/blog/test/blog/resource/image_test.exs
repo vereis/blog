@@ -1,5 +1,5 @@
 defmodule Blog.Resource.ImageTest do
-  use Blog.DataCase, async: true
+  use Blog.DataCase, async: false
 
   alias Blog.Images.Image
   alias Blog.Repo.SQLite

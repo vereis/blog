@@ -1,5 +1,5 @@
 defmodule Blog.Posts.PostTest do
-  use Blog.DataCase, async: true
+  use Blog.DataCase, async: false
 
   alias Blog.Posts.Post
   alias Blog.Repo.SQLite
