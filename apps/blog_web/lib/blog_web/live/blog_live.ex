@@ -6,113 +6,15 @@ defmodule BlogWeb.BlogLive do
 
   alias Blog.Lanyard
   alias Blog.Posts
+  alias Blog.Projects
   alias BlogWeb.Presence
   alias Phoenix.LiveView.JS
-
-  # TODO: source these from some `Blog` context.
-  @projects Enum.reverse([
-              %{
-                name: "Neovim Config",
-                tags: [%{label: "neovim"}, %{label: "lua"}],
-                url: "https://github.com/vereis/nix-config/tree/master/modules/home/neovim/lua",
-                description: """
-                Personal Neovim configuration based on Lazy, with LSP support, Treesitter, and custom Lua plugins.
-                """
-              },
-              %{
-                name: "Nix Config",
-                tags: [%{label: "nix"}, %{label: "nixos"}],
-                url: "https://github.com/vereis/nix-config",
-                description: """
-                Personal Nix configuration utilizing flakes and building regularly for Windows (WSL), Linux, and MacOS.
-                """
-              },
-              %{
-                name: "Toggle",
-                tags: [%{label: "elixir"}, %{label: "ecto"}],
-                url: "https://github.com/vereis/toggle",
-                description: """
-                Minimalistic and stupid-simple Feature Flagging Library for Elixir, with cache support and hooking capabilities.
-                """
-              },
-              %{
-                name: "Cinema",
-                tags: [%{label: "elixir"}],
-                url: "https://github.com/vereis/cinema",
-                description: """
-                Framework for defining Incremental Materialized Views in raw Elixir and Ecto, with support for recursive/dependant views.
-                """
-              },
-              %{
-                name: "Sibyl",
-                tags: [%{label: "elixir"}, %{label: "telemetry"}],
-                url: "https://github.com/vetspire/sibyl",
-                description: """
-                Zero runtime cost telemetry and distributed tracing with custom plugins, library support, leveraging standard telemetry events.
-                """
-              },
-              %{
-                name: "Endo",
-                tags: [%{label: "elixir"}, %{label: "ecto"}],
-                url: "https://github.com/vetspire/endo",
-                description: """
-                Database reflection tool with fluent, composable API for Postgres and SQLite.
-                """
-              },
-              %{
-                name: "Ecto Middleware",
-                tags: [%{label: "elixir"}, %{label: "ecto"}],
-                url: "https://github.com/vereis/ecto_middleware",
-                description: """
-                Generic middleware implementation for Ecto, allowing for easy customization and extension of Ecto's standard Repo interface.
-                """
-              },
-              %{
-                name: "Ecto Hooks",
-                tags: [%{label: "elixir"}, %{label: "ecto"}],
-                url: "https://github.com/vereis/ecto_hooks",
-                description: """
-                Library which extends Ecto Schemas with the ability to automatically execute before or after hooks on Repo callbacks.
-                """
-              },
-              %{
-                name: "Ecto Model",
-                tags: [%{label: "elixir"}, %{label: "ecto"}],
-                url: "https://github.com/vetspire/ecto_model",
-                description: """
-                Collection of various Ecto extensions and utilities to make working with Ecto more enjoyable, including a query building abstraction and hooks.
-                """
-              },
-              %{
-                name: "Monarch",
-                tags: [%{label: "elixir"}, %{label: "migrations"}],
-                url: "https://hexdocs.pm/monarch/Monarch.html",
-                description: """
-                A simple Oban powered framework for defining and running long running, large data backfill tasks asynchronously across your cluster.
-                """
-              },
-              %{
-                name: "Jarlang",
-                tags: [%{label: "erlang"}, %{label: "compiler"}],
-                url: "https://github.com/vereis/jarlang",
-                description: """
-                (Archived) Erlang to ES5 compiler, written in Erlang and absolutely, definitely not suitable for production use.
-                """
-              },
-              %{
-                name: "Blog",
-                tags: [%{label: "elixir"}, %{label: "liveview"}],
-                url: "https://github.com/vereis/blog",
-                description: """
-                My personal blog and playground for Phoenix LiveView and other technologies.
-                """
-              }
-            ])
 
   @impl Phoenix.LiveView
   def mount(params, _session, socket) do
     Phoenix.PubSub.subscribe(Blog.PubSub, "post:reload")
     Phoenix.PubSub.subscribe(Blog.PubSub, "image:reload")
+    Phoenix.PubSub.subscribe(Blog.PubSub, "project:reload")
     Phoenix.PubSub.subscribe(Blog.PubSub, "lanyard:presence")
 
     posts = Posts.list_posts(order_by: [desc: :published_at])
@@ -123,7 +25,7 @@ defmodule BlogWeb.BlogLive do
       |> assign_new(:is_release?, fn -> :code.get_mode() == :embedded end)
       |> assign_new(:posts, fn -> posts end)
       |> assign_new(:post, fn -> post end)
-      |> assign_new(:projects, fn -> @projects end)
+      |> assign_new(:projects, fn -> Projects.list_projects() end)
       |> assign_new(:tag, fn -> nil end)
       |> assign_new(:search, fn -> %{} end)
       |> assign_new(:presence, fn -> Lanyard.get_presence() end)
@@ -165,6 +67,13 @@ defmodule BlogWeb.BlogLive do
       end
 
     socket = assign(socket, :post, post)
+    {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({:resource_reload, Blog.Resource.Project, _project_id}, socket) do
+    projects = Projects.list_projects()
+    socket = assign(socket, :projects, projects)
     {:noreply, socket}
   end
 
@@ -256,7 +165,7 @@ defmodule BlogWeb.BlogLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_event("search", %{"search" => search_term}, socket) when byte_size(search_term) > 0 do
+  def handle_event("post-search", %{"search" => search_term}, socket) when byte_size(search_term) > 0 do
     socket =
       assign(
         socket,
@@ -267,8 +176,25 @@ defmodule BlogWeb.BlogLive do
     {:noreply, socket}
   end
 
-  def handle_event("search", _params, socket) do
+  def handle_event("post-search", _params, socket) do
     socket = assign(socket, :posts, Posts.list_posts(order_by: [desc: :published_at]))
+    {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_event("project-search", %{"project_search" => search_term}, socket) when byte_size(search_term) > 0 do
+    socket =
+      assign(
+        socket,
+        :projects,
+        Projects.list_projects(search: search_term)
+      )
+
+    {:noreply, socket}
+  end
+
+  def handle_event("project-search", _params, socket) do
+    socket = assign(socket, :projects, Projects.list_projects())
     {:noreply, socket}
   end
 
@@ -335,23 +261,29 @@ defmodule BlogWeb.BlogLive do
 
           <h2>Index</h2>
 
-          <div class="component-container">
-            <label class="search-container hidden">
+          <.form
+            class="component-container"
+            for={@search}
+            phx-change="project-search"
+            phx-debounce="300"
+          >
+            <label class="search-container">
               <span>search:</span>
-              <span class="input-container">
-                <input
-                  type="text"
-                  onInput="this.parentNode.dataset.value = this.value"
-                  size="1"
-                  placeholder=""
-                />
-              </span>
+              <.input
+                field={@search[:project_value]}
+                name="project_search"
+                value=""
+                type="text"
+                size="1"
+                placeholder=""
+                phx-debounce="300"
+              />
             </label>
 
             <div>
               tags:
               <div class="tags">
-                <%= for tag <- Enum.flat_map(@projects, & &1.tags) |> Enum.uniq() |> Enum.sort() do %>
+                <%= for tag <- Enum.flat_map(@projects, & &1.tags) |> Enum.uniq_by(& &1.label) |> Enum.sort_by(& &1.label) do %>
                   <.button phx-click="proj-tag" phx-value-tag={tag.label}>
                     {"#" <> tag.label}
                   </.button>
@@ -361,44 +293,56 @@ defmodule BlogWeb.BlogLive do
                 <% end %>
               </div>
             </div>
-          </div>
+          </.form>
 
-          <table class="projects-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Project</th>
-                <th>Tags</th>
-              </tr>
-            </thead>
-            <tbody>
-              <%= for {project, idx} <- Enum.reverse(Enum.with_index(@projects)), is_nil(@tag) or Enum.any?(project.tags, & &1.label == @tag) do %>
-                <tr class="project-row">
-                  <td class="project-id">{"##{idx}"}</td>
-                  <td class="project-title-cell">
-                    <a class="project-name" href={project.url}>
-                      {project.name}
-                    </a>
-                    <div class="project-description">{project.description}</div>
-                    <div class="project-tags-mobile">
+          <% filtered_projects =
+            Enum.filter(@projects, fn project ->
+              is_nil(@tag) or Enum.any?(project.tags, &(&1.label == @tag))
+            end) %>
+
+          <%= if Enum.empty?(filtered_projects) do %>
+            <blockquote class="warning" style="margin-top: 1ex;">
+              <p><strong>Warning:</strong> No content found</p>
+              <p><a href="/projects">Reset page</a></p>
+            </blockquote>
+          <% else %>
+            <table class="projects-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Project</th>
+                  <th>Tags</th>
+                </tr>
+              </thead>
+              <tbody>
+                <%= for {project, _idx} <- Enum.reverse(Enum.with_index(filtered_projects)) do %>
+                  <tr class="project-row">
+                    <td class="project-id">{"##{project.id}"}</td>
+                    <td class="project-title-cell">
+                      <a class="project-name" href={project.url}>
+                        {project.name}
+                      </a>
+                      <div class="project-description">{project.description}</div>
+                      <div class="project-tags-mobile">
+                        <%= for tag <- project.tags do %>
+                          <span class="tag" phx-click="proj-tag" phx-value-tag={tag.label}>
+                            {"#" <> tag.label}
+                          </span>
+                        <% end %>
+                      </div>
+                    </td>
+                    <td class="project-tags">
                       <%= for tag <- project.tags do %>
                         <span class="tag" phx-click="proj-tag" phx-value-tag={tag.label}>
                           {"#" <> tag.label}
                         </span>
                       <% end %>
-                    </div>
-                  </td>
-                  <td class="project-tags">
-                    <%= for tag <- project.tags do %>
-                      <span class="tag" phx-click="proj-tag" phx-value-tag={tag.label}>
-                        {"#" <> tag.label}
-                      </span>
-                    <% end %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          <% end %>
         </main>
       <% end %>
 
@@ -422,7 +366,7 @@ defmodule BlogWeb.BlogLive do
 
           <h2>Index</h2>
 
-          <.form class="component-container" for={@search} phx-change="search" phx-debounce="300">
+          <.form class="component-container" for={@search} phx-change="post-search" phx-debounce="300">
             <label class="search-container">
               <span>search:</span>
               <.input

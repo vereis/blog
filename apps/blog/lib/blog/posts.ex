@@ -18,6 +18,7 @@ defmodule Blog.Posts do
 
   def get_post(filters) do
     filters
+    |> Keyword.put_new(:limit, 1)
     |> Post.query()
     |> SQLite.one()
     |> SQLite.preload(:tags)

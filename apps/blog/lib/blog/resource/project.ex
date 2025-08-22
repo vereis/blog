@@ -3,14 +3,16 @@ defmodule Blog.Resource.Project do
   Resource implementation for importing projects.
 
   Implements the Blog.Resource behaviour to provide project-specific
-  import functionality. Supports both single project files and files
-  with multiple projects under a 'projects:' key.
+  import functionality. All project files must have projects under a
+  `projects:` key, whether they contain one or multiple projects.
   """
 
   @behaviour Blog.Resource
 
+  alias Blog.Posts.Tag
   alias Blog.Projects
   alias Blog.Projects.Project
+  alias Blog.Repo.SQLite
 
   @impl Blog.Resource
   def source do
@@ -33,36 +35,69 @@ defmodule Blog.Resource.Project do
       |> File.read!()
       |> YamlElixir.read_from_string!()
 
-    case file_data do
-      # Multiple projects under a "projects" key
-      %{"projects" => projects} when is_list(projects) ->
-        Enum.map(projects, &normalize_project/1)
+    # All files must have projects under a "projects" key
+    projects_list =
+      case file_data do
+        %{"projects" => projects} when is_list(projects) ->
+          projects
 
-      # Single project at root level (must have name, url, description)
-      %{"name" => _name, "url" => _url, "description" => _description} = project ->
-        normalize_project(project)
+        unexpected ->
+          raise "Project file #{filename} must have projects under a 'projects:' key, got: #{inspect(unexpected)}"
+      end
 
-      unexpected ->
-        raise "Project file #{filename} must either have projects under a 'projects:' key or be a single project with name, url, and description. Got: #{inspect(unexpected)}"
-    end
+    Enum.map(projects_list, fn project ->
+      %{
+        # Will be assigned during import
+        id: nil,
+        name: project["name"],
+        url: project["url"],
+        description: project["description"],
+        tags: project["tags"] || []
+      }
+    end)
   end
 
   @impl Blog.Resource
-  def import(parsed_projects) do
+  def import(parsed_projects) when is_list(parsed_projects) do
+    # parsed_projects is already flattened by the generic import function
+    all_projects = parsed_projects
+
+    now =
+      DateTime.utc_now()
+      |> DateTime.to_naive()
+      |> NaiveDateTime.truncate(:second)
+
+    # Assign sequential IDs to projects
+    project_attrs =
+      all_projects
+      |> Enum.with_index(1)
+      |> Enum.map(fn {attrs, index} -> Map.put(attrs, :id, index) end)
+
+    # Create tags first
+    {_count, tags} =
+      project_attrs
+      |> Enum.flat_map(& &1.tags)
+      |> Enum.uniq()
+      |> Enum.map(&%{label: &1, inserted_at: now, updated_at: now})
+      |> then(
+        &SQLite.insert_all(
+          Tag,
+          &1,
+          on_conflict: {:replace_all_except, [:id, :inserted_at, :updated_at]},
+          returning: true
+        )
+      )
+
+    tag_lookup_table = Map.new(tags, fn tag -> {tag.label, tag.id} end)
+
+    # Import projects with tag associations and collect results
     imported_projects =
-      for project_attrs <- parsed_projects do
-        {:ok, %Project{} = imported_project} = Projects.create_project(project_attrs)
+      for project <- project_attrs,
+          project = Map.put(project, :tag_ids, Enum.map(project.tags, &tag_lookup_table[&1])) do
+        {:ok, %Project{} = imported_project} = Projects.upsert_project(project)
         imported_project
       end
 
     {:ok, imported_projects}
-  end
-
-  defp normalize_project(project) do
-    %{
-      name: project["name"],
-      url: project["url"],
-      description: project["description"]
-    }
   end
 end

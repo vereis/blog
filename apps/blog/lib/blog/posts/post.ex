@@ -4,6 +4,7 @@ defmodule Blog.Posts.Post do
   use Blog.Schema
 
   alias Blog.Posts.Tag
+  alias Blog.Schema.FTS
 
   schema "posts" do
     field(:title, :string)
@@ -153,7 +154,7 @@ defmodule Blog.Posts.Post do
   def query(base_query, filters) do
     Enum.reduce(filters, base_query, fn
       {:search, search_term}, query ->
-        case sanitize_fts_query(search_term) do
+        case FTS.sanitize_fts_query(search_term) do
           sanitized when sanitized in [nil, ""] ->
             from post in query,
               order_by: [desc: :published_at]
@@ -170,50 +171,5 @@ defmodule Blog.Posts.Post do
       {key, value}, query ->
         EctoUtils.Queryable.apply_filter(query, key, value)
     end)
-  end
-
-  defp sanitize_fts_query(query) when is_binary(query) do
-    case String.trim(query) do
-      "" ->
-        nil
-
-      trimmed ->
-        sanitized =
-          trimmed
-          # Convert unsupported operators to supported equivalents
-          # | or || -> OR
-          |> String.replace(~r/\s*\|\|?\s*/, " OR ")
-          # & or && -> AND
-          |> String.replace(~r/\s*\&\&?\s*/, " AND ")
-          # ! -> NOT
-          |> String.replace(~r/\s*\!\s*/, " NOT ")
-          # Remove problematic characters that have no FTS equivalent
-          |> String.replace(~r/[\~\;\,\?\\\=\<\>\[\]\{\}]/, " ")
-          # Handle trailing operators
-          |> String.replace(~r/\s+(AND|OR|NOT)\s*$/i, "")
-          # Incomplete NEAR functions
-          |> String.replace(~r/NEAR\(\s*$/i, "")
-          |> String.replace(~r/NEAR\([^)]*$/i, "")
-          # Incomplete column filters
-          |> String.replace(~r/\w+:\s*$/, "")
-          # Trailing special operators
-          |> String.replace(~r/\s+[\+\^\-\:\.]?\s*$/, "")
-          # Standalone elements
-          |> String.replace(~r/^\s*\(\s*$/, "")
-          |> String.replace(~r/^\s*\)\s*$/, "")
-          |> String.replace(~r/^\s*(AND|OR|NOT)\s*$/i, "")
-          # Clean up multiple spaces
-          |> String.replace(~r/\s+/, " ")
-          |> String.trim()
-
-        case sanitized do
-          "" -> nil
-          valid -> valid
-        end
-    end
-  end
-
-  defp sanitize_fts_query(_non_binary) do
-    nil
   end
 end

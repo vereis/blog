@@ -28,9 +28,10 @@ defmodule Blog.Resource.ProjectTest do
   describe "parse/1" do
     test "parses single project file" do
       content = """
-      name: "Test Project"
-      url: "https://example.com"
-      description: "A test project"
+      projects:
+        - name: "Test Project"
+          url: "https://example.com"
+          description: "A test project"
       """
 
       File.write!("#{@temp_dir}/single.yaml", content)
@@ -39,11 +40,15 @@ defmodule Blog.Resource.ProjectTest do
       stub(ProjectResource, :source, fn -> @temp_dir end)
       result = ProjectResource.parse("single.yaml")
 
-      assert result == %{
-               name: "Test Project",
-               url: "https://example.com",
-               description: "A test project"
-             }
+      assert result == [
+               %{
+                 id: nil,
+                 name: "Test Project",
+                 url: "https://example.com",
+                 description: "A test project",
+                 tags: []
+               }
+             ]
     end
 
     test "parses multiple projects file" do
@@ -64,14 +69,18 @@ defmodule Blog.Resource.ProjectTest do
 
       assert result == [
                %{
+                 id: nil,
                  name: "Project 1",
                  url: "https://example1.com",
-                 description: "First project"
+                 description: "First project",
+                 tags: []
                },
                %{
+                 id: nil,
                  name: "Project 2",
                  url: "https://example2.com",
-                 description: "Second project"
+                 description: "Second project",
+                 tags: []
                }
              ]
     end
@@ -85,7 +94,7 @@ defmodule Blog.Resource.ProjectTest do
 
       stub(ProjectResource, :source, fn -> @temp_dir end)
 
-      assert_raise RuntimeError, ~r/must either have projects under a 'projects:' key/, fn ->
+      assert_raise RuntimeError, ~r/must have projects under a 'projects:' key/, fn ->
         ProjectResource.parse("invalid.yaml")
       end
     end
@@ -94,8 +103,8 @@ defmodule Blog.Resource.ProjectTest do
   describe "import/1" do
     test "imports projects successfully" do
       parsed_projects = [
-        %{name: "Test 1", url: "https://test1.com", description: "First test"},
-        %{name: "Test 2", url: "https://test2.com", description: "Second test"}
+        %{name: "Test 1", url: "https://test1.com", description: "First test", tags: []},
+        %{name: "Test 2", url: "https://test2.com", description: "Second test", tags: []}
       ]
 
       assert {:ok, imported_projects} = ProjectResource.import(parsed_projects)
@@ -108,6 +117,34 @@ defmodule Blog.Resource.ProjectTest do
       # Verify they're in the database
       all_projects = Blog.Repo.SQLite.all(Project)
       assert length(all_projects) >= 2
+    end
+
+    test "imports projects with tags" do
+      parsed_projects = [
+        %{
+          name: "Elixir Project",
+          url: "https://example.com",
+          description: "An Elixir project",
+          tags: ["elixir", "phoenix"]
+        },
+        %{
+          name: "Python Project",
+          url: "https://example2.com",
+          description: "A Python project",
+          tags: ["python", "django"]
+        }
+      ]
+
+      assert {:ok, imported_projects} = ProjectResource.import(parsed_projects)
+      assert length(imported_projects) == 2
+
+      # Verify tags were created and associated
+      elixir_project = Enum.find(imported_projects, &(&1.name == "Elixir Project"))
+      elixir_project_with_tags = Blog.Repo.SQLite.preload(elixir_project, :tags)
+
+      tag_labels = Enum.map(elixir_project_with_tags.tags, & &1.label)
+      assert "elixir" in tag_labels
+      assert "phoenix" in tag_labels
     end
   end
 end

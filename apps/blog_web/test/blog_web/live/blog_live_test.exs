@@ -83,6 +83,12 @@ defmodule BlogWeb.BlogLiveTest do
 
   describe "projects page (:list_projects)" do
     test "renders projects list", %{conn: conn} do
+      elixir_tag = insert(:tag, label: "elixir")
+      nix_tag = insert(:tag, label: "nix")
+
+      insert(:project, name: "Neovim Config", tags: [nix_tag])
+      insert(:project, name: "Toggle", tags: [elixir_tag])
+
       {:ok, _view, html} = live(conn, ~p"/projects/")
 
       assert html =~ "All Projects"
@@ -94,6 +100,12 @@ defmodule BlogWeb.BlogLiveTest do
     end
 
     test "filters projects by tag", %{conn: conn} do
+      elixir_tag = insert(:tag, label: "elixir")
+      nix_tag = insert(:tag, label: "nix")
+
+      insert(:project, name: "Neovim Config", tags: [nix_tag])
+      insert(:project, name: "Toggle", tags: [elixir_tag])
+
       {:ok, view, _html} = live(conn, ~p"/projects/")
 
       # Click on elixir tag
@@ -107,6 +119,12 @@ defmodule BlogWeb.BlogLiveTest do
     end
 
     test "can clear tag filter", %{conn: conn} do
+      elixir_tag = insert(:tag, label: "elixir")
+      nix_tag = insert(:tag, label: "nix")
+
+      insert(:project, name: "Neovim Config", tags: [nix_tag])
+      insert(:project, name: "Toggle", tags: [elixir_tag])
+
       {:ok, view, _html} = live(conn, ~p"/projects/")
 
       # Apply filter first
