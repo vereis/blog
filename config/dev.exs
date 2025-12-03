@@ -5,7 +5,8 @@ config :blog, Blog.Repo,
   database: Path.expand("../blog_dev.db", __DIR__),
   pool_size: 5,
   stacktrace: true,
-  show_sensitive_data_on_connection_error: true
+  show_sensitive_data_on_connection_error: true,
+  default_transaction_mode: :immediate
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
