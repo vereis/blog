@@ -35,3 +35,4 @@ node_modules/
 npm-debug.log*
 rel/
 Thumbs.db
+priv/
