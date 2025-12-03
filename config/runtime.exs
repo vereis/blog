@@ -31,7 +31,8 @@ if config_env() == :prod do
 
   config :blog, Blog.Repo,
     database: database_path,
-    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "5")
+    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "5"),
+    default_transaction_mode: :immediate
 
   config :blog, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
