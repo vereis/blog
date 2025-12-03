@@ -1,0 +1,10 @@
+{
+  "mcp": {
+    "tidewave": {
+      "type": "local",
+      "command": ["mcp-proxy", "http://localhost:4000/tidewave/mcp"],
+      "enabled": true
+    }
+  },
+  "$schema": "https://opencode.ai/config.json"
+}

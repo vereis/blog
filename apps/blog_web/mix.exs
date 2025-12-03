@@ -23,9 +23,12 @@ defmodule BlogWeb.MixProject do
   #
   # Type `mix help compile.app` for more information.
   def application do
+    extra_apps = [:logger, :runtime_tools]
+    extra_apps = if Mix.env() == :dev, do: [:tidewave | extra_apps], else: extra_apps
+
     [
       mod: {BlogWeb.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: extra_apps
     ]
   end
 
@@ -56,6 +59,7 @@ defmodule BlogWeb.MixProject do
        depth: 1},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
+      {:tidewave, "~> 0.5", only: :dev},
       {:blog, in_umbrella: true},
       {:jason, "~> 1.2"},
       {:bandit, "~> 1.5"}
