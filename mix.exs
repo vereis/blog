@@ -8,7 +8,11 @@ defmodule Blog.Umbrella.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases(),
-      listeners: [Phoenix.CodeReloader]
+      listeners: [Phoenix.CodeReloader],
+      dialyzer: [
+        plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
+        plt_add_apps: [:mix]
+      ]
     ]
   end
 
@@ -33,7 +37,8 @@ defmodule Blog.Umbrella.MixProject do
   defp deps do
     [
       {:phoenix_live_view, ">= 0.0.0"},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 
