@@ -38,7 +38,8 @@ defmodule Blog.Umbrella.MixProject do
     [
       {:phoenix_live_view, ">= 0.0.0"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false}
     ]
   end
 
