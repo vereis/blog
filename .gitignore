@@ -1,29 +1,37 @@
-# The directory Mix will write compiled artifacts to.
-/_build/
-
-# If you run "mix test --cover", coverage assets end up here.
-/cover/
-
-# The directory Mix downloads your dependencies sources to.
-/deps/
-
-# Where 3rd-party dependencies like ExDoc output generated docs.
-/doc/
-
-# Ignore .fetch files in case you like to edit your project deps locally.
-/.fetch
-
-# If the VM crashes, it generates a dump, let's ignore it too.
-erl_crash.dump
-
-# Also ignore archive artifacts (built via "mix archive.build").
-*.ez
-
-# Temporary files, for example, from tests.
-/tmp/
-
-
-# Database files
+*.coverdata
 *.db
 *.db-*
-
+*.ez
+*.log
+*.sqlite
+*.sqlite3
+*.swo
+*.swp
+*~
+._*
+.direnv/
+.DS_Store
+.env
+.env.*
+.idea/
+.Spotlight-V100
+.Trashes
+.vscode/
+/.fetch
+/_build/
+/assets/
+/cover/
+/deps/
+/doc/
+/tmp/
+apps/*/*.coverdata
+apps/*/priv/static/**/*.gz
+apps/*/priv/static/cache_manifest.json
+blog.db*
+blog_test.db*
+ehthumbs.db
+erl_crash.dump
+node_modules/
+npm-debug.log*
+rel/
+Thumbs.db
