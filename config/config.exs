@@ -13,10 +13,6 @@ import Config
 config :blog,
   ecto_repos: [Blog.Repo]
 
-config :blog_web,
-  ecto_repos: [Blog.Repo],
-  generators: [context_app: :blog]
-
 # Configures the endpoint
 config :blog_web, BlogWeb.Endpoint,
   url: [host: "localhost"],
@@ -28,6 +24,10 @@ config :blog_web, BlogWeb.Endpoint,
   pubsub_server: Blog.PubSub,
   live_view: [signing_salt: "Iecpn077"]
 
+config :blog_web,
+  ecto_repos: [Blog.Repo],
+  generators: [context_app: :blog]
+
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.25.4",
@@ -38,17 +38,6 @@ config :esbuild,
     env: %{"NODE_PATH" => [Path.expand("../deps", __DIR__), Mix.Project.build_path()]}
   ]
 
-# Configure tailwind (the version is required)
-config :tailwind,
-  version: "4.1.12",
-  blog_web: [
-    args: ~w(
-      --input=assets/css/app.css
-      --output=priv/static/assets/css/app.css
-    ),
-    cd: Path.expand("../apps/blog_web", __DIR__)
-  ]
-
 # Configure Elixir's Logger
 config :logger, :default_formatter,
   format: "$time $metadata[$level] $message\n",
@@ -57,6 +46,18 @@ config :logger, :default_formatter,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-# Import environment specific config. This must remain at the bottom
-# of this file so it overrides the configuration defined above.
+# Configure tailwind (the version is required)
+config :tailwind,
+  version: "4.1.12",
+  blog_web: [
+    args: ~w(
+      --input=assets/css/app.css
+      --output=priv/static/assets/css/app.css
+    ),
+
+    # Import environment specific config. This must remain at the bottom
+    # of this file so it overrides the configuration defined above.
+    cd: Path.expand("../apps/blog_web", __DIR__)
+  ]
+
 import_config "#{config_env()}.exs"

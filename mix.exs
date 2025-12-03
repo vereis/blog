@@ -51,7 +51,8 @@ defmodule Blog.Umbrella.MixProject do
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       {:excellent_migrations, "~> 0.1", only: [:dev, :test], runtime: false},
-      {:excoveralls, "~> 0.18", only: :test}
+      {:excoveralls, "~> 0.18", only: :test},
+      {:styler, "~> 1.2", only: [:dev, :test], runtime: false}
     ]
   end
 

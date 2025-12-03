@@ -17,10 +17,6 @@ if config_env() == :prod do
       For example: /etc/blog/blog.db
       """
 
-  config :blog, Blog.Repo,
-    database: database_path,
-    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "5")
-
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
   # want to use a different value for prod and you most likely don't want
@@ -33,23 +29,30 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
+  config :blog, Blog.Repo,
+    database: database_path,
+    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "5")
+
+  config :blog, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
+
   config :blog_web, BlogWeb.Endpoint,
     http: [
       # Enable IPv6 and bind on all interfaces.
       # Set it to  {0, 0, 0, 0, 0, 0, 0, 1} for local network only access.
       ip: {0, 0, 0, 0, 0, 0, 0, 0}
     ],
-    secret_key_base: secret_key_base
 
-  # ## Using releases
-  #
-  # If you are doing OTP releases, you need to instruct Phoenix
-  # to start each relevant endpoint:
-  #
-  #     config :blog_web, BlogWeb.Endpoint, server: true
-  #
-  # Then you can assemble a release by calling `mix release`.
-  # See `mix help release` for more information.
+    # ## Using releases
+    #
+    # If you are doing OTP releases, you need to instruct Phoenix
+    # to start each relevant endpoint:
+    #
+    #     config :blog_web, BlogWeb.Endpoint, server: true
+    #
+    # Then you can assemble a release by calling `mix release`.
+    # See `mix help release` for more information.
+
+    secret_key_base: secret_key_base
 
   # ## SSL Support
   #
@@ -82,6 +85,4 @@ if config_env() == :prod do
   #       force_ssl: [hsts: true]
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.
-
-  config :blog, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 end

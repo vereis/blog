@@ -71,6 +71,10 @@ config :logger, :default_formatter, format: "[$level] $message\n"
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
 
+# Set a higher stacktrace during development. Avoid configuring such
+# in production as building large stacktraces may be expensive.
+config :phoenix, :stacktrace_depth, 20
+
 config :phoenix_live_view,
   # Include debug annotations and locations in rendered markup.
   # Changing this configuration will require mix clean and a full recompile.
@@ -78,10 +82,6 @@ config :phoenix_live_view,
   debug_attributes: true,
   # Enable helpful, but potentially expensive runtime checks
   enable_expensive_runtime_checks: true
-
-# Set a higher stacktrace during development. Avoid configuring such
-# in production as building large stacktraces may be expensive.
-config :phoenix, :stacktrace_depth, 20
 
 # Configure Tidewave
 config :tidewave, :project_name, "blog"

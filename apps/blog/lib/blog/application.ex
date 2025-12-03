@@ -9,8 +9,7 @@ defmodule Blog.Application do
   def start(_type, _args) do
     children = [
       Blog.Repo,
-      {Ecto.Migrator,
-       repos: Application.fetch_env!(:blog, :ecto_repos), skip: skip_migrations?()},
+      {Ecto.Migrator, repos: Application.fetch_env!(:blog, :ecto_repos), skip: skip_migrations?()},
       {DNSCluster, query: Application.get_env(:blog, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Blog.PubSub}
       # Start a worker by calling: Blog.Worker.start_link(arg)
