@@ -20,12 +20,12 @@ defmodule Blog.DataCase do
 
   using do
     quote do
-      alias Blog.Repo
-
+      import Blog.DataCase
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import Blog.DataCase
+
+      alias Blog.Repo
     end
   end
 

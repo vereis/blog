@@ -19,15 +19,14 @@ defmodule BlogWeb.ConnCase do
 
   using do
     quote do
+      use BlogWeb, :verified_routes
+      import BlogWeb.ConnCase
+      import Phoenix.ConnTest
+      import Plug.Conn
       # The default endpoint for testing
       @endpoint BlogWeb.Endpoint
 
-      use BlogWeb, :verified_routes
-
       # Import conveniences for testing with connections
-      import Plug.Conn
-      import Phoenix.ConnTest
-      import BlogWeb.ConnCase
     end
   end
 
