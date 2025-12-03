@@ -36,3 +36,7 @@ npm-debug.log*
 rel/
 Thumbs.db
 priv/
+mcp-proxy
+bin/
+.crates.toml
+.crates2.json

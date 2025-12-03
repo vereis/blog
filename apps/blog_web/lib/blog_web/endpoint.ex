@@ -27,8 +27,10 @@ defmodule BlogWeb.Endpoint do
     only: BlogWeb.static_paths(),
     raise_on_missing_only: code_reloading?
 
-  # Code reloading can be explicitly enabled under the
-  # :code_reloader configuration of your endpoint.
+  if Code.ensure_loaded?(Tidewave) do
+    plug Tidewave
+  end
+
   if code_reloading? do
     socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
     plug Phoenix.LiveReloader
