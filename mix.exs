@@ -11,7 +11,7 @@ defmodule Blog.Umbrella.MixProject do
       listeners: [Phoenix.CodeReloader],
       dialyzer: [
         plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
-        plt_add_apps: [:mix]
+        plt_add_apps: [:mix, :ex_unit]
       ],
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
@@ -69,7 +69,25 @@ defmodule Blog.Umbrella.MixProject do
     [
       # run `mix setup` in all child apps
       setup: ["cmd mix setup"],
-      precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]
+      lint: [
+        "deps.unlock --unused",
+        "format --check-formatted",
+        "compile --warnings-as-errors",
+        "credo --strict",
+        "dialyzer",
+        "sobelow --root apps/blog_web --exit",
+        "excellent_migrations.check_safety"
+      ],
+      precommit: [
+        "deps.unlock --unused",
+        "format",
+        "compile --warnings-as-errors",
+        "credo --strict",
+        "dialyzer",
+        "sobelow --root apps/blog_web --exit",
+        "excellent_migrations.check_safety",
+        "test"
+      ]
     ]
   end
 end

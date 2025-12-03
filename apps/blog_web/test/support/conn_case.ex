@@ -20,6 +20,7 @@ defmodule BlogWeb.ConnCase do
   using do
     quote do
       use BlogWeb, :verified_routes
+
       import BlogWeb.ConnCase
       import Phoenix.ConnTest
       import Plug.Conn
