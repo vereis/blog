@@ -31,6 +31,20 @@ defmodule Blog.Projects.Project do
     |> unique_constraint(:name)
   end
 
+  @impl EctoUtils.Queryable
+  def query(base_query, filters) do
+    Enum.reduce(filters, base_query, fn
+      {:tags, tags}, query ->
+        from project in query,
+          join: t in assoc(project, :tags),
+          where: t.label in ^tags,
+          distinct: true
+
+      {key, value}, query ->
+        EctoUtils.Queryable.apply_filter(query, key, value)
+    end)
+  end
+
   @impl Blog.Resource
   def handle_import(%Blog.Resource{content: content}) do
     case YamlElixir.read_from_string(content) do

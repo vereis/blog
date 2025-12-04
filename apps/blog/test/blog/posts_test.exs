@@ -55,6 +55,35 @@ defmodule Blog.PostsTest do
       assert p2.id == post2.id
       assert p1.id == post1.id
     end
+
+    test "filters posts by tags" do
+      elixir_tag = insert(:tag, label: "elixir")
+      phoenix_tag = insert(:tag, label: "phoenix")
+      ecto_tag = insert(:tag, label: "ecto")
+
+      post1 = insert(:post, slug: "elixir-basics")
+      post2 = insert(:post, slug: "phoenix-app")
+      post3 = insert(:post, slug: "ecto-tips")
+
+      Repo.insert_all("posts_tags", [
+        %{post_id: post1.id, tag_id: elixir_tag.id},
+        %{post_id: post2.id, tag_id: elixir_tag.id},
+        %{post_id: post2.id, tag_id: phoenix_tag.id},
+        %{post_id: post3.id, tag_id: elixir_tag.id},
+        %{post_id: post3.id, tag_id: ecto_tag.id}
+      ])
+
+      elixir_posts = Posts.list_posts(tags: ["elixir"])
+      assert length(elixir_posts) == 3
+
+      phoenix_posts = Posts.list_posts(tags: ["phoenix"])
+      assert length(phoenix_posts) == 1
+      assert hd(phoenix_posts).id == post2.id
+
+      ecto_posts = Posts.list_posts(tags: ["ecto"])
+      assert length(ecto_posts) == 1
+      assert hd(ecto_posts).id == post3.id
+    end
   end
 
   describe "get_post/1" do
@@ -89,6 +118,24 @@ defmodule Blog.PostsTest do
       assert fetched.id == draft_post.id
 
       assert Posts.get_post(slug: "draft", is_draft: false) == nil
+    end
+
+    test "filters by tags" do
+      elixir_tag = insert(:tag, label: "elixir")
+      phoenix_tag = insert(:tag, label: "phoenix")
+
+      post1 = insert(:post, slug: "elixir-post")
+      post2 = insert(:post, slug: "phoenix-post")
+
+      Repo.insert_all("posts_tags", [
+        %{post_id: post1.id, tag_id: elixir_tag.id},
+        %{post_id: post2.id, tag_id: phoenix_tag.id}
+      ])
+
+      assert fetched = Posts.get_post(slug: "elixir-post", tags: ["elixir"])
+      assert fetched.id == post1.id
+
+      assert Posts.get_post(slug: "elixir-post", tags: ["phoenix"]) == nil
     end
   end
 
