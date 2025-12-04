@@ -77,11 +77,20 @@ defmodule Blog.Resource do
           handle_import(resource)
         end
 
-        {changesets, errors} =
+        parse_results =
           source()
           |> File.ls!()
           |> Task.async_stream(read_and_parse, timeout: :infinity)
-          |> Enum.split_with(&match?({:ok, %Ecto.Changeset{valid?: true}}, &1))
+          |> Enum.flat_map(fn
+            {:ok, results} when is_list(results) ->
+              Enum.map(results, &{:ok, &1})
+
+            {:ok, results} ->
+              [{:ok, results}]
+          end)
+
+        {changesets, errors} =
+          Enum.split_with(parse_results, &match?({:ok, %Ecto.Changeset{valid?: true}}, &1))
 
         if errors != [] do
           Logger.error("Errors occurred during import of #{inspect(__MODULE__)}:")
