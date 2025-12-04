@@ -3,8 +3,8 @@ defmodule Blog.Resource do
   Behaviour and macro for importable blog resources from markdown files.
 
   Implementing modules must provide:
-  - `handle_import/1` callback to parse a resource and return a changeset or `{:error, reason}`
-    These changesets will be bulk inserted into the database.
+  - `handle_import/1` callback to parse a resource and return attrs map(s) or `{:error, reason}`
+    These attrs will be passed to the provided import function for upserting.
 
   Implementing modules may provide:
   - `pubsub_topic/0` callback to specify a custom PubSub topic for reload
@@ -14,7 +14,8 @@ defmodule Blog.Resource do
 
   Options:
   - `:source_dir` (required) - Directory containing resource files
-  - `:on_conflict` (optional) - Keyword list of Ecto.Repo.insert_all/3 on_conflict options (e.g., `[on_conflict: ..., conflict_target: ...]`)
+  - `:import` (required) - Function reference to upsert function (e.g., `&Context.upsert_entity/1`)
+                           This function should accept attrs map and return `{:ok, entity}` or `{:error, changeset}`
   """
 
   defstruct [:source, :path, :content, :filename, :extension]
@@ -28,15 +29,14 @@ defmodule Blog.Resource do
         }
 
   @callback source() :: Path.t()
-  @callback handle_import(resource :: t()) ::
-              Ecto.Changeset.t() | [Ecto.Changeset.t()] | {:error, term()}
+  @callback handle_import(resource :: t()) :: map() | [map()] | {:error, term()}
   @callback import() :: {:ok, [term()]} | {:error, term()}
   @callback pubsub_topic() :: String.t()
   @optional_callbacks pubsub_topic: 0
 
   defmacro __using__(opts) do
     source_dir = Keyword.fetch!(opts, :source_dir)
-    on_conflict_opts = Keyword.get(opts, :on_conflict, [])
+    import_fn = Keyword.fetch!(opts, :import)
 
     quote do
       @behaviour unquote(__MODULE__)
@@ -77,70 +77,31 @@ defmodule Blog.Resource do
           handle_import(resource)
         end
 
-        parse_results =
+        {successes, errors} =
           source()
           |> File.ls!()
           |> Task.async_stream(read_and_parse, timeout: :infinity)
-          |> Enum.flat_map(fn
-            {:ok, results} when is_list(results) ->
-              Enum.map(results, &{:ok, &1})
-
-            {:ok, results} ->
-              [{:ok, results}]
-          end)
-
-        {changesets, errors} =
-          Enum.split_with(parse_results, &match?({:ok, %Ecto.Changeset{valid?: true}}, &1))
+          |> Stream.flat_map(fn {:ok, res} -> List.wrap(res) end)
+          |> Stream.map(unquote(import_fn))
+          |> Enum.split_with(&match?({:ok, _res}, &1))
 
         if errors != [] do
-          Logger.error("Errors occurred during import of #{inspect(__MODULE__)}:")
+          Logger.error("Invalid imports detected for #{inspect(__MODULE__)}, records skipped:")
 
-          for error <- errors do
+          for {:error, error} <- errors do
             Logger.error(inspect(error))
           end
         end
 
-        case changesets do
-          [] ->
-            {:ok, []}
+        topic = pubsub_topic()
+        imported = Enum.map(successes, fn {:ok, res} -> res end)
 
-          changesets ->
-            valid_changesets = Enum.map(changesets, fn {:ok, changeset} -> changeset end)
-            first_changeset = hd(valid_changesets)
-
-            now = DateTime.utc_now() |> DateTime.to_naive() |> NaiveDateTime.truncate(:second)
-
-            entries =
-              Enum.map(valid_changesets, fn changeset ->
-                struct = Ecto.Changeset.apply_changes(changeset)
-                schema = struct.__struct__
-                association_fields = schema.__schema__(:associations)
-
-                struct
-                |> Map.from_struct()
-                |> Map.drop([:id, :__meta__] ++ association_fields)
-                |> Map.put(:inserted_at, now)
-                |> Map.put(:updated_at, now)
-              end)
-
-            insert_opts = Keyword.put(unquote(on_conflict_opts), :returning, true)
-
-            {_count, imported} =
-              Blog.Repo.insert_all(
-                first_changeset.data.__struct__,
-                entries,
-                insert_opts
-              )
-
-            topic = pubsub_topic()
-
-            for resource <- imported do
-              message = {:resource_reload, __MODULE__, resource.id}
-              Phoenix.PubSub.broadcast(Blog.PubSub, topic, message)
-            end
-
-            {:ok, imported}
+        for {:ok, resource} <- imported do
+          message = {:resource_reload, __MODULE__, resource.id}
+          Phoenix.PubSub.broadcast(Blog.PubSub, topic, message)
         end
+
+        {:ok, imported}
       end
 
       @impl unquote(__MODULE__)

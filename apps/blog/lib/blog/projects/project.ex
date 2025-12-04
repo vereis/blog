@@ -4,10 +4,7 @@ defmodule Blog.Projects.Project do
 
   use Blog.Resource,
     source_dir: "priv/projects",
-    on_conflict: [
-      on_conflict: {:replace_all_except, [:id, :inserted_at]},
-      conflict_target: :name
-    ]
+    import: &Blog.Projects.upsert_project/1
 
   @castable_fields [:name, :url, :description, :hash]
 
@@ -53,12 +50,9 @@ defmodule Blog.Projects.Project do
     case YamlElixir.read_from_string(content) do
       {:ok, %{"projects" => projects}} when is_list(projects) ->
         Enum.map(projects, fn project ->
-          attrs =
-            project
-            |> Map.take(Enum.map(@castable_fields -- [:hash], &Atom.to_string/1))
-            |> Map.new(fn {k, v} -> {String.to_existing_atom(k), v} end)
-
-          changeset(%__MODULE__{}, attrs)
+          project
+          |> Map.take(Enum.map(@castable_fields -- [:hash], &Atom.to_string/1))
+          |> Map.new(fn {k, v} -> {String.to_existing_atom(k), v} end)
         end)
 
       {:ok, yaml_without_projects} ->

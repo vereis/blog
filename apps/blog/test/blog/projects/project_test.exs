@@ -51,16 +51,16 @@ defmodule Blog.Projects.ProjectTest do
       """
 
       resource = %Blog.Resource{content: yaml_content}
-      changesets = Project.handle_import(resource)
+      attrs_list = Project.handle_import(resource)
 
-      assert is_list(changesets)
-      assert length(changesets) == 2
+      assert is_list(attrs_list)
+      assert length(attrs_list) == 2
 
-      [cs1, cs2] = changesets
-      assert cs1.valid?
-      assert cs2.valid?
-      assert Ecto.Changeset.get_field(cs1, :name) == "Project One"
-      assert Ecto.Changeset.get_field(cs2, :name) == "Project Two"
+      [attrs1, attrs2] = attrs_list
+      assert is_map(attrs1)
+      assert is_map(attrs2)
+      assert attrs1.name == "Project One"
+      assert attrs2.name == "Project Two"
     end
 
     test "returns error for invalid YAML format" do
