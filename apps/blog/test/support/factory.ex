@@ -4,6 +4,7 @@ defmodule Blog.Factory do
   use ExMachina.Ecto, repo: Blog.Repo
 
   alias Blog.Posts.Post
+  alias Blog.Projects.Project
 
   def post_factory do
     %Post{
@@ -32,6 +33,14 @@ defmodule Blog.Factory do
       ],
       is_draft: false,
       published_at: ~U[2024-01-01 12:00:00Z]
+    }
+  end
+
+  def project_factory do
+    %Project{
+      name: sequence(:project_name, &"Project #{&1}"),
+      url: sequence(:project_url, &"https://github.com/vereis/project-#{&1}"),
+      description: "A sample project description that explains what this project does."
     }
   end
 end
