@@ -10,7 +10,7 @@ defmodule Blog.Repo.Migrations.CreatePosts do
       add :reading_time_minutes, :integer, null: false
       add :is_draft, :boolean, default: false, null: false
       add :published_at, :utc_datetime
-      add :hash, :string, null: false
+      add :hash, :string
       add :headings, :text, null: false
 
       timestamps()

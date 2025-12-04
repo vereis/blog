@@ -1,12 +1,8 @@
 defmodule Blog.Posts.Post do
   @moduledoc false
-  use Ecto.Schema
-
-  import Ecto.Changeset
+  use Blog.Schema
 
   alias Blog.Markdown
-
-  @type t :: %__MODULE__{}
 
   @castable_fields [:title, :raw_body, :slug, :is_draft, :published_at]
   @slug_format ~r/^[a-z0-9_-]+$/
@@ -28,7 +24,7 @@ defmodule Blog.Posts.Post do
     field :published_at, :utc_datetime
     field :hash, :string
 
-    embeds_many :headings, Heading, primary_key: false do
+    embeds_many :headings, Heading, primary_key: false, on_replace: :delete do
       field :link, :string
       field :title, :string
       field :level, :integer

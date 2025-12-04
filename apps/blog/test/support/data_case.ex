@@ -21,6 +21,7 @@ defmodule Blog.DataCase do
   using do
     quote do
       import Blog.DataCase
+      import Blog.Factory
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
