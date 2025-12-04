@@ -1,0 +1,7 @@
+projects:
+  - name: "Cool Elixir Library"
+    url: "https://github.com/vereis/cool_library"
+    description: "A really cool library that does cool things"
+  - name: "Another Project"
+    url: "https://example.com"
+    description: "Description here"
