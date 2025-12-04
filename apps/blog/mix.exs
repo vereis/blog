@@ -42,9 +42,11 @@ defmodule Blog.MixProject do
       {:ecto_sql, "~> 3.13"},
       {:ecto_sqlite3, ">= 0.0.0"},
       {:jason, "~> 1.2"},
+      {:ecto_utils, "~> 0.2"},
       {:mdex, "~> 0.2"},
       {:yaml_elixir, "~> 2.11"},
-      {:floki, "~> 0.36"}
+      {:floki, "~> 0.36"},
+      {:ex_machina, "~> 2.8", only: :test}
     ]
   end
 

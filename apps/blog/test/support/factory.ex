@@ -1,0 +1,37 @@
+defmodule Blog.Factory do
+  @moduledoc false
+
+  use ExMachina.Ecto, repo: Blog.Repo
+
+  alias Blog.Posts.Post
+
+  def post_factory do
+    %Post{
+      title: sequence(:post_title, &"Post Title #{&1}"),
+      slug: sequence(:post_slug, &"post-title-#{&1}"),
+      raw_body: """
+      # Sample Post
+
+      This is a sample blog post body with some content.
+
+      ## Introduction
+
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+      ## Content
+
+      Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+      """,
+      body:
+        ~s(<h1 id="sample-post">Sample Post</h1><p>This is a sample blog post body with some content.</p><h2 id="introduction">Introduction</h2><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p><h2 id="content">Content</h2><p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>),
+      reading_time_minutes: 1,
+      headings: [
+        %Post.Heading{level: 1, title: "Sample Post", link: "sample-post"},
+        %Post.Heading{level: 2, title: "Introduction", link: "introduction"},
+        %Post.Heading{level: 2, title: "Content", link: "content"}
+      ],
+      is_draft: false,
+      published_at: ~U[2024-01-01 12:00:00Z]
+    }
+  end
+end
