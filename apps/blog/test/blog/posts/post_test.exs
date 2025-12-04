@@ -1,5 +1,5 @@
 defmodule Blog.Posts.PostTest do
-  use Blog.DataCase, async: true
+  use Blog.DataCase, async: false
 
   alias Blog.Posts.Post
   alias Ecto.Changeset
@@ -246,6 +246,41 @@ defmodule Blog.Posts.PostTest do
 
       assert changeset.valid?
       assert {:ok, 2} = Changeset.fetch_change(changeset, :reading_time_minutes)
+    end
+  end
+
+  describe "import/0" do
+    test "imports posts from markdown files and inserts into database" do
+      assert {:ok, imported} = Post.import()
+
+      assert length(imported) == 3
+
+      # Verify posts are in the database
+      assert Repo.aggregate(Post, :count) == 3
+
+      # Check published post
+      published = Repo.get_by!(Post, slug: "published-post")
+      assert published.title == "Published Test Post"
+      assert published.is_draft == false
+      assert published.published_at == ~U[2024-12-01 10:00:00Z]
+      assert published.body =~ "<h1"
+      assert published.reading_time_minutes == 1
+      assert length(published.headings) == 3
+
+      # Check draft post
+      draft = Repo.get_by!(Post, slug: "draft-post")
+      assert draft.title == "Draft Test Post"
+      assert draft.is_draft == true
+      assert is_nil(draft.published_at)
+      assert draft.body =~ "Draft Post"
+      assert length(draft.headings) == 2
+
+      # Check minimal post
+      minimal = Repo.get_by!(Post, slug: "minimal-post")
+      assert minimal.title == "Minimal Post"
+      assert minimal.is_draft == false
+      assert is_nil(minimal.published_at)
+      assert minimal.body =~ "Just some minimal content"
     end
   end
 end
