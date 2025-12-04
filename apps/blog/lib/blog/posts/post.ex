@@ -94,6 +94,8 @@ defmodule Blog.Posts.Post do
     end
   end
 
+  # NOTE: Make sure all headings have unique IDs we can link to.
+  # NOTE: Side effect: Accumulate headings so that we can build a list of headers to store in the DB.
   defp process_html({"h" <> level_str = tag, attrs, children}, acc) do
     level = String.to_integer(level_str)
     title = Floki.text({tag, attrs, children})
@@ -108,6 +110,7 @@ defmodule Blog.Posts.Post do
     {{tag, [{"id", link} | attrs], children}, [heading | acc]}
   end
 
+  # NOTE: Wrap images in links so that when clicked, they open the full-size image in a new tab.
   defp process_html({"img", attrs, children}, acc) do
     src = [{"img", attrs, children}] |> Floki.attribute("src") |> List.first()
 
