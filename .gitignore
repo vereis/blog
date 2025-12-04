@@ -35,7 +35,7 @@ node_modules/
 npm-debug.log*
 rel/
 Thumbs.db
-priv/
+/priv/
 mcp-proxy
 bin/
 .crates.toml
