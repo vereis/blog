@@ -38,6 +38,10 @@ config :esbuild,
     env: %{"NODE_PATH" => [Path.expand("../deps", __DIR__), Mix.Project.build_path()]}
   ]
 
+# SQLite doesn't support certain Postgres features so skipping those checks
+config :excellent_migrations,
+  skip_checks: [:index_not_concurrently]
+
 # Configure Elixir's Logger
 config :logger, :default_formatter,
   format: "$time $metadata[$level] $message\n",
