@@ -99,7 +99,7 @@ defmodule Blog.Posts.Post do
   defp process_html({"h" <> level_str = tag, attrs, children}, acc) do
     level = String.to_integer(level_str)
     title = Floki.text({tag, attrs, children})
-    link = slugify_heading_text(title)
+    link = slugify(title)
 
     heading = %{
       level: level,
@@ -128,11 +128,15 @@ defmodule Blog.Posts.Post do
     {other, acc}
   end
 
-  defp slugify_heading_text(title) do
-    title
+  @doc false
+  @spec slugify(String.t(), keyword()) :: String.t()
+  def slugify(text, opts \\ []) do
+    separator = Keyword.get(opts, :separator, "-")
+
+    text
     |> String.downcase()
     |> String.replace(~r/[^\w\s-]/, "")
-    |> String.replace(~r/\s+/, "-")
-    |> String.trim("-")
+    |> String.replace(~r/\s+/, separator)
+    |> String.trim(separator)
   end
 end
