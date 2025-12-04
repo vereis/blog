@@ -3,6 +3,7 @@ title: "Published Test Post"
 slug: "published-post"
 is_draft: false
 published_at: "2024-12-01T10:00:00Z"
+tags: ["elixir", "testing"]
 ---
 
 # Published Test Post

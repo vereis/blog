@@ -77,21 +77,31 @@ defmodule Blog.Projects.ProjectTest do
       assert {:ok, imported} = Project.import()
 
       assert length(imported) == 2
-      assert Enum.any?(imported, &(&1.name == "Cool Elixir Library"))
+      assert Enum.any?(imported, &(&1.name == "Test Project"))
       assert Enum.any?(imported, &(&1.name == "Another Project"))
+
+      # Check tags were imported and associated
+      test_project = Project |> Repo.get_by!(name: "Test Project") |> Repo.preload(:tags)
+      assert length(test_project.tags) == 2
+      tag_labels = test_project.tags |> Enum.map(& &1.label) |> Enum.sort()
+      assert tag_labels == ["elixir", "web"]
+
+      another_project = Project |> Repo.get_by!(name: "Another Project") |> Repo.preload(:tags)
+      assert length(another_project.tags) == 1
+      assert hd(another_project.tags).label == "rust"
     end
 
     test "upserts projects based on name" do
       # First import
       assert {:ok, _} = Project.import()
-      first_project = Repo.get_by(Project, name: "Cool Elixir Library")
+      first_project = Repo.get_by(Project, name: "Test Project")
 
       # Second import should update, not duplicate
       assert {:ok, _} = Project.import()
       assert Repo.aggregate(Project, :count) == 2
 
       # Project should still have the same ID
-      second_project = Repo.get_by(Project, name: "Cool Elixir Library")
+      second_project = Repo.get_by(Project, name: "Test Project")
       assert first_project.id == second_project.id
     end
   end

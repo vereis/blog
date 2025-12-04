@@ -50,4 +50,17 @@ defmodule Blog.Tags do
   def delete_tag(%Tag{} = tag) do
     Repo.delete(tag)
   end
+
+  @spec label_to_id(String.t() | [String.t()] | map()) :: integer() | [integer()] | map()
+  def label_to_id(label) when is_binary(label) do
+    %{label: label} |> upsert_tag() |> elem(1) |> Map.get(:id)
+  end
+
+  def label_to_id(labels) when is_list(labels) do
+    Enum.map(labels, &label_to_id/1)
+  end
+
+  def label_to_id(entity) when is_map(entity) and is_map_key(entity, :tags) do
+    Map.put(entity, :tag_ids, label_to_id(entity.tags))
+  end
 end

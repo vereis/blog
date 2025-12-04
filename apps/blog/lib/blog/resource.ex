@@ -37,6 +37,7 @@ defmodule Blog.Resource do
   defmacro __using__(opts) do
     source_dir = Keyword.fetch!(opts, :source_dir)
     import_fn = Keyword.fetch!(opts, :import)
+    preprocess_fn = Keyword.get(opts, :preprocess, & &1)
 
     quote do
       @behaviour unquote(__MODULE__)
@@ -82,6 +83,7 @@ defmodule Blog.Resource do
           |> File.ls!()
           |> Task.async_stream(read_and_parse, timeout: :infinity)
           |> Stream.flat_map(fn {:ok, res} -> List.wrap(res) end)
+          |> Stream.map(fn attrs -> unquote(preprocess_fn).(attrs) end)
           |> Stream.map(unquote(import_fn))
           |> Enum.split_with(&match?({:ok, _res}, &1))
 

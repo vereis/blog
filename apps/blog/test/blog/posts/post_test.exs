@@ -291,13 +291,18 @@ defmodule Blog.Posts.PostTest do
       assert Repo.aggregate(Post, :count) == 3
 
       # Check published post
-      published = Repo.get_by!(Post, slug: "published-post")
+      published = Post |> Repo.get_by!(slug: "published-post") |> Repo.preload(:tags)
       assert published.title == "Published Test Post"
       assert published.is_draft == false
       assert published.published_at == ~U[2024-12-01 10:00:00Z]
       assert published.body =~ "<h1"
       assert published.reading_time_minutes == 1
       assert length(published.headings) == 4
+
+      # Check tags were imported and associated
+      assert length(published.tags) == 2
+      tag_labels = published.tags |> Enum.map(& &1.label) |> Enum.sort()
+      assert tag_labels == ["elixir", "testing"]
 
       # Check draft post
       draft = Repo.get_by!(Post, slug: "draft-post")
