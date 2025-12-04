@@ -61,17 +61,9 @@ defmodule Blog.PostsTest do
       phoenix_tag = insert(:tag, label: "phoenix")
       ecto_tag = insert(:tag, label: "ecto")
 
-      post1 = insert(:post, slug: "elixir-basics")
-      post2 = insert(:post, slug: "phoenix-app")
-      post3 = insert(:post, slug: "ecto-tips")
-
-      Repo.insert_all("posts_tags", [
-        %{post_id: post1.id, tag_id: elixir_tag.id},
-        %{post_id: post2.id, tag_id: elixir_tag.id},
-        %{post_id: post2.id, tag_id: phoenix_tag.id},
-        %{post_id: post3.id, tag_id: elixir_tag.id},
-        %{post_id: post3.id, tag_id: ecto_tag.id}
-      ])
+      _post1 = insert(:post, slug: "elixir-basics", tags: [elixir_tag])
+      post2 = insert(:post, slug: "phoenix-app", tags: [elixir_tag, phoenix_tag])
+      post3 = insert(:post, slug: "ecto-tips", tags: [elixir_tag, ecto_tag])
 
       elixir_posts = Posts.list_posts(tags: ["elixir"])
       assert length(elixir_posts) == 3
@@ -124,13 +116,8 @@ defmodule Blog.PostsTest do
       elixir_tag = insert(:tag, label: "elixir")
       phoenix_tag = insert(:tag, label: "phoenix")
 
-      post1 = insert(:post, slug: "elixir-post")
-      post2 = insert(:post, slug: "phoenix-post")
-
-      Repo.insert_all("posts_tags", [
-        %{post_id: post1.id, tag_id: elixir_tag.id},
-        %{post_id: post2.id, tag_id: phoenix_tag.id}
-      ])
+      post1 = insert(:post, slug: "elixir-post", tags: [elixir_tag])
+      _post2 = insert(:post, slug: "phoenix-post", tags: [phoenix_tag])
 
       assert fetched = Posts.get_post(slug: "elixir-post", tags: ["elixir"])
       assert fetched.id == post1.id

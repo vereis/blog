@@ -4,6 +4,7 @@ defmodule Blog.Posts.Post do
 
   use Blog.Resource,
     source_dir: "priv/posts",
+    preprocess: &Blog.Tags.label_to_id/1,
     import: &Blog.Posts.upsert_post/1
 
   alias Blog.Markdown
@@ -44,10 +45,12 @@ defmodule Blog.Posts.Post do
   @doc false
   @spec changeset(t() | Ecto.Changeset.t(t()), map()) :: Ecto.Changeset.t(t())
   def changeset(post, attrs) do
+    slug_error = "must be lowercase alphanumeric with hyphens or underscores only"
+
     post
     |> cast(attrs, @castable_fields)
     |> validate_required([:title, :raw_body, :slug])
-    |> validate_format(:slug, @slug_format, message: "must be lowercase alphanumeric with hyphens or underscores only")
+    |> validate_format(:slug, @slug_format, message: slug_error)
     |> unique_constraint(:slug)
     |> preload_put_assoc(attrs, :tags, :tag_ids)
     |> process_markdown()
@@ -74,7 +77,7 @@ defmodule Blog.Posts.Post do
       metadata
       |> Map.take(Enum.map(@castable_fields, &Atom.to_string/1))
       |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
-      |> Map.put(:raw_body, String.trim(raw_body))
+      |> Map.merge(%{raw_body: String.trim(raw_body), tags: Map.get(metadata, "tags", [])})
     end
   end
 

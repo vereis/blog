@@ -4,6 +4,7 @@ defmodule Blog.Projects.Project do
 
   use Blog.Resource,
     source_dir: "priv/projects",
+    preprocess: &Blog.Tags.label_to_id/1,
     import: &Blog.Projects.upsert_project/1
 
   @castable_fields [:name, :url, :description, :hash]
@@ -50,9 +51,12 @@ defmodule Blog.Projects.Project do
     case YamlElixir.read_from_string(content) do
       {:ok, %{"projects" => projects}} when is_list(projects) ->
         Enum.map(projects, fn project ->
-          project
-          |> Map.take(Enum.map(@castable_fields -- [:hash], &Atom.to_string/1))
-          |> Map.new(fn {k, v} -> {String.to_existing_atom(k), v} end)
+          attrs =
+            project
+            |> Map.take(Enum.map(@castable_fields -- [:hash], &Atom.to_string/1))
+            |> Map.new(fn {k, v} -> {String.to_existing_atom(k), v} end)
+
+          Map.put(attrs, :tags, Map.get(project, "tags", []))
         end)
 
       {:ok, yaml_without_projects} ->
