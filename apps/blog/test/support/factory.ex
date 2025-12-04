@@ -5,6 +5,7 @@ defmodule Blog.Factory do
 
   alias Blog.Posts.Post
   alias Blog.Projects.Project
+  alias Blog.Tags.Tag
 
   def post_factory do
     %Post{
@@ -41,6 +42,12 @@ defmodule Blog.Factory do
       name: sequence(:project_name, &"Project #{&1}"),
       url: sequence(:project_url, &"https://github.com/vereis/project-#{&1}"),
       description: "A sample project description that explains what this project does."
+    }
+  end
+
+  def tag_factory do
+    %Tag{
+      label: sequence(:tag_label, &"tag-#{&1}")
     }
   end
 end
