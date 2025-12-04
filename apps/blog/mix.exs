@@ -46,6 +46,7 @@ defmodule Blog.MixProject do
       {:mdex, "~> 0.2"},
       {:yaml_elixir, "~> 2.11"},
       {:floki, "~> 0.36"},
+      {:vix, "~> 0.31"},
       {:ex_machina, "~> 2.8", only: :test}
     ]
   end
