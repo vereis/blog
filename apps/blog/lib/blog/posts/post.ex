@@ -4,10 +4,7 @@ defmodule Blog.Posts.Post do
 
   use Blog.Resource,
     source_dir: "priv/posts",
-    on_conflict: [
-      on_conflict: {:replace_all_except, [:id, :inserted_at]},
-      conflict_target: :slug
-    ]
+    import: &Blog.Posts.upsert_post/1
 
   alias Blog.Markdown
 
@@ -74,13 +71,10 @@ defmodule Blog.Posts.Post do
   def handle_import(%Blog.Resource{content: content}) do
     with [_front, metadata_yaml, raw_body] <- String.split(content, "---\n", parts: 3),
          {:ok, metadata} <- YamlElixir.read_from_string(metadata_yaml) do
-      attrs =
-        metadata
-        |> Map.take(Enum.map(@castable_fields, &Atom.to_string/1))
-        |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
-        |> Map.put(:raw_body, String.trim(raw_body))
-
-      changeset(%__MODULE__{}, attrs)
+      metadata
+      |> Map.take(Enum.map(@castable_fields, &Atom.to_string/1))
+      |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+      |> Map.put(:raw_body, String.trim(raw_body))
     end
   end
 
