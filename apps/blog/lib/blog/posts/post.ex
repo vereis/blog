@@ -31,7 +31,9 @@ defmodule Blog.Posts.Post do
     field :published_at, :utc_datetime
     field :hash, :string
 
-    many_to_many :tags, Blog.Tags.Tag, join_through: "posts_tags"
+    many_to_many :tags, Blog.Tags.Tag,
+      join_through: join_schema("posts_tags", {:post_id, :tag_id}),
+      on_replace: :delete
 
     embeds_many :headings, Heading, primary_key: false, on_replace: :delete do
       field :link, :string
@@ -50,6 +52,7 @@ defmodule Blog.Posts.Post do
     |> validate_required([:title, :raw_body, :slug])
     |> validate_format(:slug, @slug_format, message: "must be lowercase alphanumeric with hyphens or underscores only")
     |> unique_constraint(:slug)
+    |> preload_put_assoc(attrs, :tags, :tag_ids)
     |> process_markdown()
   end
 

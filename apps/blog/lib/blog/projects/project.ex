@@ -17,7 +17,9 @@ defmodule Blog.Projects.Project do
     field :description, :string
     field :hash, :string
 
-    many_to_many :tags, Blog.Tags.Tag, join_through: "projects_tags"
+    many_to_many :tags, Blog.Tags.Tag,
+      join_through: join_schema("projects_tags", {:project_id, :tag_id}),
+      on_replace: :delete
 
     timestamps()
   end
@@ -29,6 +31,7 @@ defmodule Blog.Projects.Project do
     |> cast(attrs, @castable_fields)
     |> validate_required([:name, :url, :description])
     |> unique_constraint(:name)
+    |> preload_put_assoc(attrs, :tags, :tag_ids)
   end
 
   @impl EctoUtils.Queryable
