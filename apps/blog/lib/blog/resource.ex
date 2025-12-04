@@ -14,6 +14,7 @@ defmodule Blog.Resource do
 
   Options:
   - `:source_dir` (required) - Directory containing resource files
+  - `:on_conflict` (optional) - Keyword list of Ecto.Repo.insert_all/3 on_conflict options (e.g., `[on_conflict: ..., conflict_target: ...]`)
   """
 
   defstruct [:source, :path, :content, :filename, :extension]
@@ -27,13 +28,15 @@ defmodule Blog.Resource do
         }
 
   @callback source() :: Path.t()
-  @callback handle_import(resource :: t()) :: Ecto.Changeset.t() | {:error, term()}
+  @callback handle_import(resource :: t()) ::
+              Ecto.Changeset.t() | [Ecto.Changeset.t()] | {:error, term()}
   @callback import() :: {:ok, [term()]} | {:error, term()}
   @callback pubsub_topic() :: String.t()
   @optional_callbacks pubsub_topic: 0
 
   defmacro __using__(opts) do
     source_dir = Keyword.fetch!(opts, :source_dir)
+    on_conflict_opts = Keyword.get(opts, :on_conflict, [])
 
     quote do
       @behaviour unquote(__MODULE__)
@@ -108,13 +111,13 @@ defmodule Blog.Resource do
                 |> Map.put(:updated_at, now)
               end)
 
+            insert_opts = Keyword.put(unquote(on_conflict_opts), :returning, true)
+
             {_count, imported} =
               Blog.Repo.insert_all(
                 first_changeset.data.__struct__,
                 entries,
-                on_conflict: {:replace_all_except, [:id, :inserted_at]},
-                conflict_target: :slug,
-                returning: true
+                insert_opts
               )
 
             topic = pubsub_topic()

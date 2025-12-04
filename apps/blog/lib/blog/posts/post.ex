@@ -1,7 +1,13 @@
 defmodule Blog.Posts.Post do
   @moduledoc false
   use Blog.Schema
-  use Blog.Resource, source_dir: "priv/posts"
+
+  use Blog.Resource,
+    source_dir: "priv/posts",
+    on_conflict: [
+      on_conflict: {:replace_all_except, [:id, :inserted_at]},
+      conflict_target: :slug
+    ]
 
   alias Blog.Markdown
 
