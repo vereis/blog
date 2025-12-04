@@ -132,6 +132,28 @@ defmodule Blog.Posts.PostTest do
 
       refute changeset.valid?
     end
+
+    test "wraps images in clickable links" do
+      changeset =
+        Post.changeset(%Post{}, %{
+          title: "Test Post",
+          raw_body: "![Alt text](/images/test.png)",
+          slug: "test-post"
+        })
+
+      assert changeset.valid?
+      assert {:ok, body} = Changeset.fetch_change(changeset, :body)
+
+      # Should have an anchor tag wrapping the image
+      assert body =~ ~r/<a[^>]*href="\/images\/test\.png"[^>]*>/
+      assert body =~ ~r/title="View full size"/
+      assert body =~ ~r/target="_blank"/
+      assert body =~ ~r/rel="noopener"/
+
+      # Should still have the image tag
+      assert body =~ ~r/<img[^>]*src="\/images\/test\.png"[^>]*>/
+      assert body =~ ~r/alt="Alt text"/
+    end
   end
 
   describe "changeset/2 - heading extraction" do

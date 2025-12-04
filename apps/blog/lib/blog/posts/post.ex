@@ -108,6 +108,19 @@ defmodule Blog.Posts.Post do
     {{tag, [{"id", link} | attrs], children}, [heading | acc]}
   end
 
+  defp process_html({"img", attrs, children}, acc) do
+    src = [{"img", attrs, children}] |> Floki.attribute("src") |> List.first()
+
+    link_attrs = [
+      {"href", src},
+      {"title", "View full size"},
+      {"target", "_blank"},
+      {"rel", "noopener"}
+    ]
+
+    {{"a", link_attrs, [{"img", attrs, children}]}, acc}
+  end
+
   defp process_html(other, acc) do
     {other, acc}
   end
