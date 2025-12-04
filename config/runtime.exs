@@ -1,5 +1,7 @@
 import Config
 
+config :blog, BlogWeb.Endpoint, http: [port: String.to_integer(System.get_env("PORT", "4000"))]
+
 # config/runtime.exs is executed for all environments, including
 # during releases. It is executed after compilation and before the
 # system starts, so it is typically used to load production configuration
@@ -7,7 +9,8 @@ import Config
 # any compile-time configuration in here, as it won't be applied.
 # The block below contains prod specific runtime configuration.
 
-config :blog, BlogWeb.Endpoint, http: [port: String.to_integer(System.get_env("PORT", "4000"))]
+# Set the runtime environment for Blog
+config :blog, :env, config_env()
 
 if config_env() == :prod do
   database_path =

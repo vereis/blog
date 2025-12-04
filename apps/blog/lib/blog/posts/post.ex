@@ -1,6 +1,7 @@
 defmodule Blog.Posts.Post do
   @moduledoc false
   use Blog.Schema
+  use Blog.Resource, source_dir: "priv/posts"
 
   alias Blog.Markdown
 
@@ -42,6 +43,20 @@ defmodule Blog.Posts.Post do
     |> validate_format(:slug, @slug_format, message: "must be lowercase alphanumeric with hyphens or underscores only")
     |> unique_constraint(:slug)
     |> process_markdown()
+  end
+
+  @impl Blog.Resource
+  def handle_import(%Blog.Resource{content: content}) do
+    with [_front, metadata_yaml, raw_body] <- String.split(content, "---\n", parts: 3),
+         {:ok, metadata} <- YamlElixir.read_from_string(metadata_yaml) do
+      attrs =
+        metadata
+        |> Map.take(Enum.map(@castable_fields, &Atom.to_string/1))
+        |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+        |> Map.put(:raw_body, String.trim(raw_body))
+
+      changeset(%__MODULE__{}, attrs)
+    end
   end
 
   defp calculate_reading_time(raw_body) do
