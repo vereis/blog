@@ -98,15 +98,25 @@ defmodule Blog.Posts.Post do
 
   defp process_markdown(changeset) do
     raw_body = get_change(changeset, :raw_body)
+    title = get_field(changeset, :title)
 
     case Markdown.render(raw_body, &process_html/2) do
       {:ok, [html, headings]} ->
         reading_time = calculate_reading_time(raw_body)
 
+        # Always include title as the top-level heading
+        title_heading = %{
+          level: 1,
+          title: title,
+          link: slugify(title)
+        }
+
+        all_headings = [title_heading | headings]
+
         changeset
         |> put_change(:body, html)
         |> put_change(:reading_time_minutes, reading_time)
-        |> put_embed(:headings, headings)
+        |> put_embed(:headings, all_headings)
 
       {:error, reason} ->
         add_error(changeset, :raw_body, reason)
