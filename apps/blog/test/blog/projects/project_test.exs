@@ -37,4 +37,62 @@ defmodule Blog.Projects.ProjectTest do
       assert %{name: ["has already been taken"]} = errors_on(changeset)
     end
   end
+
+  describe "handle_import/1 - YAML parsing" do
+    test "parses projects.yaml with multiple projects" do
+      yaml_content = """
+      projects:
+        - name: "Project One"
+          url: "https://example.com/one"
+          description: "First project"
+        - name: "Project Two"
+          url: "https://example.com/two"
+          description: "Second project"
+      """
+
+      resource = %Blog.Resource{content: yaml_content}
+      changesets = Project.handle_import(resource)
+
+      assert is_list(changesets)
+      assert length(changesets) == 2
+
+      [cs1, cs2] = changesets
+      assert cs1.valid?
+      assert cs2.valid?
+      assert Ecto.Changeset.get_field(cs1, :name) == "Project One"
+      assert Ecto.Changeset.get_field(cs2, :name) == "Project Two"
+    end
+
+    test "returns error for invalid YAML format" do
+      yaml_content = "invalid: yaml"
+      resource = %Blog.Resource{content: yaml_content}
+
+      assert {:error, ~s(YAML content does not contain 'projects' key with a list value, got: %{"invalid" => "yaml"})} =
+               Project.handle_import(resource)
+    end
+  end
+
+  describe "import/0 - resource import system" do
+    test "imports projects from projects.yaml file" do
+      assert {:ok, imported} = Project.import()
+
+      assert length(imported) == 2
+      assert Enum.any?(imported, &(&1.name == "Cool Elixir Library"))
+      assert Enum.any?(imported, &(&1.name == "Another Project"))
+    end
+
+    test "upserts projects based on name" do
+      # First import
+      assert {:ok, _} = Project.import()
+      first_project = Repo.get_by(Project, name: "Cool Elixir Library")
+
+      # Second import should update, not duplicate
+      assert {:ok, _} = Project.import()
+      assert Repo.aggregate(Project, :count) == 2
+
+      # Project should still have the same ID
+      second_project = Repo.get_by(Project, name: "Cool Elixir Library")
+      assert first_project.id == second_project.id
+    end
+  end
 end
