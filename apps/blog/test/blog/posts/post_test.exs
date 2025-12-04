@@ -174,10 +174,14 @@ defmodule Blog.Posts.PostTest do
 
       assert changeset.valid?
       assert {:ok, heading_changesets} = Changeset.fetch_change(changeset, :headings)
-      assert length(heading_changesets) == 6
+      assert length(heading_changesets) == 7
 
       headings = Enum.map(heading_changesets, & &1.changes)
-      assert [h1, h2, h3, h4, h5, h6] = headings
+      assert [h0, h1, h2, h3, h4, h5, h6] = headings
+
+      assert h0.level == 1
+      assert h0.title == "Test Post"
+      assert h0.link == "test-post"
 
       assert h1.level == 1
       assert h1.title == "Heading One"
@@ -237,9 +241,15 @@ defmodule Blog.Posts.PostTest do
 
       assert changeset.valid?
       assert {:ok, heading_changesets} = Changeset.fetch_change(changeset, :headings)
-      assert [heading_changeset] = heading_changesets
-      heading = heading_changeset.changes
-      assert heading.link == "hello-world-this-is-a-test"
+      assert [title_heading, content_heading] = heading_changesets
+
+      # Title heading
+      assert title_heading.changes.level == 1
+      assert title_heading.changes.title == "Test Post"
+      assert title_heading.changes.link == "test-post"
+
+      # Content heading
+      assert content_heading.changes.link == "hello-world-this-is-a-test"
     end
   end
 
@@ -287,7 +297,7 @@ defmodule Blog.Posts.PostTest do
       assert published.published_at == ~U[2024-12-01 10:00:00Z]
       assert published.body =~ "<h1"
       assert published.reading_time_minutes == 1
-      assert length(published.headings) == 3
+      assert length(published.headings) == 4
 
       # Check draft post
       draft = Repo.get_by!(Post, slug: "draft-post")
@@ -295,12 +305,13 @@ defmodule Blog.Posts.PostTest do
       assert draft.is_draft == true
       assert is_nil(draft.published_at)
       assert draft.body =~ "Draft Post"
-      assert length(draft.headings) == 2
+      assert length(draft.headings) == 3
 
       # Check minimal post
       minimal = Repo.get_by!(Post, slug: "minimal-post")
       assert minimal.title == "Minimal Post"
       assert minimal.is_draft == false
+      assert length(minimal.headings) == 1
       assert is_nil(minimal.published_at)
       assert minimal.body =~ "Just some minimal content"
     end
