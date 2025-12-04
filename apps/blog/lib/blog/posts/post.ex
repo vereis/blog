@@ -31,6 +31,8 @@ defmodule Blog.Posts.Post do
     field :published_at, :utc_datetime
     field :hash, :string
 
+    many_to_many :tags, Blog.Tags.Tag, join_through: "posts_tags"
+
     embeds_many :headings, Heading, primary_key: false, on_replace: :delete do
       field :link, :string
       field :title, :string

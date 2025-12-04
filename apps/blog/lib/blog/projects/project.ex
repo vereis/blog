@@ -17,6 +17,8 @@ defmodule Blog.Projects.Project do
     field :description, :string
     field :hash, :string
 
+    many_to_many :tags, Blog.Tags.Tag, join_through: "projects_tags"
+
     timestamps()
   end
 

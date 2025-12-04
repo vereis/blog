@@ -112,10 +112,13 @@ defmodule Blog.Resource do
 
             entries =
               Enum.map(valid_changesets, fn changeset ->
-                changeset
-                |> Ecto.Changeset.apply_changes()
+                struct = Ecto.Changeset.apply_changes(changeset)
+                schema = struct.__struct__
+                association_fields = schema.__schema__(:associations)
+
+                struct
                 |> Map.from_struct()
-                |> Map.drop([:id, :__meta__])
+                |> Map.drop([:id, :__meta__] ++ association_fields)
                 |> Map.put(:inserted_at, now)
                 |> Map.put(:updated_at, now)
               end)
