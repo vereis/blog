@@ -58,7 +58,7 @@ alias Credo.Check
           {Check.Refactor.MatchInCondition, []},
           {Check.Refactor.NegatedConditionsInUnless, []},
           {Check.Refactor.NegatedConditionsWithElse, []},
-          {Check.Refactor.Nesting, []},
+          {Check.Refactor.Nesting, [max_nesting: 3]},
           {Check.Refactor.UnlessWithElse, []},
           {Check.Refactor.WithClauses, []},
 
