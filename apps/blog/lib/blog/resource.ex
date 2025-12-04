@@ -34,10 +34,15 @@ defmodule Blog.Resource do
   @callback pubsub_topic() :: String.t()
   @optional_callbacks pubsub_topic: 0
 
+  @doc false
+  def identity(x) do
+    x
+  end
+
   defmacro __using__(opts) do
     source_dir = Keyword.fetch!(opts, :source_dir)
     import_fn = Keyword.fetch!(opts, :import)
-    preprocess_fn = Keyword.get(opts, :preprocess, & &1)
+    preprocess_fn = Keyword.get(opts, :preprocess, &__MODULE__.identity/1)
 
     quote do
       @behaviour unquote(__MODULE__)
