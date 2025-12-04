@@ -41,6 +41,34 @@ defmodule Blog.ProjectsTest do
       assert p2.name == "Bob"
       assert p3.name == "Charlie"
     end
+
+    test "filters projects by tags" do
+      elixir_tag = insert(:tag, label: "elixir")
+      rust_tag = insert(:tag, label: "rust")
+      web_tag = insert(:tag, label: "web")
+
+      project1 = insert(:project, name: "Elixir Library")
+      project2 = insert(:project, name: "Web Framework")
+      project3 = insert(:project, name: "Rust CLI")
+
+      Repo.insert_all("projects_tags", [
+        %{project_id: project1.id, tag_id: elixir_tag.id},
+        %{project_id: project2.id, tag_id: elixir_tag.id},
+        %{project_id: project2.id, tag_id: web_tag.id},
+        %{project_id: project3.id, tag_id: rust_tag.id}
+      ])
+
+      elixir_projects = Projects.list_projects(tags: ["elixir"])
+      assert length(elixir_projects) == 2
+
+      web_projects = Projects.list_projects(tags: ["web"])
+      assert length(web_projects) == 1
+      assert hd(web_projects).id == project2.id
+
+      rust_projects = Projects.list_projects(tags: ["rust"])
+      assert length(rust_projects) == 1
+      assert hd(rust_projects).id == project3.id
+    end
   end
 
   describe "get_project/1" do
@@ -65,6 +93,24 @@ defmodule Blog.ProjectsTest do
 
     test "returns nil when project not found by name" do
       assert Projects.get_project(name: "Nonexistent") == nil
+    end
+
+    test "filters by tags" do
+      elixir_tag = insert(:tag, label: "elixir")
+      rust_tag = insert(:tag, label: "rust")
+
+      project1 = insert(:project, name: "Elixir Project")
+      project2 = insert(:project, name: "Rust Project")
+
+      Repo.insert_all("projects_tags", [
+        %{project_id: project1.id, tag_id: elixir_tag.id},
+        %{project_id: project2.id, tag_id: rust_tag.id}
+      ])
+
+      assert fetched = Projects.get_project(name: "Elixir Project", tags: ["elixir"])
+      assert fetched.id == project1.id
+
+      assert Projects.get_project(name: "Elixir Project", tags: ["rust"]) == nil
     end
   end
 

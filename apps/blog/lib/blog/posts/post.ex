@@ -53,6 +53,20 @@ defmodule Blog.Posts.Post do
     |> process_markdown()
   end
 
+  @impl EctoUtils.Queryable
+  def query(base_query, filters) do
+    Enum.reduce(filters, base_query, fn
+      {:tags, tags}, query ->
+        from post in query,
+          join: t in assoc(post, :tags),
+          where: t.label in ^tags,
+          distinct: true
+
+      {key, value}, query ->
+        EctoUtils.Queryable.apply_filter(query, key, value)
+    end)
+  end
+
   @impl Blog.Resource
   def handle_import(%Blog.Resource{content: content}) do
     with [_front, metadata_yaml, raw_body] <- String.split(content, "---\n", parts: 3),
