@@ -9,12 +9,15 @@ defmodule Blog.Repo.Migrations.CreateAssets do
       add :width, :integer, null: false
       add :height, :integer, null: false
       add :content_type, :string, null: false
+      add :type, :string, null: false
       add :hash, :string
 
       timestamps()
     end
 
     create unique_index(:assets, [:name])
+    create unique_index(:assets, [:path])
     create index(:assets, [:hash])
+    create index(:assets, [:type])
   end
 end
