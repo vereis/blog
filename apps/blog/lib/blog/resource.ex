@@ -103,7 +103,7 @@ defmodule Blog.Resource do
         topic = pubsub_topic()
         imported = Enum.map(successes, fn {:ok, res} -> res end)
 
-        for {:ok, resource} <- imported do
+        for resource <- imported do
           message = {:resource_reload, __MODULE__, resource.id}
           Phoenix.PubSub.broadcast(Blog.PubSub, topic, message)
         end

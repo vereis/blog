@@ -48,6 +48,7 @@ defmodule Blog.MixProject do
       {:floki, "~> 0.36"},
       {:vix, "~> 0.31"},
       {:mime, "~> 2.0"},
+      {:file_system, "~> 1.0"},
       {:ex_machina, "~> 2.8", only: :test}
     ]
   end
