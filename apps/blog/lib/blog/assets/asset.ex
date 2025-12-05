@@ -19,6 +19,7 @@ defmodule Blog.Assets.Asset do
     field :content_type, :string
     field :type, Ecto.Enum, values: Types.enum()
     field :hash, :string
+    field :lqip_hash, :integer
 
     timestamps()
   end
