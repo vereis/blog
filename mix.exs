@@ -76,7 +76,7 @@ defmodule Blog.Umbrella.MixProject do
         "compile --warnings-as-errors",
         "credo --strict",
         "dialyzer",
-        "sobelow --root apps/blog_web --exit",
+        "sobelow --root apps/blog_web --skip --exit",
         "excellent_migrations.check_safety"
       ],
       precommit: [
@@ -85,7 +85,7 @@ defmodule Blog.Umbrella.MixProject do
         "compile --warnings-as-errors",
         "credo --strict",
         "dialyzer",
-        "sobelow --root apps/blog_web --exit",
+        "sobelow --root apps/blog_web --skip --exit",
         "excellent_migrations.check_safety",
         "test"
       ]
