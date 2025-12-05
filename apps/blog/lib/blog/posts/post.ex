@@ -7,17 +7,13 @@ defmodule Blog.Posts.Post do
     preprocess: &Blog.Tags.label_to_id/1,
     import: &Blog.Posts.upsert_post/1
 
+  import Blog.Utils.Guards
+
   alias Blog.Markdown
 
   @castable_fields [:title, :raw_body, :slug, :is_draft, :published_at]
   @slug_format ~r/^[a-z0-9_-]+$/
   @reading_speed_wpm 260
-
-  defguardp valid?(changeset)
-            when is_struct(changeset, Ecto.Changeset) and changeset.valid? == true
-
-  defguardp changes?(changeset, field)
-            when is_struct(changeset, Ecto.Changeset) and is_map_key(changeset.changes, field)
 
   schema "posts" do
     field :title, :string
