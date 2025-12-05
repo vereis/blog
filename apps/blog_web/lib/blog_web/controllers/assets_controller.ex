@@ -3,12 +3,13 @@ defmodule BlogWeb.AssetsController do
 
   alias Blog.Assets
 
-  @cache_control "public, max-age=31536000"
+  # Cache for 1 week (604800 seconds)
+  @cache_control "public, max-age=604800"
 
   # NOTE: serving binary image data, not user input, content-type is validated
   # sobelow_skip ["XSS.SendResp", "XSS.ContentType"]
   def show(conn, %{"name" => name}) do
-    case Assets.get_asset(name: name) do
+    case Assets.get_asset(name: name, type: :image) do
       nil ->
         conn
         |> put_status(:not_found)

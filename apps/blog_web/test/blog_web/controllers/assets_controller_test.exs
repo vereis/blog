@@ -23,7 +23,7 @@ defmodule BlogWeb.AssetsControllerTest do
 
       conn = get(conn, "/assets/images/#{asset.name}")
 
-      assert get_resp_header(conn, "cache-control") == ["public, max-age=31536000"]
+      assert get_resp_header(conn, "cache-control") == ["public, max-age=604800"]
     end
 
     test "returns 404 for non-existent asset", %{conn: conn} do
