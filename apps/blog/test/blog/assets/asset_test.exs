@@ -9,6 +9,21 @@ defmodule Blog.Assets.AssetTest do
                      "test/fixtures/priv/assets/test_image.jpg"
                    ])
 
+  @test_text_path Path.join([
+                    File.cwd!(),
+                    "test/fixtures/priv/assets/test_document.txt"
+                  ])
+
+  @test_pdf_path Path.join([
+                   File.cwd!(),
+                   "test/fixtures/priv/assets/test_document.pdf"
+                 ])
+
+  @invalid_image_path Path.join([
+                        File.cwd!(),
+                        "test/fixtures/priv/assets/invalid_image.jpg"
+                      ])
+
   describe "changeset/2 - validation" do
     test "validates required path field" do
       changeset = Asset.changeset(%Asset{}, %{})
@@ -53,9 +68,47 @@ defmodule Blog.Assets.AssetTest do
       assert changeset.valid?
       assert {:ok, "test_image.webp"} = Changeset.fetch_change(changeset, :name)
     end
+
+    test "handles invalid image files gracefully" do
+      changeset = Asset.changeset(%Asset{}, %{path: @invalid_image_path})
+
+      refute changeset.valid?
+      assert {"Failed to process image: " <> _, _} = changeset.errors[:path]
+    end
+
+    test "handles missing image files gracefully" do
+      changeset = Asset.changeset(%Asset{}, %{path: "/nonexistent/path/image.jpg"})
+
+      refute changeset.valid?
+      assert {"Failed to process image: " <> _, _} = changeset.errors[:path]
+    end
+  end
+
+  describe "changeset/2 - unimplemented types" do
+    test "returns type error for text files" do
+      changeset = Asset.changeset(%Asset{}, %{path: @test_text_path})
+
+      refute changeset.valid?
+      assert {"Asset type handling not implemented", _} = changeset.errors[:type]
+    end
+
+    test "returns type error for PDF files" do
+      changeset = Asset.changeset(%Asset{}, %{path: @test_pdf_path})
+
+      refute changeset.valid?
+      assert {"Asset type handling not implemented", _} = changeset.errors[:type]
+    end
+
+    test "does not set type field for unimplemented types" do
+      changeset = Asset.changeset(%Asset{}, %{path: @test_text_path})
+
+      # Type field is not set because the changeset is invalid
+      assert :error = Changeset.fetch_change(changeset, :type)
+    end
   end
 
   describe "import/0" do
+    @tag :capture_log
     test "imports assets from source directory" do
       assert {:ok, imported} = Asset.import()
 

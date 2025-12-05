@@ -61,11 +61,25 @@ defmodule Blog.AssetsTest do
       assert %{path: ["can't be blank"]} = errors_on(changeset)
     end
 
-    test "enforces unique name constraint" do
+    test "enforces unique path constraint" do
       {:ok, _asset} = Assets.create_asset(%{path: @test_image_path})
 
       assert {:error, changeset} = Assets.create_asset(%{path: @test_image_path})
-      assert %{name: ["has already been taken"]} = errors_on(changeset)
+      assert %{path: ["has already been taken"]} = errors_on(changeset)
+    end
+
+    test "enforces unique name constraint" do
+      {:ok, asset} = Assets.create_asset(%{path: @test_image_path})
+
+      # Create a changeset manually with the same name but different path
+      changeset =
+        %Asset{}
+        |> Asset.changeset(%{path: @test_image_path})
+        |> Ecto.Changeset.put_change(:path, "/different/path.jpg")
+        |> Ecto.Changeset.put_change(:name, asset.name)
+
+      assert {:error, result} = Repo.insert(changeset)
+      assert %{name: ["has already been taken"]} = errors_on(result)
     end
   end
 
