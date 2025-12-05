@@ -9,6 +9,8 @@ defmodule Blog.Posts.Post do
 
   import Blog.Utils.Guards
 
+  alias Blog.Assets
+  alias Blog.Assets.Asset
   alias Blog.Markdown
 
   @castable_fields [:title, :raw_body, :slug, :is_draft, :published_at]
@@ -138,18 +140,35 @@ defmodule Blog.Posts.Post do
     {{tag, [{"id", link} | attrs], children}, [heading | acc]}
   end
 
-  # NOTE: Wrap images in links so that when clicked, they open the full-size image in a new tab.
+  # NOTE: Wrap images in links to the full-size image and add LQIP styles for optimized loading.
   defp process_html({"img", attrs, children}, acc) do
     src = [{"img", attrs, children}] |> Floki.attribute("src") |> List.first()
 
+    {updated_attrs, href} =
+      with true <- Regex.match?(~r/\/assets\//, src),
+           false <- Regex.match?(~r/^https?:\/\//, src),
+           %Asset{name: name, lqip_hash: lqip_hash} <- Assets.get_asset(path: src) do
+        new_src = "/assets/images/#{name}"
+        lqip_style = if lqip_hash, do: "--lqip:#{lqip_hash}", else: ""
+
+        updated =
+          attrs
+          |> List.keystore("src", 0, {"src", new_src})
+          |> List.keystore("style", 0, {"style", lqip_style})
+
+        {updated, new_src}
+      else
+        _noop? -> {attrs, src}
+      end
+
     link_attrs = [
-      {"href", src},
+      {"href", href},
       {"title", "View full size"},
       {"target", "_blank"},
       {"rel", "noopener"}
     ]
 
-    {{"a", link_attrs, [{"img", attrs, children}]}, acc}
+    {{"a", link_attrs, [{"img", updated_attrs, children}]}, acc}
   end
 
   defp process_html(other, acc) do

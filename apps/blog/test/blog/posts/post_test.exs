@@ -1,8 +1,14 @@
 defmodule Blog.Posts.PostTest do
   use Blog.DataCase, async: false
 
+  alias Blog.Assets
   alias Blog.Posts.Post
   alias Ecto.Changeset
+
+  @test_image_path Path.join([
+                     File.cwd!(),
+                     "test/fixtures/priv/assets/test_image.jpg"
+                   ])
 
   describe "changeset/2 - validation" do
     test "validates required fields" do
@@ -144,15 +150,62 @@ defmodule Blog.Posts.PostTest do
       assert changeset.valid?
       assert {:ok, body} = Changeset.fetch_change(changeset, :body)
 
-      # Should have an anchor tag wrapping the image
       assert body =~ ~r/<a[^>]*href="\/images\/test\.png"[^>]*>/
       assert body =~ ~r/title="View full size"/
       assert body =~ ~r/target="_blank"/
       assert body =~ ~r/rel="noopener"/
-
-      # Should still have the image tag
       assert body =~ ~r/<img[^>]*src="\/images\/test\.png"[^>]*>/
       assert body =~ ~r/alt="Alt text"/
+    end
+
+    test "rewrites asset paths and injects LQIP hashes" do
+      {:ok, asset} = Assets.create_asset(%{path: @test_image_path})
+
+      changeset =
+        Post.changeset(%Post{}, %{
+          title: "Test Post",
+          raw_body: "![Test image](#{@test_image_path})",
+          slug: "test-post"
+        })
+
+      assert changeset.valid?
+      assert {:ok, body} = Changeset.fetch_change(changeset, :body)
+
+      assert body =~ ~r/<img[^>]*src="\/assets\/images\/#{asset.name}"[^>]*>/
+      assert body =~ ~r/style="--lqip:#{asset.lqip_hash}"/
+      assert body =~ ~r/<a[^>]*href="\/assets\/images\/#{asset.name}"[^>]*>/
+      assert body =~ ~r/title="View full size"/
+      assert body =~ ~r/alt="Test image"/
+    end
+
+    test "handles missing assets gracefully" do
+      changeset =
+        Post.changeset(%Post{}, %{
+          title: "Test Post",
+          raw_body: "![Missing](../assets/nonexistent.jpg)",
+          slug: "test-post"
+        })
+
+      assert changeset.valid?
+      assert {:ok, body} = Changeset.fetch_change(changeset, :body)
+
+      assert body =~ ~r/<img[^>]*src="\.\.\/assets\/nonexistent\.jpg"[^>]*>/
+      refute body =~ ~r/--lqip:/
+    end
+
+    test "skips external image URLs" do
+      changeset =
+        Post.changeset(%Post{}, %{
+          title: "Test Post",
+          raw_body: "![External](https://example.com/image.jpg)",
+          slug: "test-post"
+        })
+
+      assert changeset.valid?
+      assert {:ok, body} = Changeset.fetch_change(changeset, :body)
+
+      assert body =~ ~r/<img[^>]*src="https:\/\/example\.com\/image\.jpg"[^>]*>/
+      refute body =~ ~r/--lqip:/
     end
   end
 
