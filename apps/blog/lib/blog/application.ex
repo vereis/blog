@@ -7,14 +7,17 @@ defmodule Blog.Application do
 
   @impl true
   def start(_type, _args) do
-    children = [
-      Blog.Repo,
-      {Ecto.Migrator, repos: Application.fetch_env!(:blog, :ecto_repos), skip: skip_migrations?()},
-      {DNSCluster, query: Application.get_env(:blog, :dns_cluster_query) || :ignore},
-      {Phoenix.PubSub, name: Blog.PubSub}
-      # Start a worker by calling: Blog.Worker.start_link(arg)
-      # {Blog.Worker, arg}
-    ]
+    children =
+      Enum.reject(
+        [
+          Blog.Repo,
+          {Ecto.Migrator, repos: Application.fetch_env!(:blog, :ecto_repos), skip: skip_migrations?()},
+          {DNSCluster, query: Application.get_env(:blog, :dns_cluster_query) || :ignore},
+          {Phoenix.PubSub, name: Blog.PubSub},
+          {Blog.Resource.Watcher, schemas: [Blog.Assets.Asset, Blog.Posts.Post, Blog.Projects.Project]}
+        ],
+        &is_nil/1
+      )
 
     Supervisor.start_link(children, strategy: :one_for_one, name: Blog.Supervisor)
   end

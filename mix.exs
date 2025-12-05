@@ -11,7 +11,7 @@ defmodule Blog.Umbrella.MixProject do
       listeners: [Phoenix.CodeReloader],
       dialyzer: [
         plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
-        plt_add_apps: [:mix, :ex_unit],
+        plt_add_apps: [:mix, :ex_unit, :file_system],
         ignore_warnings: "dialyzer_ignore.exs"
       ],
       test_coverage: [tool: ExCoveralls],
