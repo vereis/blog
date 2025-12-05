@@ -69,18 +69,30 @@ defmodule Blog.Assets.AssetTest do
       assert {:ok, "test_image.webp"} = Changeset.fetch_change(changeset, :name)
     end
 
+    test "generates LQIP hash for image" do
+      changeset = Asset.changeset(%Asset{}, %{path: @test_image_path})
+
+      assert changeset.valid?
+      assert {:ok, lqip_hash} = Changeset.fetch_change(changeset, :lqip_hash)
+      assert is_integer(lqip_hash)
+      # Verify the hash is within valid 20-bit signed range
+      assert lqip_hash >= -524_288 and lqip_hash <= 524_287
+      # Verify the specific hash for test_image.jpg (regression test)
+      assert lqip_hash == -169_437
+    end
+
     test "handles invalid image files gracefully" do
       changeset = Asset.changeset(%Asset{}, %{path: @invalid_image_path})
 
       refute changeset.valid?
-      assert {"Failed to process image: " <> _, _} = changeset.errors[:path]
+      assert {"Failed to load image: " <> _, _} = changeset.errors[:path]
     end
 
     test "handles missing image files gracefully" do
       changeset = Asset.changeset(%Asset{}, %{path: "/nonexistent/path/image.jpg"})
 
       refute changeset.valid?
-      assert {"Failed to process image: " <> _, _} = changeset.errors[:path]
+      assert {"Failed to load image: " <> _, _} = changeset.errors[:path]
     end
   end
 
