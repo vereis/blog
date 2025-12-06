@@ -55,15 +55,27 @@ defmodule Blog.Markdown do
 
   defp postprocess(html, processor) do
     with {:ok, ast} <- Floki.parse_document(html) do
-      ast
-      |> Floki.traverse_and_update([], processor)
-      |> Tuple.to_list()
-      |> then(fn [modified_html | rest] ->
-        {:ok, [Floki.raw_html(modified_html) | Enum.map(rest, &Enum.reverse/1)]}
-      end)
+      {modified_html, acc} = Floki.traverse_and_update(ast, [], processor)
+
+      {:ok, [Floki.raw_html(modified_html), maybe_reverse_acc(acc)]}
     end
   rescue
     error ->
       {:error, Exception.message(error)}
+  end
+
+  defp maybe_reverse_acc(acc) when is_map(acc) do
+    Map.new(acc, fn
+      {key, value} when is_list(value) -> {key, Enum.reverse(value)}
+      {key, value} -> {key, value}
+    end)
+  end
+
+  defp maybe_reverse_acc(acc) when is_list(acc) do
+    Enum.reverse(acc)
+  end
+
+  defp maybe_reverse_acc(acc) do
+    acc
   end
 end
