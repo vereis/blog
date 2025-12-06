@@ -1,0 +1,21 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Vereis' Site</title>
+    <description>All things Nix, Erlang, and Elixir</description>
+    <link>https://vereis.com/</link>
+    <lastBuildDate><%= BlogWeb.RssController.latest_pub_date(assigns.posts) %></lastBuildDate>
+    <pubDate><%= BlogWeb.RssController.latest_pub_date(assigns.posts) %></pubDate>
+    <ttl>1800</ttl>
+    <atom:link href="https://vereis.com/rss" rel="self" type="application/rss+xml"/>
+
+    <%= for post <- assigns.posts do %>
+      <item>
+        <title><%= Phoenix.HTML.html_escape(post.title) |> Phoenix.HTML.safe_to_string() %></title>
+        <description><![CDATA[<%= post.excerpt %><p><em>Read more →</em></p>]]></description>
+        <link>https://vereis.com/posts/<%= post.slug %></link>
+        <guid isPermaLink="false"><%= post.slug %></guid>
+        <pubDate><%= BlogWeb.RssController.format_rfc822(post.published_at) %></pubDate>
+      </item>
+    <% end %>
+  </channel>
+</rss>
