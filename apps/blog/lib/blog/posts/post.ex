@@ -20,6 +20,7 @@ defmodule Blog.Posts.Post do
   schema "posts" do
     field :title, :string
     field :body, :string
+    field :excerpt, :string
     field :raw_body, :string
     field :slug, :string
     field :reading_time_minutes, :integer
