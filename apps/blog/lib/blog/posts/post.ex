@@ -103,7 +103,7 @@ defmodule Blog.Posts.Post do
     title = get_field(changeset, :title)
 
     case Markdown.render(raw_body, &process_html/2) do
-      {:ok, [html, headings]} ->
+      {:ok, [html, %{headings: headings, excerpt: excerpt}]} ->
         reading_time = calculate_reading_time(raw_body)
 
         # Always include title as the top-level heading
@@ -117,6 +117,7 @@ defmodule Blog.Posts.Post do
 
         changeset
         |> put_change(:body, html)
+        |> put_change(:excerpt, excerpt)
         |> put_change(:reading_time_minutes, reading_time)
         |> put_embed(:headings, all_headings)
 
@@ -125,9 +126,14 @@ defmodule Blog.Posts.Post do
     end
   end
 
+  # NOTE: Initialize accumulator on first node if still using default empty list
+  defp process_html(node, []) do
+    process_html(node, %{headings: [], excerpt: "", excerpt_stopped: false, excerpt_count: 0})
+  end
+
   # NOTE: Make sure all headings have unique IDs we can link to.
   # NOTE: Side effect: Accumulate headings so that we can build a list of headers to store in the DB.
-  defp process_html({"h" <> level_str = tag, attrs, children}, acc) do
+  defp process_html({"h" <> level_str = tag, attrs, children}, acc) when is_map(acc) do
     level = String.to_integer(level_str)
     title = Floki.text({tag, attrs, children})
     link = slugify(title)
@@ -138,7 +144,26 @@ defmodule Blog.Posts.Post do
       link: link
     }
 
-    {{tag, [{"id", link} | attrs], children}, [heading | acc]}
+    # Stop excerpt collection at h2+ if we have paragraphs
+    new_stopped =
+      if level > 1 and acc.excerpt != "",
+        do: true,
+        else: acc.excerpt_stopped
+
+    {{tag, [{"id", link} | attrs], children}, %{acc | headings: [heading | acc.headings], excerpt_stopped: new_stopped}}
+  end
+
+  # NOTE: Collect paragraphs for excerpt (first 3, until stopped)
+  defp process_html({"p", _, _} = node, %{excerpt: excerpt, excerpt_stopped: false, excerpt_count: count} = acc)
+       when count < 3 do
+    paragraph_html = Floki.raw_html(node)
+    {node, %{acc | excerpt: excerpt <> paragraph_html, excerpt_count: count + 1}}
+  end
+
+  # NOTE: Stop excerpt collection at block elements if we have paragraphs
+  defp process_html({tag, _, _} = node, %{excerpt: excerpt, excerpt_stopped: false} = acc)
+       when tag in ["ul", "ol", "table", "blockquote", "pre", "hr"] and excerpt != "" do
+    {node, %{acc | excerpt_stopped: true}}
   end
 
   # NOTE: Wrap images in links to the full-size image and add LQIP styles for optimized loading.

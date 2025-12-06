@@ -26,6 +26,7 @@ defmodule Blog.Factory do
       """,
       body:
         ~s(<h1 id="sample-post">Sample Post</h1><p>This is a sample blog post body with some content.</p><h2 id="introduction">Introduction</h2><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p><h2 id="content">Content</h2><p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>),
+      excerpt: ~s(<p>This is a sample blog post body with some content.</p>),
       reading_time_minutes: 1,
       headings: [
         %Post.Heading{level: 1, title: "Sample Post", link: "sample-post"},

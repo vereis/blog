@@ -334,6 +334,110 @@ defmodule Blog.Posts.PostTest do
     end
   end
 
+  describe "changeset/2 - excerpt generation" do
+    test "generates excerpt from first 3 paragraphs" do
+      changeset =
+        Post.changeset(%Post{}, %{
+          title: "Test Post",
+          slug: "test-post",
+          raw_body: """
+          First paragraph.
+
+          Second paragraph.
+
+          Third paragraph.
+
+          Fourth paragraph.
+          """
+        })
+
+      assert changeset.valid?
+      assert {:ok, excerpt} = Changeset.fetch_change(changeset, :excerpt)
+      assert excerpt =~ "First paragraph"
+      assert excerpt =~ "Second paragraph"
+      assert excerpt =~ "Third paragraph"
+      refute excerpt =~ "Fourth paragraph"
+    end
+
+    test "stops excerpt at h2 heading" do
+      changeset =
+        Post.changeset(%Post{}, %{
+          title: "Test Post",
+          slug: "test-post",
+          raw_body: """
+          First paragraph.
+
+          Second paragraph.
+
+          ## Heading
+
+          Should not be in excerpt.
+          """
+        })
+
+      assert changeset.valid?
+      assert {:ok, excerpt} = Changeset.fetch_change(changeset, :excerpt)
+      assert excerpt =~ "First paragraph"
+      assert excerpt =~ "Second paragraph"
+      refute excerpt =~ "Should not be in excerpt"
+    end
+
+    test "stops excerpt at list" do
+      changeset =
+        Post.changeset(%Post{}, %{
+          title: "Test Post",
+          slug: "test-post",
+          raw_body: """
+          First paragraph.
+
+          - List item
+          - Another item
+
+          After list.
+          """
+        })
+
+      assert changeset.valid?
+      assert {:ok, excerpt} = Changeset.fetch_change(changeset, :excerpt)
+      assert excerpt =~ "First paragraph"
+      refute excerpt =~ "List item"
+      refute excerpt =~ "After list"
+    end
+
+    test "handles short posts gracefully" do
+      changeset =
+        Post.changeset(%Post{}, %{
+          title: "Test Post",
+          slug: "test-post",
+          raw_body: "Just one paragraph."
+        })
+
+      assert changeset.valid?
+      assert {:ok, excerpt} = Changeset.fetch_change(changeset, :excerpt)
+      assert excerpt =~ "Just one paragraph"
+    end
+
+    test "skips h1 title in excerpt" do
+      changeset =
+        Post.changeset(%Post{}, %{
+          title: "Test Post",
+          slug: "test-post",
+          raw_body: """
+          # Title
+
+          First paragraph after title.
+
+          Second paragraph.
+          """
+        })
+
+      assert changeset.valid?
+      assert {:ok, excerpt} = Changeset.fetch_change(changeset, :excerpt)
+      assert excerpt =~ "First paragraph after title"
+      assert excerpt =~ "Second paragraph"
+    end
+  end
+
   describe "import/0" do
     test "imports posts from markdown files and inserts into database" do
       assert {:ok, imported} = Post.import()
