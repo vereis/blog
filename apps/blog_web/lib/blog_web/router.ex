@@ -23,6 +23,7 @@ defmodule BlogWeb.Router do
 
     get "/", PageController, :home
     get "/assets/images/:name", AssetsController, :show
+    get "/rss", RssController, :index
   end
 
   # Other scopes may use custom stacks.
