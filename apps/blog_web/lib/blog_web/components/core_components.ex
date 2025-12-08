@@ -29,25 +29,18 @@ defmodule BlogWeb.CoreComponents do
       id={@id}
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
       role="alert"
-      class="toast toast-top toast-end z-50"
+      class={["flash", "flash-#{@kind}"]}
       {@rest}
     >
-      <div class={[
-        "alert w-80 sm:w-96 max-w-80 sm:max-w-96 text-wrap",
-        @kind == :info && "alert-info",
-        @kind == :error && "alert-error"
-      ]}>
-        <.icon :if={@kind == :info} name="info" class="size-5 shrink-0" />
-        <.icon :if={@kind == :error} name="error" class="size-5 shrink-0" />
-        <div>
-          <p :if={@title} class="font-semibold">{@title}</p>
-          <p>{msg}</p>
-        </div>
-        <div class="flex-1" />
-        <button type="button" class="group self-start cursor-pointer" aria-label="close">
-          <.icon name="close" class="size-5 opacity-40 group-hover:opacity-70" />
-        </button>
+      <.icon :if={@kind == :info} name="info" />
+      <.icon :if={@kind == :error} name="error" />
+      <div class="flash-content">
+        <p :if={@title} class="flash-title">{@title}</p>
+        <p>{msg}</p>
       </div>
+      <button type="button" class="flash-close" aria-label="close">
+        <.icon name="close" />
+      </button>
     </div>
     """
   end
@@ -109,23 +102,11 @@ defmodule BlogWeb.CoreComponents do
   ## JS Commands
 
   def show(js \\ %JS{}, selector) do
-    JS.show(js,
-      to: selector,
-      time: 300,
-      transition:
-        {"transition-all ease-out duration-300", "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95",
-         "opacity-100 translate-y-0 sm:scale-100"}
-    )
+    JS.show(js, to: selector)
   end
 
   def hide(js \\ %JS{}, selector) do
-    JS.hide(js,
-      to: selector,
-      time: 200,
-      transition:
-        {"transition-all ease-in duration-200", "opacity-100 translate-y-0 sm:scale-100",
-         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"}
-    )
+    JS.hide(js, to: selector)
   end
 
   @doc """
