@@ -37,15 +37,15 @@ defmodule BlogWeb.CoreComponents do
         @kind == :info && "alert-info",
         @kind == :error && "alert-error"
       ]}>
-        <.icon :if={@kind == :info} name="hero-information-circle" class="size-5 shrink-0" />
-        <.icon :if={@kind == :error} name="hero-exclamation-circle" class="size-5 shrink-0" />
+        <.icon :if={@kind == :info} name="info" class="size-5 shrink-0" />
+        <.icon :if={@kind == :error} name="error" class="size-5 shrink-0" />
         <div>
           <p :if={@title} class="font-semibold">{@title}</p>
           <p>{msg}</p>
         </div>
         <div class="flex-1" />
         <button type="button" class="group self-start cursor-pointer" aria-label="close">
-          <.icon name="hero-x-mark" class="size-5 opacity-40 group-hover:opacity-70" />
+          <.icon name="close" class="size-5 opacity-40 group-hover:opacity-70" />
         </button>
       </div>
     </div>
@@ -74,29 +74,35 @@ defmodule BlogWeb.CoreComponents do
   end
 
   @doc """
-  Renders a [Heroicon](https://heroicons.com).
+  Renders an ASCII/Unicode icon for terminal aesthetic.
 
-  Heroicons come in three styles – outline, solid, and mini.
-  By default, the outline style is used, but solid and mini may
-  be applied by using the `-solid` and `-mini` suffix.
+  ## Available icons
 
-  You can customize the size and colors of the icons by setting
-  width, height, and background color classes.
-
-  Icons are extracted from the `deps/heroicons` directory and bundled within
-  your compiled app.css by the plugin in `assets/vendor/heroicons.js`.
+    * `info` - ℹ
+    * `error` - ⚠
+    * `close` - ✕
+    * `spinner` - ↻
 
   ## Examples
 
-      <.icon name="hero-x-mark" />
-      <.icon name="hero-arrow-path" class="ml-1 size-3 motion-safe:animate-spin" />
+      <.icon name="info" />
+      <.icon name="spinner" class="icon-spin" />
   """
   attr :name, :string, required: true
-  attr :class, :any, default: "size-4"
+  attr :class, :any, default: nil
 
-  def icon(%{name: "hero-" <> _} = assigns) do
+  def icon(assigns) do
+    icons = %{
+      "info" => "ℹ",
+      "error" => "⚠",
+      "close" => "✕",
+      "spinner" => "↻"
+    }
+
+    assigns = assign(assigns, :glyph, Map.get(icons, assigns.name, "?"))
+
     ~H"""
-    <span class={[@name, @class]} />
+    <span class={["icon", "icon-#{@name}", @class]} aria-hidden="true">{@glyph}</span>
     """
   end
 
