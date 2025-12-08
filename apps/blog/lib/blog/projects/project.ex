@@ -7,13 +7,12 @@ defmodule Blog.Projects.Project do
     preprocess: &Blog.Tags.label_to_id/1,
     import: &Blog.Projects.upsert_project/1
 
-  @castable_fields [:name, :url, :description, :hash]
+  @castable_fields [:name, :url, :description]
 
   schema "projects" do
     field :name, :string
     field :url, :string
     field :description, :string
-    field :hash, :string
 
     many_to_many :tags, Blog.Tags.Tag,
       join_through: join_schema("projects_tags", {:project_id, :tag_id}),
@@ -53,7 +52,7 @@ defmodule Blog.Projects.Project do
         Enum.map(projects, fn project ->
           attrs =
             project
-            |> Map.take(Enum.map(@castable_fields -- [:hash], &Atom.to_string/1))
+            |> Map.take(Enum.map(@castable_fields, &Atom.to_string/1))
             |> Map.new(fn {k, v} -> {String.to_existing_atom(k), v} end)
 
           Map.put(attrs, :tags, Map.get(project, "tags", []))
