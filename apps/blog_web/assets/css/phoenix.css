@@ -1,0 +1,20 @@
+/* Phoenix LiveView loading states */
+.phx-click-loading {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.phx-submit-loading {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.phx-change-loading {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+/* Make LiveView wrapper divs transparent for layout */
+[data-phx-session], [data-phx-teleported-src] {
+  display: contents;
+}
