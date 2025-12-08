@@ -53,15 +53,14 @@ defmodule Blog.Resource do
       def source do
         case Blog.env() do
           :test ->
-            Path.join([File.cwd!(), "test/fixtures", unquote(source_dir)])
-
-          :dev ->
-            Path.join(File.cwd!(), unquote(source_dir))
+            # Use __DIR__ in test mode to get source directory, not _build
+            app_dir = Path.expand("../../..", __DIR__)
+            Path.join([app_dir, "test/fixtures", unquote(source_dir)])
 
           _other ->
             :blog
-            |> :code.priv_dir()
-            |> Path.join(unquote(source_dir) |> Path.split() |> List.last())
+            |> Application.app_dir()
+            |> Path.join(unquote(source_dir))
         end
       end
 
@@ -86,6 +85,7 @@ defmodule Blog.Resource do
         {successes, errors} =
           source()
           |> File.ls!()
+          |> Enum.reject(&String.starts_with?(&1, "."))
           |> Task.async_stream(read_and_parse, timeout: :infinity)
           |> Stream.flat_map(fn {:ok, res} -> List.wrap(res) end)
           |> Stream.map(fn attrs -> unquote(preprocess_fn).(attrs) end)
