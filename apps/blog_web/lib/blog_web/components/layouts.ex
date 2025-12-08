@@ -73,7 +73,7 @@ defmodule BlogWeb.Layouts do
         phx-connected={hide("#client-error") |> JS.set_attribute({"hidden", ""})}
         hidden
       >
-        Attempting to reconnect <.icon name="spinner" class="ml-1 size-3 icon-spin" />
+        Attempting to reconnect <.icon name="spinner" class="icon-spin" />
       </.flash>
 
       <.flash
@@ -84,7 +84,7 @@ defmodule BlogWeb.Layouts do
         phx-connected={hide("#server-error") |> JS.set_attribute({"hidden", ""})}
         hidden
       >
-        Attempting to reconnect <.icon name="spinner" class="ml-1 size-3 icon-spin" />
+        Attempting to reconnect <.icon name="spinner" class="icon-spin" />
       </.flash>
     </div>
     """
