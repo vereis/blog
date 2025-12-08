@@ -23,8 +23,7 @@ config :blog_web, BlogWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "EMcwhpoo5CZBn8MVF0x0/MxbTa0rm9SwoVPGUa0hbI6kGB+SD8Qf9ylGCdAl017p",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:blog_web, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:blog_web, ~w(--watch)]}
+    esbuild: {Esbuild, :install_and_run, [:blog_web, ~w(--sourcemap=inline --watch)]}
   ]
 
 # ## SSL Support

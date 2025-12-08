@@ -50,9 +50,6 @@ defmodule BlogWeb.MixProject do
       {:lazy_html, ">= 0.1.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
-      {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
-      {:heroicons,
-       github: "tailwindlabs/heroicons", tag: "v2.2.0", sparse: "optimized", app: false, compile: false, depth: 1},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:tidewave, "~> 0.5", only: :dev},
@@ -69,13 +66,9 @@ defmodule BlogWeb.MixProject do
     [
       setup: ["deps.get", "assets.setup", "assets.build"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["compile", "tailwind blog_web", "esbuild blog_web"],
-      "assets.deploy": [
-        "tailwind blog_web --minify",
-        "esbuild blog_web --minify",
-        "phx.digest"
-      ]
+      "assets.setup": ["esbuild.install --if-missing"],
+      "assets.build": ["compile", "esbuild blog_web"],
+      "assets.deploy": ["esbuild blog_web --minify", "phx.digest"]
     ]
   end
 end
