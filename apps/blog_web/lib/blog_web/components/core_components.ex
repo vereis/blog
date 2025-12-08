@@ -418,6 +418,27 @@ defmodule BlogWeb.CoreComponents do
   end
 
   @doc """
+  Renders the site-wide navigation bar with links to main sections.
+
+  ## Examples
+
+      <.navbar />
+  """
+  def navbar(assigns) do
+    ~H"""
+    <header>
+      <nav>
+        <ul>
+          <li><.link navigate="/">Home</.link></li>
+          <li><.link navigate="/posts">Posts</.link></li>
+          <li><.link navigate="/projects">Projects</.link></li>
+        </ul>
+      </nav>
+    </header>
+    """
+  end
+
+  @doc """
   Renders a [Heroicon](https://heroicons.com).
 
   Heroicons come in three styles – outline, solid, and mini.
