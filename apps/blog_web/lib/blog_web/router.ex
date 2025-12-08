@@ -21,7 +21,14 @@ defmodule BlogWeb.Router do
   scope "/", BlogWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live_session :default do
+      live "/", HomeLive, :index
+      live "/posts", PostsLive, :index
+      live "/posts/:slug", PostsLive, :show
+      live "/projects", ProjectsLive, :index
+      live "/projects/:slug", ProjectsLive, :show
+    end
+
     get "/assets/images/:name", AssetsController, :show
     get "/rss", RssController, :index
   end
