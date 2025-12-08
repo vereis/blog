@@ -26,7 +26,6 @@ defmodule Blog.Posts.Post do
     field :reading_time_minutes, :integer
     field :is_draft, :boolean, default: false
     field :published_at, :utc_datetime
-    field :hash, :string
 
     many_to_many :tags, Blog.Tags.Tag,
       join_through: join_schema("posts_tags", {:post_id, :tag_id}),
