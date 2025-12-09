@@ -17,7 +17,9 @@ defmodule BlogWeb.Components.Gallery do
       <h2>{@title}</h2>
       <p :if={@description}>{@description}</p>
       <div class="component-preview">
-        {render_slot(@inner_block)}
+        <div class="component-preview-content">
+          {render_slot(@inner_block)}
+        </div>
       </div>
     </section>
     """

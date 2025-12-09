@@ -5,6 +5,7 @@ defmodule BlogWeb.Components.Post do
   use Phoenix.Component
 
   alias Blog.Posts.Post
+  alias BlogWeb.Components.Tag
 
   @doc """
   Renders a full blog post with metadata and content.
@@ -17,12 +18,10 @@ defmodule BlogWeb.Components.Post do
   def full(assigns) do
     ~H"""
     <article class="post">
-      <header class="post-metadata">
+      <header>
         <hgroup class="post-title">
           <h1 id={@post.slug}>{@post.title}</h1>
-          <nav :if={@post.tags not in [nil, []]} class="tags" aria-label="Post tags">
-            <a :for={tag <- @post.tags} href="#" class="tag">{"##{tag.label}"}</a>
-          </nav>
+          <Tag.list tags={@post.tags} />
         </hgroup>
         <time class="post-published" datetime={DateTime.to_iso8601(@post.published_at)}>
           {Calendar.strftime(@post.published_at, "%B %d, %Y")}

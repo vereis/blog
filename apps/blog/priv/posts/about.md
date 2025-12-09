@@ -1,79 +1,229 @@
 ---
-title: Hello, world!
+title: Markdown Test Kitchen
 slug: about
 is_draft: false
 reading_time_minutes:
 published_at: 2024-07-20 14:06:00Z
 tags:
-  - ahoy
+  - markdown
+  - test
+  - demo
 ---
 
-Ahoy!! I'm `vereis`!
+This is a comprehensive test document showcasing **every** markdown feature supported by this blog. Use this to test styling and rendering!
 
-I have a long history of working on distributed systems using [Erlang](https://erlang.org) and [Elixir](https://elixir-lang.org).
+## Text Formatting
 
-I'm currently a London-based `Tech Lead` trying to save veterinarians time so they can focus on what they do best: helping animals.
+**Bold text** using double asterisks.
 
-In my spare time I enjoy cooking, eating, and drinking tea!
+*Italic text* using single asterisks.
 
-## Background
+***Bold and italic*** using triple asterisks.
 
-I'm a self-taught developer who got started with game development when I was 7 years old.
+~~Strikethrough text~~ using double tildes.
 
-I started with [GameMaker](https://www.yoyogames.com/gamemaker) where I (very inefficiently) taught myself how to code.
+`Inline code` using backticks.
 
-I've since dabbled in a variety of languages and frameworks, primarily focused on web development or systems programming.
+Regular text with no formatting at all, just to show the baseline.
 
-Nowadays, my go-to tech stack includes:
+---
 
-- [Elixir](https://elixir-lang.org)
-- [Erlang](https://erlang.org)
-- [PostgreSQL](https://postgresql.org) or [SQLite](https://sqlite.org)
-- [Svelte](https://svelte.dev)
-- [Tailscale](https://tailscale.com)
-- [Nix](https://nixos.org)
+## Links
 
-I've been a longtime member of the [ricing](https://reddit.com/r/unixporn) community, which still regularly inspires me to optimize my workflow and environment.
+Here's a [link to Elixir](https://elixir-lang.org) with descriptive text.
 
-## Stuff I Use
+Here's a bare URL: https://github.com
 
-I keep an up-to-date list of hardware, software, services, and hobbies that vibe with me on [my uses](/uses) page.
+Here's an [internal link](/posts) to another page.
 
-A lot of people ask, so tl;dr:
+## Images
 
-- [NixOS](https://nixos.org)
-- [NeoVim](https://neovim.io)
-- [QuteBrowser](https://qutebrowser.org)
-- [Dotfiles](https://github.com/vereis/nix-config)
+Here are some test images:
 
-## Blog & Projects
+![Avatar](../assets/avatar.jpg)
 
-You can check out my writings on various topics on my [blog](/posts).
+![Banner](../assets/banner.png)
 
-You can additionally see a list of [projects](/projects) I've worked on or contributed to.
+![Rin Print Upscale](../assets/rin_print_upscale.jpg)
 
-## Contact
+## Lists
 
-I try to go by `vereis` on most platforms, you can find me on:
+### Unordered Lists
 
-- [GitHub](https://github.com/vereis)
-- [Steam](https://steamcommunity.com/id/vereis)
-- [BlueSky](https://bsky.app/profile/vereis.com)
-- [Discord](@vereis)
+- First item
+- Second item
+- Third item
+  - Nested item 1
+  - Nested item 2
+    - Double nested item
+- Fourth item
 
-In cases where `vereis` is not available, you can find me here:
+### Ordered Lists
 
-- [Twitter](https://twitter.com/vereisyaps)
-- [Instagram](https://instagram.com/vereissnaps)
+1. First step
+2. Second step
+3. Third step
+   1. Nested step 3.1
+   2. Nested step 3.2
+4. Fourth step
 
-Feel free to reach out to me via [email](mailto:contact@vereis.com) or any of the platforms above if you want to chat!
+### Mixed Lists
 
-> Views expressed here or elsewhere online are my own and do not reflect the views of my employer.
+1. Start with ordered
+2. Continue ordered
+   - Switch to unordered nested
+   - Another unordered
+3. Back to ordered
+   1. Nested ordered again
+   2. More nested ordered
 
-## Acknowledgements
+### Task Lists
 
-This blog is powered by [LiveView](https://hexdocs.pm/phoenix_live_view).
+- [x] Completed task
+- [x] Another completed task
+- [ ] Incomplete task
+- [ ] Another incomplete task
 
-The theme is based on [glow](https://github.com/charmbracelet/glow), an awesome CLI tool for rendering Markdown files in the terminal.
+## Code Blocks
 
-The colorscheme is a minimally modified [rose-pine](https://rosepinetheme.com) palette.
+Inline code: `let x = 42;`
+
+Fenced code block with syntax highlighting:
+
+```elixir
+defmodule Blog.Example do
+  @moduledoc """
+  Example module for testing code highlighting.
+  """
+
+  def hello(name) do
+    "Hello, #{name}!"
+  end
+
+  def fibonacci(0), do: 0
+  def fibonacci(1), do: 1
+  def fibonacci(n) when n > 1 do
+    fibonacci(n - 1) + fibonacci(n - 2)
+  end
+end
+```
+
+Another language:
+
+```javascript
+function factorial(n) {
+  if (n <= 1) return 1;
+  return n * factorial(n - 1);
+}
+
+const result = factorial(5);
+console.log(`5! = ${result}`);
+```
+
+Plain code block without language:
+
+```
+This is a plain code block.
+No syntax highlighting here.
+Just monospace text.
+```
+
+## Blockquotes
+
+> This is a blockquote.
+> It can span multiple lines.
+> And continue with more text.
+
+> You can also have a single-line blockquote.
+
+Nested blockquotes:
+
+> This is the first level.
+>
+> > This is nested inside.
+> >
+> > > And this is double-nested!
+>
+> Back to first level.
+
+
+## Tables
+
+| Language | Typing | Paradigm |
+|----------|--------|----------|
+| Elixir | Dynamic | Functional |
+| Rust | Static | Multi-paradigm |
+| JavaScript | Dynamic | Multi-paradigm |
+| Haskell | Static | Functional |
+
+With alignment:
+
+| Left-aligned | Center-aligned | Right-aligned |
+|:-------------|:--------------:|--------------:|
+| Text | Text | Text |
+| More | More | More |
+
+## Nested Structures
+
+Complex nesting example:
+
+1. First ordered item
+   - Nested unordered
+   - Another nested
+     ```elixir
+     # Code in a list!
+     def nested, do: :cool
+     ```
+   - Back to unordered
+2. Second ordered item
+   > A blockquote in a list!
+   >
+   > With multiple lines.
+3. Third ordered item
+   1. Nested ordered
+      - And back to unordered
+      - With more items
+
+## Long Paragraphs
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
+
+## Special Characters
+
+Testing special characters and escaping:
+
+- Ampersands: AT&T, Ben & Jerry's
+- Angle brackets: `<html>`, `<div>`
+- Quotes: "double quotes" and 'single quotes'
+- Apostrophes: it's, don't, can't
+- Em-dashes: Hello—world
+- Ellipsis: Wait...
+
+## Edge Cases
+
+Empty paragraph between this and next heading.
+
+## Mixed Content Test
+
+Here's a paragraph with **bold**, *italic*, ***both***, ~~strikethrough~~, and `inline code` all together. Plus a [link](https://example.com) for good measure!
+
+- List item with **bold**
+- List item with *italic*
+- List item with `code`
+- List item with [link](https://example.com)
+
+> Blockquote with **bold**, *italic*, and `code` elements mixed in!
+
+## Very Long Lines
+
+This is a test of a very long line that should wrap properly in the browser without breaking the layout or causing horizontal scrollbars to appear unless absolutely necessary because the line is genuinely too long to fit even with wrapping enabled and contains no break opportunities whatsoever which would be quite unusual in normal prose but we should test it anyway.
+
+## End of Test Document
+
+If you can see this, you've made it to the end! All markdown features should be tested above.
+
+**Note:** Some features like footnotes, definition lists, abbreviations, and superscript/subscript may not be supported depending on your markdown parser.
