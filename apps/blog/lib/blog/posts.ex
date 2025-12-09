@@ -19,7 +19,7 @@ defmodule Blog.Posts do
 
   def get_post(filters) when is_list(filters) do
     filters
-    |> Keyword.put(:limit, 1)
+    |> Keyword.merge(preload: :tags, limit: 1)
     |> Post.query()
     |> Repo.one()
   end
