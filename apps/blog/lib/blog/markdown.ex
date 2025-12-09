@@ -1,6 +1,8 @@
 defmodule Blog.Markdown do
   @moduledoc "Utilities for converting markdown to HTML"
 
+  alias Floki.HTMLParser.Html5ever
+
   @markdown_opts [
     extension: [
       table: true,
@@ -13,6 +15,9 @@ defmodule Blog.Markdown do
     ],
     render: [
       unsafe_: true
+    ],
+    syntax_highlight: [
+      formatter: {:html_inline, theme: "github_dark"}
     ]
   ]
 
@@ -54,14 +59,11 @@ defmodule Blog.Markdown do
   end
 
   defp postprocess(html, processor) do
-    with {:ok, ast} <- Floki.parse_document(html) do
+    with {:ok, ast} <- Floki.parse_document(html, html_parser: Html5ever) do
       {modified_html, acc} = Floki.traverse_and_update(ast, [], processor)
 
       {:ok, [Floki.raw_html(modified_html), maybe_reverse_acc(acc)]}
     end
-  rescue
-    error ->
-      {:error, Exception.message(error)}
   end
 
   defp maybe_reverse_acc(acc) when is_map(acc) do
