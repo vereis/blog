@@ -70,12 +70,14 @@ defmodule Blog.Posts.Post do
 
   @impl Blog.Resource
   def handle_import(%Blog.Resource{content: content}) do
-    with [_front, metadata_yaml, raw_body] <- String.split(content, "---\n", parts: 3),
+    # Split only on the opening --- and the first closing ---
+    # This allows --- to be used as horizontal rules in the markdown body
+    with [_front, metadata_yaml, raw_body] <- String.split(content, ~r/^---\n/m, parts: 3),
          {:ok, metadata} <- YamlElixir.read_from_string(metadata_yaml) do
       metadata
       |> Map.take(Enum.map(@castable_fields, &Atom.to_string/1))
       |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
-      |> Map.merge(%{raw_body: String.trim(raw_body), tags: Map.get(metadata, "tags", [])})
+      |> Map.merge(%{raw_body: raw_body, tags: Map.get(metadata, "tags", [])})
     end
   end
 
