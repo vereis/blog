@@ -70,11 +70,22 @@ defmodule Blog.Assets.Types.Image do
     with {:ok, thumbnail} <- Operation.thumbnail_image(image, 3, height: 2),
          {:ok, sharpened} <- Operation.sharpen(thumbnail, sigma: 1.0),
          {:ok, binary} <- VixImage.write_to_binary(sharpened) do
+      # Extract RGB pixels (3 bytes per pixel, need exactly 6 pixels for 3x2 grid)
       oklab_pixels =
         binary
         |> :binary.bin_to_list()
         |> Enum.chunk_every(3)
-        |> Enum.map(fn [r, g, b] -> rgb_to_oklab(r, g, b) end)
+        |> Enum.take(6)
+        |> Enum.map(fn
+          [r, g, b] -> rgb_to_oklab(r, g, b)
+          # Handle images with alpha channel
+          [r, g, b, _a] -> rgb_to_oklab(r, g, b)
+          # Fallback for unexpected format
+          _other -> rgb_to_oklab(0, 0, 0)
+        end)
+
+      # Pad with neutral gray if we didn't get 6 pixels
+      oklab_pixels = oklab_pixels ++ List.duplicate({0.5, 0.0, 0.0}, 6 - length(oklab_pixels))
 
       {base_l, base_a, base_b} = get_average_oklab(oklab_pixels)
       {ll, aaa, bbb} = find_best_oklab_bits(base_l, base_a, base_b)

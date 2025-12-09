@@ -173,14 +173,17 @@ defmodule Blog.Posts.Post do
     {updated_attrs, href} =
       with true <- Regex.match?(~r/\/assets\//, src),
            false <- Regex.match?(~r/^https?:\/\//, src),
-           %Asset{name: name, lqip_hash: lqip_hash} <- Assets.get_asset(path: src) do
-        new_src = "/assets/images/#{name}"
-        lqip_style = if lqip_hash, do: "--lqip:#{lqip_hash}", else: ""
+           name = (src |> Path.basename() |> Path.rootname()) <> ".webp",
+           %Asset{} = asset <- Assets.get_asset(name: name) do
+        new_src = "/assets/images/#{asset.name}"
+        lqip_style = if asset.lqip_hash, do: "--lqip:#{asset.lqip_hash}", else: ""
 
         updated =
           attrs
           |> List.keystore("src", 0, {"src", new_src})
           |> List.keystore("style", 0, {"style", lqip_style})
+          |> List.keystore("width", 0, {"width", to_string(asset.width)})
+          |> List.keystore("height", 0, {"height", to_string(asset.height)})
 
         {updated, new_src}
       else
