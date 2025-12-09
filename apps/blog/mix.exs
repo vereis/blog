@@ -49,7 +49,8 @@ defmodule Blog.MixProject do
       {:vix, "~> 0.31"},
       {:mime, "~> 2.0"},
       {:file_system, "~> 1.0"},
-      {:ex_machina, "~> 2.8", only: :test}
+      {:ex_machina, "~> 2.8", only: :test},
+      {:html5ever, "~> 0.17.0"}
     ]
   end
 
