@@ -132,7 +132,8 @@ defmodule Blog.Posts.Post do
 
   # NOTE: Make sure all headings have unique IDs we can link to.
   # NOTE: Side effect: Accumulate headings so that we can build a list of headers to store in the DB.
-  defp process_html({"h" <> level_str = tag, attrs, children}, acc) when is_map(acc) do
+  defp process_html({"h" <> level_str = tag, attrs, children}, acc)
+       when level_str in ["1", "2", "3", "4", "5", "6"] and is_map(acc) do
     level = String.to_integer(level_str)
     title = Floki.text({tag, attrs, children})
     link = slugify(title)
