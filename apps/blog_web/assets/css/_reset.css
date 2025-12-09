@@ -104,7 +104,7 @@ section {
 }
 
 body {
-	line-height: 1;
+	line-height: inherit;
 }
 
 ol,
@@ -137,5 +137,5 @@ table {
 }
 
 :target {
-	scroll-margin-block: 5ex;
+	scroll-margin-block: var(--space-line-2);
 }

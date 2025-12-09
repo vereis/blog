@@ -1,0 +1,16 @@
+@layer base {
+  main {
+    max-inline-size: 80ch;
+    margin-inline: auto;
+    padding-block: var(--space-line-4);
+    padding-inline: var(--space-4);
+  }
+
+  section {
+    margin-block-end: var(--space-line-4);
+
+    &:last-child {
+      margin-block-end: 0;
+    }
+  }
+}
