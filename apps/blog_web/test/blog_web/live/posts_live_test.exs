@@ -45,7 +45,7 @@ defmodule BlogWeb.PostsLiveTest do
         |> render_click()
         |> follow_redirect(conn, ~p"/")
 
-      assert has_element?(home_view, "h1", "Home")
+      assert home_view.module == BlogWeb.HomeLive
     end
   end
 
