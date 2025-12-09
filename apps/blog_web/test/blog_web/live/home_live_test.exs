@@ -1,14 +1,60 @@
 defmodule BlogWeb.HomeLiveTest do
   use BlogWeb.ConnCase
 
+  import Blog.Factory
   import Phoenix.LiveViewTest
 
-  describe "HomeLive" do
-    test "mounts successfully and displays content", %{conn: conn} do
-      {:ok, view, _html} = live(conn, ~p"/")
+  alias Blog.Posts.Post
 
-      assert has_element?(view, "h1", "Home")
-      assert has_element?(view, "p", "Welcome to the blog!")
+  describe "HomeLive" do
+    test "mounts successfully and displays about post", %{conn: conn} do
+      insert(:post, slug: "hello-world", title: "Hello, world!")
+
+      {:ok, view, _html} = live(conn, ~p"/")
+      html = render_async(view)
+
+      assert html =~ "Hello, world!"
+      assert has_element?(view, "article.post")
+      assert has_element?(view, "h1#hello-world", "Hello, world!")
+    end
+
+    test "displays empty state when no about post exists", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/")
+      render_async(view)
+
+      assert has_element?(view, ".empty")
+      assert has_element?(view, ".empty span", "No content available yet")
+    end
+
+    test "subscribes to post reload events and updates when post changes", %{conn: conn} do
+      post = insert(:post, slug: "hello-world", title: "Original Title")
+
+      {:ok, view, _html} = live(conn, ~p"/")
+      render_async(view)
+
+      assert has_element?(view, "h1#hello-world", "Original Title")
+
+      {:ok, updated_post} = Blog.Posts.update_post(post, %{title: "Updated Title"})
+      Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:resource_reload, Post, updated_post.id})
+
+      render_async(view)
+
+      assert has_element?(view, "h1#hello-world", "Updated Title")
+    end
+
+    test "does not reload when a different post changes", %{conn: conn} do
+      insert(:post, slug: "hello-world", title: "Hello World")
+      other_post = insert(:post, slug: "other-post", title: "Other Post")
+
+      {:ok, view, _html} = live(conn, ~p"/")
+      render_async(view)
+
+      assert has_element?(view, "h1#hello-world", "Hello World")
+
+      {:ok, updated_other} = Blog.Posts.update_post(other_post, %{title: "Updated Other"})
+      Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:resource_reload, Post, updated_other.id})
+
+      assert has_element?(view, "h1#hello-world", "Hello World")
     end
 
     test "renders navbar with navigation links", %{conn: conn} do

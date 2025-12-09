@@ -45,7 +45,7 @@ defmodule BlogWeb.ProjectsLiveTest do
         |> render_click()
         |> follow_redirect(conn, ~p"/")
 
-      assert has_element?(home_view, "h1", "Home")
+      assert home_view.module == BlogWeb.HomeLive
     end
 
     test "navigates to posts via navbar (live_redirect)", %{conn: conn} do
