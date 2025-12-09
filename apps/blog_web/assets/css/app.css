@@ -11,7 +11,9 @@
 @import "animations.css" layer(base);
 
 /* Components */
-/* Component imports will go here as we build them */
+@import "components/gallery.css" layer(components);
+@import "components/post.css" layer(components);
+@import "components/tag.css" layer(components);
 
 /* Utilities (always win over components) */
 @import "phoenix.css" layer(utilities);

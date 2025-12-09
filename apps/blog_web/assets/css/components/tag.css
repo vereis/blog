@@ -1,0 +1,22 @@
+@layer components {
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+
+  .tag {
+    color: var(--color-accent);
+    text-decoration: none;
+
+    &::before {
+      content: '#';
+      margin-inline-end: -1ch;
+    }
+
+    &:hover {
+      background-color: var(--color-accent);
+      color: var(--color-bg-primary);
+    }
+  }
+}

@@ -1,0 +1,30 @@
+@layer components {
+  .post {
+    margin-block-end: var(--space-line);
+  }
+
+  .post-title {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    margin-block-end: var(--space-line);
+
+    & h1 {
+      background-color: var(--ansi-blue);
+      color: var(--ansi-yellow);
+      padding-inline: var(--space-1);
+      font-weight: var(--font-weight-bold);
+      margin: 0;
+
+      &::before {
+        content: '';
+      }
+    }
+  }
+
+  .post-published,
+  .post-read-time {
+    color: var(--color-fg-secondary);
+  }
+}

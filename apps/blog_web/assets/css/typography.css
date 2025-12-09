@@ -1,0 +1,221 @@
+@layer base {
+  :root {
+    /* Typography variables */
+    --grid-base: 16px;
+    --line-height: 1.3;
+    --font-size-base: var(--grid-base);
+    --font-mono: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+
+    /* Font weights */
+    --font-weight-normal: 400;
+    --font-weight-bold: 700;
+
+    /* Spacing scale */
+    --space-1: 1ch;
+    --space-2: 2ch;
+    --space-4: 4ch;
+    --space-8: 8ch;
+    --space-line: 1lh;
+    --space-line-2: 2lh;
+    --space-line-4: 4lh;
+  }
+
+  html {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--ansi-bright-cyan);
+    font-size: inherit;
+    font-weight: var(--font-weight-bold);
+    line-height: inherit;
+    margin-block-end: var(--space-line);
+  }
+
+  b,
+  strong {
+    font-weight: var(--font-weight-bold);
+  }
+
+  i,
+  em {
+    font-style: italic;
+  }
+
+  h1::before {
+    content: '# ';
+  }
+
+  h2::before {
+    content: '## ';
+  }
+
+  h3::before {
+    content: '### ';
+  }
+
+  h4::before {
+    content: '#### ';
+  }
+
+  h5::before {
+    content: '##### ';
+  }
+
+  h6::before {
+    content: '###### ';
+  }
+
+  p {
+    margin-block-end: var(--space-line);
+  }
+
+  a {
+    color: var(--color-link);
+    text-decoration: underline;
+
+    &:hover {
+      color: var(--color-link-hover);
+    }
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin-block-end: var(--space-line);
+
+    /* Hide alt text that shows while image loads */
+    color: transparent;
+    overflow: hidden;
+  }
+
+  hr {
+    border: none;
+    border-block-start: 1px solid var(--ansi-black);
+    margin-block: var(--space-line-2);
+  }
+
+  code {
+    background-color: var(--color-bg-secondary);
+    color: var(--ansi-red);
+    padding-inline: var(--space-1);
+  }
+
+  pre {
+    overflow-x: auto;
+    margin-block-end: var(--space-line);
+    tab-size: 2;
+
+    /* HACK: Override background color set by syntax highlighter */
+    background-color: transparent !important;
+
+    & code {
+      padding: 0;
+      background: none;
+      white-space: pre;
+      display: block;
+
+      & .line::before {
+        padding-inline-end: var(--space-2);
+        content: attr(data-line);
+        color: var(--color-fg-dim);
+        text-align: right;
+        display: inline-block;
+        width: 4ch;
+        user-select: none;
+        opacity: 0.5;
+      }
+    }
+  }
+
+  blockquote {
+    /* HACK: offset the padding added by the border to keep our grid alignment */
+    border-inline-start: 1px solid var(--color-bg-secondary);
+    margin-inline-start: -1px;
+    padding-inline-start: var(--space-2);
+    color: var(--color-fg-secondary);
+  }
+
+  ul,
+  ol {
+    margin-block-end: var(--space-line);
+  }
+
+  ul {
+    list-style-type: disc;
+    padding-inline-start: var(--space-2);
+  }
+
+  ol {
+    list-style-type: decimal;
+    padding-inline-start: var(--space-4);
+  }
+
+  li {
+    margin-block-end: 0;
+
+    & ul,
+    & ol {
+      margin-block-end: 0;
+    }
+  }
+
+  table {
+    max-width: 100%;
+    border-collapse: collapse;
+    margin-block-end: var(--space-line);
+    border: 1px solid var(--color-bg-secondary);
+  }
+
+  th {
+    font-weight: var(--font-weight-bold);
+    text-align: left;
+    border-block-start: 1px solid var(--color-bg-secondary);
+    border-block-end: 1px solid var(--color-bg-secondary);
+    padding-inline: var(--space-2);
+    padding-block: calc(var(--space-line) / 2);
+
+    &+th {
+      border-inline-start: 1px solid var(--color-bg-secondary);
+    }
+  }
+
+  /* HACK: Add extra padding to first and last row to better separate from header
+  *        Yes, this means we're breaking our character grid a bit, but...
+  *        its prettier and at least it adds up to one line of space total */
+  tbody tr:first-of-type td {
+    padding-block-start: calc(var(--space-line) / 2);
+  }
+
+  tbody tr:last-of-type td {
+    padding-block-end: calc(var(--space-line) / 2);
+  }
+
+  td {
+    padding: 0 var(--space-2);
+
+    &+td {
+      border-inline-start: 1px solid var(--color-bg-secondary);
+    }
+  }
+
+  th[align="right"],
+  td[align="right"] {
+    text-align: right;
+  }
+
+  th[align="center"],
+  td[align="center"] {
+    text-align: center;
+  }
+}

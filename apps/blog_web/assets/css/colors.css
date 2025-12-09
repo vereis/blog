@@ -1,0 +1,49 @@
+@layer base {
+  :root {
+    /* Glow-inspired color palette (based on Glamour's ANSI 256 colors) */
+    --ansi-black: #585858;
+    --ansi-red: #ff5f5f;
+    --ansi-green: #00af5f;
+    --ansi-yellow: #ffff87;
+    --ansi-blue: #5f5fff;
+    --ansi-magenta: #ff5fff;
+    --ansi-cyan: #008787;
+    --ansi-white: #d0d0d0;
+    --ansi-bright-black: #808080;
+    --ansi-bright-red: #ff8787;
+    --ansi-bright-green: #5fff87;
+    --ansi-bright-yellow: #ffffaf;
+    --ansi-bright-blue: #8787ff;
+    --ansi-bright-magenta: #ff87ff;
+    --ansi-bright-cyan: #00afff;
+    --ansi-bright-white: #ffffff;
+    --ansi-bg: #0e0e0e;
+    --ansi-fg: #d0d0d0;
+
+    /* Semantic color mappings */
+    --color-bg-primary: var(--ansi-bg);
+    --color-bg-secondary: #303030;
+    --color-fg-primary: var(--ansi-fg);
+    --color-fg-secondary: var(--ansi-bright-black);
+    --color-fg-dim: var(--ansi-black);
+    --color-accent: var(--ansi-bright-cyan);
+    --color-success: var(--ansi-green);
+    --color-warning: var(--ansi-yellow);
+    --color-error: var(--ansi-red);
+    --color-info: var(--ansi-blue);
+
+    /* Interactive states */
+    --color-link: var(--ansi-cyan);
+    --color-link-hover: var(--ansi-bright-cyan);
+    --color-focus: var(--ansi-bright-cyan);
+  }
+
+  html {
+    background-color: var(--color-bg-primary);
+    color: var(--color-fg-primary);
+  }
+
+  ::selection {
+    background-color: rgba(0, 175, 255, 0.3);
+  }
+}
