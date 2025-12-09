@@ -7,8 +7,8 @@ defmodule BlogWeb.GalleryLive do
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
-    about_post = Blog.Posts.get_post(slug: "about")
-    {:ok, assign(socket, :about_post, about_post)}
+    test_post = Blog.Posts.get_post(slug: "test")
+    {:ok, assign(socket, :test_post, test_post)}
   end
 
   @impl Phoenix.LiveView
@@ -53,9 +53,9 @@ defmodule BlogWeb.GalleryLive do
       </Gallery.item>
 
       <Gallery.item title="Post Component" description="Full post rendering with metadata">
-        <Post.full :if={@about_post} post={@about_post} />
-        <p :if={!@about_post} class="error">
-          No "about" post found. Make sure to import posts first.
+        <Post.full :if={@test_post} post={@test_post} />
+        <p :if={!@test_post} class="error">
+          No "test" post found. Make sure to import posts first.
         </p>
       </Gallery.item>
     </Layouts.app>
