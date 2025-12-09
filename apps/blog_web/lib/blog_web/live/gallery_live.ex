@@ -2,9 +2,13 @@ defmodule BlogWeb.GalleryLive do
   @moduledoc false
   use BlogWeb, :live_view
 
+  alias BlogWeb.Components.Gallery
+  alias BlogWeb.Components.Post
+
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    about_post = Blog.Posts.get_post(slug: "about")
+    {:ok, assign(socket, :about_post, about_post)}
   end
 
   @impl Phoenix.LiveView
@@ -14,9 +18,7 @@ defmodule BlogWeb.GalleryLive do
       <h1>Component Gallery</h1>
       <p>Preview of available components and their variants.</p>
 
-      <section>
-        <h2>Icons</h2>
-        <p>ASCII/Unicode icons for terminal aesthetic:</p>
+      <Gallery.item title="Icons" description="ASCII/Unicode icons for terminal aesthetic">
         <div class="icon-gallery">
           <div class="icon-item">
             <.icon name="info" />
@@ -35,28 +37,27 @@ defmodule BlogWeb.GalleryLive do
             <code>spinner</code>
           </div>
         </div>
-      </section>
+      </Gallery.item>
 
-      <section>
-        <h2>Flash Messages</h2>
-        <p>Flash notifications for user feedback:</p>
-        <div class="component-preview">
-          <.flash kind={:info} title="Info Flash">
-            This is an informational message.
-          </.flash>
-          <.flash kind={:error} title="Error Flash">
-            This is an error message.
-          </.flash>
-        </div>
-      </section>
+      <Gallery.item title="Flash Messages" description="Flash notifications for user feedback">
+        <.flash kind={:info} title="Info Flash">
+          This is an informational message.
+        </.flash>
+        <.flash kind={:error} title="Error Flash">
+          This is an error message.
+        </.flash>
+      </Gallery.item>
 
-      <section>
-        <h2>Navigation</h2>
-        <p>Site navigation component:</p>
-        <div class="component-preview">
-          <.navbar />
-        </div>
-      </section>
+      <Gallery.item title="Navigation" description="Site navigation component">
+        <.navbar />
+      </Gallery.item>
+
+      <Gallery.item title="Post Component" description="Full post rendering with metadata">
+        <Post.full :if={@about_post} post={@about_post} />
+        <p :if={!@about_post} class="error">
+          No "about" post found. Make sure to import posts first.
+        </p>
+      </Gallery.item>
     </Layouts.app>
     """
   end
