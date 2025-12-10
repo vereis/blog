@@ -9,7 +9,15 @@ defmodule BlogWeb.GalleryLive do
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     test_post = Blog.Posts.get_post(slug: "test")
-    {:ok, assign(socket, :test_post, test_post)}
+    posts = Blog.Posts.list_posts(order_by: [desc: :published_at])
+
+    socket =
+      socket
+      |> assign(:test_post, test_post)
+      |> assign(:posts, posts)
+      |> assign(:empty_posts, [])
+
+    {:ok, socket}
   end
 
   @impl Phoenix.LiveView
@@ -62,6 +70,21 @@ defmodule BlogWeb.GalleryLive do
 
       <Gallery.item title="Bluescreen" description="Windows 95-style error screen">
         <Bluescreen.bluescreen error={nil} href="/gallery" />
+      </Gallery.item>
+
+      <Gallery.item
+        title="Post List - Loading State"
+        description="Loading state with skeleton placeholders"
+      >
+        <Post.list posts={[]} loading={true} />
+      </Gallery.item>
+
+      <Gallery.item title="Post List - With Posts" description="Multiple posts in list view">
+        <Post.list posts={@posts} empty={@posts == []} />
+      </Gallery.item>
+
+      <Gallery.item title="Post List - Empty State" description="Empty state when no posts exist">
+        <Post.list posts={[]} empty={true} />
       </Gallery.item>
     </Layouts.app>
     """
