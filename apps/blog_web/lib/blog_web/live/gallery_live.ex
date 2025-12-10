@@ -80,11 +80,11 @@ defmodule BlogWeb.GalleryLive do
       </Gallery.item>
 
       <Gallery.item title="Post List - With Posts" description="Multiple posts in list view">
-        <Post.list posts={@posts} empty={@posts == []} />
+        <Post.list posts={@posts} />
       </Gallery.item>
 
       <Gallery.item title="Post List - Empty State" description="Empty state when no posts exist">
-        <Post.list posts={[]} empty={true} />
+        <Post.list posts={[]} />
       </Gallery.item>
     </Layouts.app>
     """

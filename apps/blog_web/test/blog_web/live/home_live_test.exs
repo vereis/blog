@@ -121,8 +121,7 @@ defmodule BlogWeb.HomeLiveTest do
         |> render_click()
         |> follow_redirect(conn, ~p"/posts")
 
-      assert has_element?(posts_view, "h1", "Posts")
-      assert has_element?(posts_view, "p", "All blog posts will be listed here")
+      assert has_element?(posts_view, ".badge", "All Posts")
     end
 
     test "navigates to projects when clicking Projects link", %{conn: conn} do
