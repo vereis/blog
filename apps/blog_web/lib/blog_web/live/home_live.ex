@@ -2,6 +2,7 @@ defmodule BlogWeb.HomeLive do
   @moduledoc false
   use BlogWeb, :live_view
 
+  alias BlogWeb.Components.Bluescreen
   alias BlogWeb.Components.Post
 
   @slug "hello-world"
@@ -50,16 +51,7 @@ defmodule BlogWeb.HomeLive do
       <%= if @post do %>
         <Post.full post={@post} />
       <% else %>
-        <.bluescreen error={nil}>
-          An error has occurred. To continue:
-
-          Press <a href="/">Enter or Click</a> to return to the blog, or
-
-          Press CTRL+ALT+DEL to restart your computer. If you do this,
-          you will lose any unsaved information in all open applications.
-
-          Error: No blog post found
-        </.bluescreen>
+        <Bluescreen.bluescreen error={:post_not_found} href="/" />
       <% end %>
     </Layouts.app>
     """

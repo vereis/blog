@@ -13,7 +13,7 @@ defmodule BlogWeb.HomeLiveTest do
       {:ok, view, _html} = live(conn, ~p"/")
 
       assert has_element?(view, "article.post")
-      assert has_element?(view, "h1#hello-world", "Hello, world!")
+      assert has_element?(view, "#hello-world", "Hello, world!")
     end
 
     test "displays empty state when no about post exists", %{conn: conn} do
@@ -29,14 +29,14 @@ defmodule BlogWeb.HomeLiveTest do
 
       {:ok, view, _html} = live(conn, ~p"/")
 
-      assert has_element?(view, "h1#hello-world", "Original Title")
+      assert has_element?(view, "#hello-world", "Original Title")
 
       {:ok, updated_post} = Blog.Posts.update_post(post, %{title: "Updated Title"})
       Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:resource_reload, Post, updated_post.id})
 
       _ = :sys.get_state(view.pid)
 
-      assert has_element?(view, "h1#hello-world", "Updated Title")
+      assert has_element?(view, "#hello-world", "Updated Title")
     end
 
     test "does not reload when a different post changes", %{conn: conn} do
@@ -45,14 +45,14 @@ defmodule BlogWeb.HomeLiveTest do
 
       {:ok, view, _html} = live(conn, ~p"/")
 
-      assert has_element?(view, "h1#hello-world", "Hello World")
+      assert has_element?(view, "#hello-world", "Hello World")
 
       {:ok, updated_other} = Blog.Posts.update_post(other_post, %{title: "Updated Other"})
       Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:resource_reload, Post, updated_other.id})
 
       _ = :sys.get_state(view.pid)
 
-      assert has_element?(view, "h1#hello-world", "Hello World")
+      assert has_element?(view, "#hello-world", "Hello World")
     end
 
     test "loads post when it gets created after initial mount", %{conn: conn} do
@@ -65,7 +65,7 @@ defmodule BlogWeb.HomeLiveTest do
 
       _ = :sys.get_state(view.pid)
 
-      assert has_element?(view, "h1#hello-world", "Newly Created")
+      assert has_element?(view, "#hello-world", "Newly Created")
       refute has_element?(view, ".bluescreen")
     end
 
@@ -168,7 +168,7 @@ defmodule BlogWeb.HomeLiveTest do
       elapsed = System.monotonic_time(:millisecond) - start_time
 
       assert elapsed >= 5000
-      assert has_element?(view, "h1#hello-world", "Hello World")
+      assert has_element?(view, "#hello-world", "Hello World")
     end
   end
 end

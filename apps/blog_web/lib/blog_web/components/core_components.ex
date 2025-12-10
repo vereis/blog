@@ -2,7 +2,6 @@ defmodule BlogWeb.CoreComponents do
   @moduledoc false
   use Phoenix.Component
 
-  alias Blog.Utils.ErrorCode
   alias Phoenix.LiveView.JS
 
   @doc """
@@ -43,99 +42,6 @@ defmodule BlogWeb.CoreComponents do
         <.icon name="close" />
       </button>
     </div>
-    """
-  end
-
-  @doc """
-  Renders a state message with an icon and colored border.
-
-  ## Examples
-
-      <.state_message kind={:info}>
-        Loading your content...
-      </.state_message>
-
-      <.state_message kind={:error}>
-        Failed to load. Please try again.
-      </.state_message>
-
-      <.state_message kind={:loading}>
-        <.icon name="spinner" class="icon-spin" />
-        <span>Processing...</span>
-      </.state_message>
-  """
-  attr :id, :string, default: nil
-  attr :kind, :atom, values: [:info, :error, :loading], required: true
-
-  slot :inner_block, required: true
-
-  def state_message(assigns) do
-    ~H"""
-    <div id={@id} class={["state-message", to_string(@kind)]}>
-      <.icon :if={@kind == :info} name="info" />
-      <.icon :if={@kind == :error} name="error" />
-      <.icon :if={@kind == :loading} name="spinner" class="icon-spin" />
-      <div>
-        {render_slot(@inner_block)}
-      </div>
-    </div>
-    """
-  end
-
-  @doc """
-  Renders a Windows 95-style bluescreen error.
-
-  ## Examples
-
-      <.bluescreen error={nil}>
-        No blog post found. The system has become unstable.
-      </.bluescreen>
-
-      <.bluescreen error={:not_found}>
-        Press any key to panic.
-      </.bluescreen>
-  """
-  attr :error, :any, required: true
-
-  slot :inner_block, required: true
-
-  def bluescreen(assigns) do
-    assigns = assign(assigns, :error_code, ErrorCode.generate(assigns.error))
-
-    ~H"""
-    <div class="bluescreen" id="bluescreen" phx-hook=".Bluescreen">
-      <div class="bluescreen-badge">Unexpected Error</div>
-      <div class="bluescreen-content">
-        <p class="bluescreen-message">{render_slot(@inner_block)}</p>
-        <p class="bluescreen-error-code">Error: {@error_code}</p>
-        <p class="bluescreen-prompt">
-          Press any key to continue<span class="bluescreen-cursor"> </span>
-        </p>
-      </div>
-    </div>
-    <script :type={Phoenix.LiveView.ColocatedHook} name=".Bluescreen">
-      export default {
-        mounted() {
-          const handleKeyPress = (e) => {
-            if (e.key === 'Enter') {
-              window.location.href = '/';
-            }
-          };
-          
-          document.addEventListener('keydown', handleKeyPress);
-          
-          this.handleEvent = () => {
-            document.removeEventListener('keydown', handleKeyPress);
-          };
-        },
-        
-        destroyed() {
-          if (this.handleEvent) {
-            this.handleEvent();
-          }
-        }
-      }
-    </script>
     """
   end
 
