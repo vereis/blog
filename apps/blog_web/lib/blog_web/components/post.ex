@@ -124,6 +124,7 @@ defmodule BlogWeb.Components.Post do
           <span class="skeleton-text skeleton-index"></span>
           <div class="post-content">
             <span class="skeleton-text skeleton-title"></span>
+            <span class="skeleton-text skeleton-excerpt"></span>
             <span class="skeleton-text skeleton-meta"></span>
           </div>
         </div>
@@ -158,6 +159,10 @@ defmodule BlogWeb.Components.Post do
                 {@post.title}
               </.link>
             </h2>
+            <div :if={@post.excerpt} class="post-excerpt">
+              {Phoenix.HTML.raw(@post.excerpt)}
+              <p>...</p>
+            </div>
             <div class="post-meta">
               <time :if={@post.published_at} datetime={@datetime_iso}>{@formatted_date}</time>
               <span class="post-read-time">~{@post.reading_time_minutes} min</span>
