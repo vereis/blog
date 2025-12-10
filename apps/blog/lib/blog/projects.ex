@@ -7,6 +7,7 @@ defmodule Blog.Projects do
   @spec list_projects(Keyword.t()) :: [Project.t()]
   def list_projects(filters \\ []) do
     filters
+    |> Keyword.put_new(:preload, :tags)
     |> Project.query()
     |> Repo.all()
   end
