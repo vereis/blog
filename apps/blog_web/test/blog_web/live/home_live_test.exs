@@ -144,8 +144,7 @@ defmodule BlogWeb.HomeLiveTest do
         |> render_click()
         |> follow_redirect(conn, ~p"/projects")
 
-      assert has_element?(projects_view, "h1", "Projects")
-      assert has_element?(projects_view, "p", "All projects will be listed here")
+      assert has_element?(projects_view, ".badge", "All Projects")
     end
   end
 
