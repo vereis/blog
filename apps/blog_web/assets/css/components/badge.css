@@ -1,0 +1,9 @@
+@layer components {
+  .badge {
+    background-color: var(--ansi-blue);
+    color: var(--ansi-yellow);
+    padding-inline: var(--space-1);
+    font-weight: var(--font-weight-bold);
+    display: inline-block;
+  }
+}

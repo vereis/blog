@@ -1,63 +1,62 @@
 @layer components {
   .bluescreen {
     background-color: #0000AA;
-    color: #FFFFFF;
+    color: var(--ansi-bright-white);
     font-family: var(--font-family-mono);
-    font-weight: var(--font-weight-bold);
-    padding: var(--space-4);
-    min-height: 50vh;
+    padding-block: var(--space-line);
+    padding-inline: var(--space-4);
   }
 
   .bluescreen a {
-    color: var(--color-link);
-    text-decoration: underline;
+    color: var(--ansi-bright-white);
   }
 
   .bluescreen a:hover {
-    color: var(--color-link-hover);
+    color: var(--ansi-bright-white);
   }
 
-  .bluescreen-badge {
-    background-color: var(--ansi-blue);
-    color: var(--ansi-yellow);
-    padding-inline: var(--space-1);
-    font-weight: var(--font-weight-bold);
-    display: inline-block;
-    margin-block-end: var(--space-4);
+  .bluescreen-header {
+    text-align: center;
+    margin-block-end: var(--space-line);
   }
 
-  .bluescreen-content {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-line);
+  .bluescreen .bluescreen-badge {
+    background-color: var(--ansi-yellow);
+    color: var(--ansi-blue);
   }
 
-  .bluescreen-message {
-    white-space: pre-wrap;
-  }
-
-  .bluescreen-error-code {
-    margin-block-start: var(--space-2);
+  .bluescreen-content p {
+    margin-block-end: var(--space-line);
   }
 
   .bluescreen-prompt {
     text-align: center;
-    margin-block-start: var(--space-4);
+    margin-block-start: var(--space-line);
   }
 
   .bluescreen-cursor {
     display: inline-block;
-    background-color: #FFFFFF;
+    background-color: var(--ansi-bright-white);
     width: 1ch;
     animation: blink 1s step-end infinite;
   }
 
-  @keyframes blink {
-    0%, 50% {
+  @media (prefers-reduced-motion: reduce) {
+    .bluescreen-cursor {
+      animation: none;
       opacity: 1;
     }
-    51%, 100% {
-      opacity: 0;
-    }
+  }
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  51%,
+  100% {
+    opacity: 0;
   }
 }

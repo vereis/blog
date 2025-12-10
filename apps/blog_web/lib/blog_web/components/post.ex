@@ -5,6 +5,7 @@ defmodule BlogWeb.Components.Post do
   use Phoenix.Component
 
   alias Blog.Posts.Post
+  alias BlogWeb.Components.Badge
   alias BlogWeb.Components.Tag
 
   @doc """
@@ -20,7 +21,7 @@ defmodule BlogWeb.Components.Post do
     <article class="post">
       <header>
         <hgroup class="post-title">
-          <h1 id={@post.slug}>{@post.title}</h1>
+          <Badge.badge id={@post.slug}>{@post.title}</Badge.badge>
           <Tag.list tags={@post.tags} />
         </hgroup>
         <time class="post-published" datetime={DateTime.to_iso8601(@post.published_at)}>

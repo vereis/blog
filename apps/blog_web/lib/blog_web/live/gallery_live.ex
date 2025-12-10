@@ -2,6 +2,7 @@ defmodule BlogWeb.GalleryLive do
   @moduledoc false
   use BlogWeb, :live_view
 
+  alias BlogWeb.Components.Bluescreen
   alias BlogWeb.Components.Gallery
   alias BlogWeb.Components.Post
 
@@ -48,20 +49,6 @@ defmodule BlogWeb.GalleryLive do
         </.flash>
       </Gallery.item>
 
-      <Gallery.item title="State Messages" description="Contextual state indicators with icons">
-        <.state_message kind={:info}>
-          <span>This is an informational state message.</span>
-        </.state_message>
-
-        <.state_message kind={:error}>
-          <span>This is an error state message.</span>
-        </.state_message>
-
-        <.state_message kind={:loading}>
-          <span>This is a loading state message.</span>
-        </.state_message>
-      </Gallery.item>
-
       <Gallery.item title="Navigation" description="Site navigation component">
         <.navbar />
       </Gallery.item>
@@ -74,15 +61,7 @@ defmodule BlogWeb.GalleryLive do
       </Gallery.item>
 
       <Gallery.item title="Bluescreen" description="Windows 95-style error screen">
-        <.bluescreen error={nil}>
-          An error has occurred. To continue:
-
-          Press Enter to return to Windows, or
-
-          Press CTRL+ALT+DEL to restart your computer.
-
-          Error: Example error message
-        </.bluescreen>
+        <Bluescreen.bluescreen error={nil} href="/gallery" />
       </Gallery.item>
     </Layouts.app>
     """
