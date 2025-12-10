@@ -187,7 +187,7 @@ defmodule BlogWeb.PostsLiveTest do
         |> follow_redirect(conn, ~p"/projects")
 
       assert projects_view.module == BlogWeb.ProjectsLive
-      assert has_element?(projects_view, "h1", "Projects")
+      assert has_element?(projects_view, ".badge", "All Projects")
     end
   end
 
