@@ -26,7 +26,6 @@ defmodule BlogWeb.Router do
       live "/posts", PostsLive, :index
       live "/posts/:slug", PostsLive, :show
       live "/projects", ProjectsLive, :index
-      live "/projects/:slug", ProjectsLive, :show
       live "/gallery", GalleryLive, :index
     end
 
