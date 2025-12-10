@@ -13,19 +13,17 @@ defmodule BlogWeb.HomeLive do
       Phoenix.PubSub.subscribe(Blog.PubSub, "post:reload")
     end
 
-    post = load_post(params)
+    if params["_debug"] == "slow" do
+      Process.sleep(5000)
+    end
 
-    {:ok, assign(socket, :post, post)}
+    {:ok,
+     assign(
+       socket,
+       :post,
+       (params["_debug"] != "empty" && Blog.Posts.get_post(slug: @slug)) || nil
+     )}
   end
-
-  defp load_post(%{"_debug" => "empty"}), do: nil
-
-  defp load_post(%{"_debug" => "slow"}) do
-    Process.sleep(5000)
-    Blog.Posts.get_post(slug: @slug)
-  end
-
-  defp load_post(_params), do: Blog.Posts.get_post(slug: @slug)
 
   @impl Phoenix.LiveView
   def handle_info({:resource_reload, Blog.Posts.Post, changed_id}, socket) do

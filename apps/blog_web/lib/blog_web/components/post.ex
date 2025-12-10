@@ -25,7 +25,11 @@ defmodule BlogWeb.Components.Post do
           <Badge.badge id={@post.slug}>{@post.title}</Badge.badge>
           <Tag.list tags={@post.tags} />
         </hgroup>
-        <time class="post-published" datetime={DateTime.to_iso8601(@post.published_at)}>
+        <time
+          :if={@post.published_at}
+          class="post-published"
+          datetime={DateTime.to_iso8601(@post.published_at)}
+        >
           {Calendar.strftime(@post.published_at, "%B %d, %Y")}
         </time>
         <p class="post-read-time">
@@ -66,20 +70,19 @@ defmodule BlogWeb.Components.Post do
       # With LiveView streams:
       def mount(_params, _session, socket) do
         posts = Blog.Posts.list_posts()
-        
-        socket = 
+
+        socket =
           socket
           |> assign(:posts_empty, posts == [])
           |> stream(:posts, Enum.with_index(posts, 1))
-        
+
         {:ok, socket}
       end
-      
+
       <Post.list posts={@streams.posts} empty={@posts_empty} id="posts-stream" />
   """
   attr :posts, :any, default: [], doc: "List of Post structs or LiveView stream"
   attr :loading, :boolean, default: false
-  attr :empty, :boolean, default: false
   attr :id, :string, default: "posts"
   attr :title, :string, default: "All Posts"
   attr :rest, :global, doc: "Additional HTML attributes to add to the list element"
@@ -88,30 +91,43 @@ defmodule BlogWeb.Components.Post do
     ~H"""
     <section>
       <Badge.badge id={"#{@id}-title"}>{@title}</Badge.badge>
-      <ol
-        id={@id}
-        class={["posts-list", @loading && "posts-loading"]}
-        phx-update={if @loading or @empty, do: nil, else: phx_update(@posts)}
-        aria-busy={if @loading, do: "true", else: nil}
-        {@rest}
-      >
-        <%= if @loading do %>
-          <.skeleton :for={_ <- 1..5} />
-        <% else %>
-          <%= if @empty do %>
+      <%= cond do %>
+        <% @loading -> %>
+          <p id={"#{@id}-loading-text"} phx-hook=".ScrambleCount"><span data-count>0</span> items</p>
+          <ol id={"#{@id}-loading"} class={["posts-list", "posts-loading"]} aria-busy="true" {@rest}>
+            <.skeleton :for={_ <- 1..5} />
+          </ol>
+          <script :type={Phoenix.LiveView.ColocatedHook} name=".ScrambleCount">
+            export default {
+              mounted() {
+                const span = this.el.querySelector('[data-count]');
+                this.interval = setInterval(() => {
+                  span.textContent = Math.floor(Math.random() * 10);
+                }, 50);
+              },
+              destroyed() {
+                clearInterval(this.interval);
+              }
+            }
+          </script>
+        <% match?(%LiveStream{inserts: []}, @posts) or @posts == [] -> %>
+          <p>No items</p>
+          <ol id={"#{@id}-empty"} class="posts-list" {@rest}>
             <li class="posts-list-empty">
               No posts yet. Check back soon!
             </li>
-          <% else %>
+          </ol>
+        <% true -> %>
+          <p>{Enum.count(@posts)} items</p>
+          <ol id={@id} class="posts-list" phx-update={phx_update(@posts)} {@rest}>
             <.item
               :for={{dom_id, {post, index}} <- normalize_posts(@posts)}
               id={dom_id}
               post={post}
               index={index}
             />
-          <% end %>
-        <% end %>
-      </ol>
+          </ol>
+      <% end %>
     </section>
     """
   end
@@ -133,6 +149,20 @@ defmodule BlogWeb.Components.Post do
   end
 
   defp item(assigns) do
+    published_at = assigns.post.published_at
+
+    {formatted_date, datetime_iso} =
+      if published_at do
+        {Calendar.strftime(published_at, "%b %d, %Y"), DateTime.to_iso8601(published_at)}
+      else
+        {nil, nil}
+      end
+
+    assigns =
+      assigns
+      |> assign(:formatted_date, formatted_date)
+      |> assign(:datetime_iso, datetime_iso)
+
     ~H"""
     <li id={@id} class="post-item">
       <article>
@@ -145,12 +175,8 @@ defmodule BlogWeb.Components.Post do
               </.link>
             </h2>
             <div class="post-meta">
-              <time datetime={DateTime.to_iso8601(@post.published_at)}>
-                {Calendar.strftime(@post.published_at, "%b %d, %Y")}
-              </time>
-              <span class="post-meta-sep">|</span>
+              <time :if={@post.published_at} datetime={@datetime_iso}>{@formatted_date}</time>
               <span class="post-read-time">~{@post.reading_time_minutes} min</span>
-              <span :if={@post.tags != []} class="post-meta-sep">|</span>
               <Tag.list :if={@post.tags != []} tags={@post.tags} />
             </div>
           </div>
@@ -170,9 +196,7 @@ defmodule BlogWeb.Components.Post do
   defp normalize_posts(posts) when is_list(posts) do
     posts
     |> Enum.with_index(1)
-    |> Enum.map(fn {post, index} ->
-      {"post-#{post.id}", {post, index}}
-    end)
+    |> Enum.map(fn {post, index} -> {"post-#{post.id}", {post, index}} end)
   end
 
   defp reading_time_text(0), do: "Less than 1 minute read"

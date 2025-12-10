@@ -68,7 +68,7 @@ defmodule BlogWeb.ProjectsLiveTest do
         |> render_click()
         |> follow_redirect(conn, ~p"/posts")
 
-      assert has_element?(posts_view, "h1", "Posts")
+      assert has_element?(posts_view, ".badge", "All Posts")
     end
   end
 
