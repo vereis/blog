@@ -2,7 +2,7 @@
   .bluescreen {
     background-color: #0000AA;
     color: var(--ansi-bright-white);
-    font-family: var(--font-family-mono);
+    font-family: var(--font-mono);
     padding-block: var(--space-line);
     padding-inline: var(--space-4);
   }
