@@ -1,0 +1,83 @@
+projects:
+  - name: "Neovim Config"
+    url: "https://github.com/vereis/nix-config/tree/master/modules/home/neovim/lua"
+    description: "Personal Neovim configuration based on Lazy, with LSP support, Treesitter, and custom Lua plugins."
+    tags:
+      - "neovim"
+      - "lua"
+
+  - name: "Nix Config"
+    url: "https://github.com/vereis/nix-config"
+    description: "Personal Nix configuration utilizing flakes and building regularly for Windows (WSL), Linux, and MacOS."
+    tags:
+      - "nix"
+      - "nixos"
+
+  - name: "Toggle"
+    url: "https://github.com/vereis/toggle"
+    description: "Minimalistic and stupid-simple Feature Flagging Library for Elixir, with cache support and hooking capabilities."
+    tags:
+      - "elixir"
+      - "ecto"
+
+  - name: "Cinema"
+    url: "https://github.com/vereis/cinema"
+    description: "Framework for defining Incremental Materialized Views in raw Elixir and Ecto, with support for recursive/dependant views."
+    tags:
+      - "elixir"
+
+  - name: "Sibyl"
+    url: "https://github.com/vetspire/sibyl"
+    description: "Zero runtime cost telemetry and distributed tracing with custom plugins, library support, leveraging standard telemetry events."
+    tags:
+      - "elixir"
+      - "telemetry"
+
+  - name: "Endo"
+    url: "https://github.com/vetspire/endo"
+    description: "Database reflection tool with fluent, composable API for Postgres and SQLite."
+    tags:
+      - "elixir"
+      - "ecto"
+
+  - name: "Ecto Middleware"
+    url: "https://github.com/vereis/ecto_middleware"
+    description: "Generic middleware implementation for Ecto, allowing for easy customization and extension of Ecto's standard Repo interface."
+    tags:
+      - "elixir"
+      - "ecto"
+
+  - name: "Ecto Hooks"
+    url: "https://github.com/vereis/ecto_hooks"
+    description: "Library which extends Ecto Schemas with the ability to automatically execute before or after hooks on Repo callbacks."
+    tags:
+      - "elixir"
+      - "ecto"
+
+  - name: "Ecto Model"
+    url: "https://github.com/vetspire/ecto_model"
+    description: "Collection of various Ecto extensions and utilities to make working with Ecto more enjoyable, including a query building abstraction and hooks."
+    tags:
+      - "elixir"
+      - "ecto"
+
+  - name: "Monarch"
+    url: "https://hexdocs.pm/monarch/Monarch.html"
+    description: "A simple Oban powered framework for defining and running long running, large data backfill tasks asynchronously across your cluster."
+    tags:
+      - "elixir"
+      - "migrations"
+
+  - name: "Jarlang"
+    url: "https://github.com/vereis/jarlang"
+    description: "(Archived) Erlang to ES5 compiler, written in Erlang and absolutely, definitely not suitable for production use."
+    tags:
+      - "erlang"
+      - "compiler"
+
+  - name: "Blog"
+    url: "https://github.com/vereis/blog"
+    description: "My personal blog and playground for Phoenix LiveView and other technologies."
+    tags:
+      - "elixir"
+      - "liveview"
