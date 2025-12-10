@@ -5,17 +5,20 @@ defmodule BlogWeb.GalleryLive do
   alias BlogWeb.Components.Bluescreen
   alias BlogWeb.Components.Gallery
   alias BlogWeb.Components.Post
+  alias BlogWeb.Components.Project
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     test_post = Blog.Posts.get_post(slug: "test")
     posts = Blog.Posts.list_posts(order_by: [desc: :published_at])
+    projects = Blog.Projects.list_projects(order_by: [desc: :inserted_at])
 
     socket =
       socket
       |> assign(:test_post, test_post)
       |> assign(:posts, posts)
       |> assign(:empty_posts, [])
+      |> assign(:projects, projects)
 
     {:ok, socket}
   end
@@ -85,6 +88,24 @@ defmodule BlogWeb.GalleryLive do
 
       <Gallery.item title="Post List - Empty State" description="Empty state when no posts exist">
         <Post.list posts={[]} />
+      </Gallery.item>
+
+      <Gallery.item
+        title="Project List - Loading State"
+        description="Loading state with skeleton placeholders"
+      >
+        <Project.list projects={[]} loading={true} />
+      </Gallery.item>
+
+      <Gallery.item title="Project List - With Projects" description="Multiple projects in list view">
+        <Project.list projects={@projects} />
+      </Gallery.item>
+
+      <Gallery.item
+        title="Project List - Empty State"
+        description="Empty state when no projects exist"
+      >
+        <Project.list projects={[]} />
       </Gallery.item>
     </Layouts.app>
     """
