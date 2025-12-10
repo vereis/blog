@@ -15,4 +15,135 @@
   .post-read-time {
     color: var(--color-fg-secondary);
   }
+
+  .posts-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .post-item {
+    padding-block: var(--space-line);
+    border-block-end: 1px solid var(--color-bg-secondary);
+    margin-block-end: -1px;
+
+    &:last-child {
+      border-block-end: none;
+      margin-block-end: 0;
+    }
+
+    & .post-header {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-1);
+    }
+
+    & .post-index {
+      color: var(--color-fg-secondary);
+      flex-shrink: 0;
+    }
+
+    & .post-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      flex: 1;
+    }
+
+    & h2 {
+      margin: 0;
+      font-size: inherit;
+      font-weight: var(--font-weight-normal);
+
+      &::before {
+        content: none;
+      }
+    }
+
+    & .tags {
+      margin: 0;
+    }
+
+    & .post-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      color: var(--color-fg-secondary);
+
+      & .post-meta-sep {
+        color: var(--color-fg-dim);
+      }
+    }
+  }
+
+  .post-skeleton {
+    padding-block: var(--space-line);
+    border-block-end: 1px solid var(--color-bg-secondary);
+    margin-block-end: -1px;
+
+    &:last-child {
+      border-block-end: none;
+      margin-block-end: 0;
+    }
+
+    & .post-header {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-1);
+    }
+
+    & .post-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      flex: 1;
+    }
+
+    & .skeleton-text {
+      display: block;
+      min-block-size: 1lh;
+      background: linear-gradient(
+        90deg,
+        #303030 0%,
+        #404040 50%,
+        #303030 100%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.5s ease-in-out infinite;
+
+      &.skeleton-index {
+        inline-size: 3ch;
+        flex-shrink: 0;
+      }
+
+      &.skeleton-title {
+        inline-size: 40ch;
+        max-inline-size: 90%;
+      }
+
+      &.skeleton-meta {
+        inline-size: 35ch;
+        max-inline-size: 80%;
+      }
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .posts-loading {
+    opacity: 0.6;
+  }
+
+  .posts-list-empty {
+    padding-block: var(--space-line);
+    text-align: center;
+    color: var(--color-fg-secondary);
+  }
 }

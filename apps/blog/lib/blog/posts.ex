@@ -7,6 +7,7 @@ defmodule Blog.Posts do
   @spec list_posts(Keyword.t()) :: [Post.t()]
   def list_posts(filters \\ []) do
     filters
+    |> Keyword.put_new(:preload, :tags)
     |> Post.query()
     |> Repo.all()
   end
