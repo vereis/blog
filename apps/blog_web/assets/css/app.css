@@ -15,6 +15,7 @@
 @import "components/bluescreen.css" layer(components);
 @import "components/gallery.css" layer(components);
 @import "components/post.css" layer(components);
+@import "components/project.css" layer(components);
 @import "components/tag.css" layer(components);
 
 /* Utilities (always win over components) */
