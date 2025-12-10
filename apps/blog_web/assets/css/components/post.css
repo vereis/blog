@@ -66,6 +66,12 @@
       }
     }
 
+    & .post-excerpt {
+      margin: 0;
+      margin-block-start: var(--space-line);
+      color: var(--color-fg-secondary);
+    }
+
     & .tags {
       margin: 0;
     }
@@ -130,9 +136,16 @@
         max-inline-size: 90%;
       }
 
+      &.skeleton-excerpt {
+        inline-size: 50ch;
+        max-inline-size: 90%;
+        margin-block-start: var(--space-line);
+      }
+
       &.skeleton-meta {
         inline-size: 35ch;
         max-inline-size: 80%;
+        margin-block-start: var(--space-line);
       }
     }
   }
