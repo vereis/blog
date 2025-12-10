@@ -1,0 +1,63 @@
+@layer components {
+  .bluescreen {
+    background-color: #0000AA;
+    color: #FFFFFF;
+    font-family: var(--font-family-mono);
+    font-weight: var(--font-weight-bold);
+    padding: var(--space-4);
+    min-height: 50vh;
+  }
+
+  .bluescreen a {
+    color: var(--color-link);
+    text-decoration: underline;
+  }
+
+  .bluescreen a:hover {
+    color: var(--color-link-hover);
+  }
+
+  .bluescreen-badge {
+    background-color: var(--ansi-blue);
+    color: var(--ansi-yellow);
+    padding-inline: var(--space-1);
+    font-weight: var(--font-weight-bold);
+    display: inline-block;
+    margin-block-end: var(--space-4);
+  }
+
+  .bluescreen-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-line);
+  }
+
+  .bluescreen-message {
+    white-space: pre-wrap;
+  }
+
+  .bluescreen-error-code {
+    margin-block-start: var(--space-2);
+  }
+
+  .bluescreen-prompt {
+    text-align: center;
+    margin-block-start: var(--space-4);
+  }
+
+  .bluescreen-cursor {
+    display: inline-block;
+    background-color: #FFFFFF;
+    width: 1ch;
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 50% {
+      opacity: 1;
+    }
+    51%, 100% {
+      opacity: 0;
+    }
+  }
+}

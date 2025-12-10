@@ -11,33 +11,30 @@ defmodule BlogWeb.HomeLiveTest do
       insert(:post, slug: "hello-world", title: "Hello, world!")
 
       {:ok, view, _html} = live(conn, ~p"/")
-      html = render_async(view)
 
-      assert html =~ "Hello, world!"
       assert has_element?(view, "article.post")
       assert has_element?(view, "h1#hello-world", "Hello, world!")
     end
 
     test "displays empty state when no about post exists", %{conn: conn} do
       {:ok, view, _html} = live(conn, ~p"/")
-      render_async(view)
 
-      assert has_element?(view, ".empty")
-      assert has_element?(view, ".empty span", "No content available yet")
+      assert has_element?(view, ".bluescreen")
+      assert has_element?(view, ".bluescreen-badge", "Unexpected Error")
+      assert has_element?(view, ".bluescreen-error-code")
     end
 
     test "subscribes to post reload events and updates when post changes", %{conn: conn} do
       post = insert(:post, slug: "hello-world", title: "Original Title")
 
       {:ok, view, _html} = live(conn, ~p"/")
-      render_async(view)
 
       assert has_element?(view, "h1#hello-world", "Original Title")
 
       {:ok, updated_post} = Blog.Posts.update_post(post, %{title: "Updated Title"})
       Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:resource_reload, Post, updated_post.id})
 
-      render_async(view)
+      _ = :sys.get_state(view.pid)
 
       assert has_element?(view, "h1#hello-world", "Updated Title")
     end
@@ -47,14 +44,43 @@ defmodule BlogWeb.HomeLiveTest do
       other_post = insert(:post, slug: "other-post", title: "Other Post")
 
       {:ok, view, _html} = live(conn, ~p"/")
-      render_async(view)
 
       assert has_element?(view, "h1#hello-world", "Hello World")
 
       {:ok, updated_other} = Blog.Posts.update_post(other_post, %{title: "Updated Other"})
       Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:resource_reload, Post, updated_other.id})
 
+      _ = :sys.get_state(view.pid)
+
       assert has_element?(view, "h1#hello-world", "Hello World")
+    end
+
+    test "loads post when it gets created after initial mount", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/")
+
+      assert has_element?(view, ".bluescreen")
+
+      post = insert(:post, slug: "hello-world", title: "Newly Created")
+      Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:resource_reload, Post, post.id})
+
+      _ = :sys.get_state(view.pid)
+
+      assert has_element?(view, "h1#hello-world", "Newly Created")
+      refute has_element?(view, ".bluescreen")
+    end
+
+    test "empty state remains when a different post is created", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/")
+
+      assert has_element?(view, ".bluescreen")
+
+      other_post = insert(:post, slug: "other-post", title: "Different Post")
+      Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:resource_reload, Post, other_post.id})
+
+      _ = :sys.get_state(view.pid)
+
+      assert has_element?(view, ".bluescreen")
+      refute has_element?(view, "article.post")
     end
 
     test "renders navbar with navigation links", %{conn: conn} do
@@ -121,6 +147,28 @@ defmodule BlogWeb.HomeLiveTest do
 
       assert has_element?(projects_view, "h1", "Projects")
       assert has_element?(projects_view, "p", "All projects will be listed here")
+    end
+  end
+
+  describe "debug params" do
+    test "forces empty state with ?_debug=empty", %{conn: conn} do
+      insert(:post, slug: "hello-world", title: "Hello World")
+
+      {:ok, view, _html} = live(conn, ~p"/?_debug=empty")
+
+      assert has_element?(view, ".bluescreen")
+      refute has_element?(view, "article.post")
+    end
+
+    test "adds 5 second delay with ?_debug=slow", %{conn: conn} do
+      insert(:post, slug: "hello-world", title: "Hello World")
+
+      start_time = System.monotonic_time(:millisecond)
+      {:ok, view, _html} = live(conn, ~p"/?_debug=slow")
+      elapsed = System.monotonic_time(:millisecond) - start_time
+
+      assert elapsed >= 5000
+      assert has_element?(view, "h1#hello-world", "Hello World")
     end
   end
 end
