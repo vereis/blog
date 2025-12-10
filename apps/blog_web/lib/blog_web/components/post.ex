@@ -52,34 +52,18 @@ defmodule BlogWeb.Components.Post do
 
     * `posts` - List of Post structs to display
     * `loading` - Boolean indicating if posts are being loaded (default: false)
-    * `empty` - Boolean indicating if the list is empty (default: false)
     * `id` - DOM ID for the list (default: "posts")
     * `title` - Optional title to display above the list (default: "All Posts")
 
   ## Examples
 
-      # In your LiveView mount:
       def mount(_params, _session, socket) do
         posts = Blog.Posts.list_posts()
-        {:ok, assign(socket, posts: posts, loading: false, posts_empty: posts == [])}
+        {:ok, assign(socket, posts: posts, loading: false)}
       end
 
       # In your template with regular assigns:
-      <Post.list posts={@posts} loading={@loading} empty={@posts_empty} />
-
-      # With LiveView streams:
-      def mount(_params, _session, socket) do
-        posts = Blog.Posts.list_posts()
-
-        socket =
-          socket
-          |> assign(:posts_empty, posts == [])
-          |> stream(:posts, Enum.with_index(posts, 1))
-
-        {:ok, socket}
-      end
-
-      <Post.list posts={@streams.posts} empty={@posts_empty} id="posts-stream" />
+      <Post.list posts={@streams.posts} id="posts-stream" />
   """
   attr :posts, :any, default: [], doc: "List of Post structs or LiveView stream"
   attr :loading, :boolean, default: false
