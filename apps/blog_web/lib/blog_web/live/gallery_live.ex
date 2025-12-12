@@ -6,6 +6,7 @@ defmodule BlogWeb.GalleryLive do
   alias BlogWeb.Components.Gallery
   alias BlogWeb.Components.Post
   alias BlogWeb.Components.Project
+  alias BlogWeb.Components.Tag
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
@@ -62,6 +63,46 @@ defmodule BlogWeb.GalleryLive do
 
       <Gallery.item title="Navigation" description="Site navigation component">
         <.navbar />
+      </Gallery.item>
+
+      <Gallery.item title="Tags" description="Tag components with normal and active states">
+        <div style="display: flex; flex-direction: column; gap: var(--space-line);">
+          <div>
+            <p style="margin-block-end: var(--space-1); color: var(--color-fg-secondary);">
+              Normal tags (clickable, hover to see effect):
+            </p>
+            <nav class="tags" aria-label="Tags">
+              <Tag.single tag="elixir" href="#" />
+              <Tag.single tag="phoenix" href="#" />
+              <Tag.single tag="liveview" href="#" />
+              <Tag.single tag="webdev" href="#" />
+            </nav>
+          </div>
+
+          <div>
+            <p style="margin-block-end: var(--space-1); color: var(--color-fg-secondary);">
+              Active/selected tags (with .tag-active class):
+            </p>
+            <nav class="tags" aria-label="Tags">
+              <Tag.single tag="elixir" href="#" class="tag-active" />
+              <Tag.single tag="phoenix" href="#" class="tag-active" />
+              <Tag.single tag="liveview" href="#" />
+              <Tag.single tag="webdev" href="#" />
+            </nav>
+          </div>
+
+          <div>
+            <p style="margin-block-end: var(--space-1); color: var(--color-fg-secondary);">
+              Tag filter bar (active filters with clear buttons):
+            </p>
+            <nav class="tag-filter" aria-label="Active filters">
+              <span class="tag-filter-label">Filtering by:</span>
+              <Tag.single tag="elixir" href="#" class="tag-active" />
+              <Tag.single tag="phoenix" href="#" class="tag-active" />
+              <.link href="#" class="tag-filter-clear">Clear all</.link>
+            </nav>
+          </div>
+        </div>
       </Gallery.item>
 
       <Gallery.item title="Post Component" description="Full post rendering with metadata">
