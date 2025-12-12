@@ -45,7 +45,7 @@ defmodule BlogWeb.Components.Tag do
   def single(assigns) do
     ~H"""
     <.link href={@href} class={["tag", @class]}>
-      {"#{tag_label(@tag)}"}
+      {tag_label(@tag)}
     </.link>
     """
   end

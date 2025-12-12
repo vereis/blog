@@ -14,9 +14,24 @@
       margin-inline-end: -1ch;
     }
 
+    &.tag-active,
     &:hover {
       background-color: var(--color-accent);
       color: var(--color-bg-primary);
+      padding: 0 var(--space-1);
     }
+  }
+
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1);
+    margin-block-end: var(--space-line);
+  }
+
+  .tag-filter-label {
+    color: var(--color-fg-secondary);
+    margin-inline-end: var(--space-1);
   }
 }
