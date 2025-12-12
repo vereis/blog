@@ -76,6 +76,38 @@ defmodule Blog.PostsTest do
       assert length(ecto_posts) == 1
       assert hd(ecto_posts).id == post3.id
     end
+
+    test "returns all posts when tags filter is empty list" do
+      elixir_tag = insert(:tag, label: "elixir")
+      phoenix_tag = insert(:tag, label: "phoenix")
+
+      post1 = insert(:post, slug: "elixir-post", tags: [elixir_tag])
+      post2 = insert(:post, slug: "phoenix-post", tags: [phoenix_tag])
+      post3 = insert(:post, slug: "no-tags-post", tags: [])
+
+      posts = Posts.list_posts(tags: [])
+
+      assert length(posts) == 3
+      assert Enum.any?(posts, &(&1.id == post1.id))
+      assert Enum.any?(posts, &(&1.id == post2.id))
+      assert Enum.any?(posts, &(&1.id == post3.id))
+    end
+
+    test "returns all posts when tags filter is nil" do
+      elixir_tag = insert(:tag, label: "elixir")
+      phoenix_tag = insert(:tag, label: "phoenix")
+
+      post1 = insert(:post, slug: "elixir-post", tags: [elixir_tag])
+      post2 = insert(:post, slug: "phoenix-post", tags: [phoenix_tag])
+      post3 = insert(:post, slug: "no-tags-post", tags: [])
+
+      posts = Posts.list_posts(tags: nil)
+
+      assert length(posts) == 3
+      assert Enum.any?(posts, &(&1.id == post1.id))
+      assert Enum.any?(posts, &(&1.id == post2.id))
+      assert Enum.any?(posts, &(&1.id == post3.id))
+    end
   end
 
   describe "get_post/1" do

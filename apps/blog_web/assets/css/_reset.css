@@ -130,6 +130,16 @@ table {
 	border-spacing: 0;
 }
 
+fieldset {
+	margin-inline-start: 0;
+	margin-inline-end: 0;
+	min-inline-size: 0;
+}
+
+legend {
+	float: none;
+}
+
 *,
 *::before,
 *::after {

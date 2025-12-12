@@ -62,6 +62,38 @@ defmodule Blog.ProjectsTest do
       assert length(rust_projects) == 1
       assert hd(rust_projects).id == project3.id
     end
+
+    test "returns all projects when tags filter is empty list" do
+      elixir_tag = insert(:tag, label: "elixir")
+      rust_tag = insert(:tag, label: "rust")
+
+      project1 = insert(:project, name: "Elixir Project", tags: [elixir_tag])
+      project2 = insert(:project, name: "Rust Project", tags: [rust_tag])
+      project3 = insert(:project, name: "No Tags Project", tags: [])
+
+      projects = Projects.list_projects(tags: [])
+
+      assert length(projects) == 3
+      assert Enum.any?(projects, &(&1.id == project1.id))
+      assert Enum.any?(projects, &(&1.id == project2.id))
+      assert Enum.any?(projects, &(&1.id == project3.id))
+    end
+
+    test "returns all projects when tags filter is nil" do
+      elixir_tag = insert(:tag, label: "elixir")
+      rust_tag = insert(:tag, label: "rust")
+
+      project1 = insert(:project, name: "Elixir Project", tags: [elixir_tag])
+      project2 = insert(:project, name: "Rust Project", tags: [rust_tag])
+      project3 = insert(:project, name: "No Tags Project", tags: [])
+
+      projects = Projects.list_projects(tags: nil)
+
+      assert length(projects) == 3
+      assert Enum.any?(projects, &(&1.id == project1.id))
+      assert Enum.any?(projects, &(&1.id == project2.id))
+      assert Enum.any?(projects, &(&1.id == project3.id))
+    end
   end
 
   describe "get_project/1" do

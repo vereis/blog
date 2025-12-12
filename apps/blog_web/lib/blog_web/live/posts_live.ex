@@ -4,6 +4,7 @@ defmodule BlogWeb.PostsLive do
 
   alias BlogWeb.Components.Bluescreen
   alias BlogWeb.Components.Post
+  alias BlogWeb.Components.Tag
 
   @impl Phoenix.LiveView
   def mount(params, _session, socket) do
@@ -25,7 +26,18 @@ defmodule BlogWeb.PostsLive do
 
   @impl Phoenix.LiveView
   def handle_params(params, _uri, socket) do
-    socket = assign(socket, :debug_params, Map.take(params, ["_debug"]))
+    selected_tags = Tag.labels_from_params(params)
+    tags_changed? = Map.get(socket.assigns, :selected_tags) != selected_tags
+
+    socket =
+      socket
+      |> assign(:debug_params, Map.take(params, ["_debug"]))
+      |> assign(:selected_tags, selected_tags)
+
+    if tags_changed? and socket.assigns.live_action == :index do
+      send(self(), :load_posts)
+    end
+
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
@@ -37,7 +49,7 @@ defmodule BlogWeb.PostsLive do
 
     socket =
       if socket.assigns.live_action == :index and socket.assigns.debug_params["_debug"] != "empty" do
-        posts = Blog.Posts.list_posts(order_by: [desc: :published_at])
+        posts = Blog.Posts.list_posts(tags: socket.assigns[:selected_tags], order_by: [desc: :published_at])
         stream(socket, :posts, Enum.with_index(posts, 1), reset: true)
       else
         socket
@@ -69,7 +81,12 @@ defmodule BlogWeb.PostsLive do
     <Layouts.app flash={@flash}>
       <%= cond do %>
         <% @live_action == :index -> %>
-          <Post.list posts={@streams.posts} loading={@loading} id="posts" />
+          <Post.list
+            posts={@streams.posts}
+            loading={@loading}
+            id="posts"
+            selected_tags={@selected_tags}
+          />
         <% @live_action == :show and is_struct(@post) -> %>
           <Post.full post={@post} />
         <% true -> %>

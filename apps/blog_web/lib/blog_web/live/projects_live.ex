@@ -3,6 +3,7 @@ defmodule BlogWeb.ProjectsLive do
   use BlogWeb, :live_view
 
   alias BlogWeb.Components.Project
+  alias BlogWeb.Components.Tag
 
   @impl Phoenix.LiveView
   def mount(params, _session, socket) do
@@ -24,7 +25,18 @@ defmodule BlogWeb.ProjectsLive do
 
   @impl Phoenix.LiveView
   def handle_params(params, _uri, socket) do
-    socket = assign(socket, :debug_params, Map.take(params, ["_debug"]))
+    selected_tags = Tag.labels_from_params(params)
+    tags_changed? = Map.get(socket.assigns, :selected_tags) != selected_tags
+
+    socket =
+      socket
+      |> assign(:debug_params, Map.take(params, ["_debug"]))
+      |> assign(:selected_tags, selected_tags)
+
+    if tags_changed? and socket.assigns.live_action == :index do
+      send(self(), :load_projects)
+    end
+
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
@@ -36,7 +48,7 @@ defmodule BlogWeb.ProjectsLive do
 
     socket =
       if socket.assigns.live_action == :index and socket.assigns.debug_params["_debug"] != "empty" do
-        projects = Blog.Projects.list_projects(order_by: [desc: :inserted_at])
+        projects = Blog.Projects.list_projects(tags: socket.assigns[:selected_tags], order_by: [desc: :inserted_at])
         stream(socket, :projects, Enum.with_index(projects, 1), reset: true)
       else
         socket
@@ -58,7 +70,12 @@ defmodule BlogWeb.ProjectsLive do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
-      <Project.list projects={@streams.projects} loading={@loading} id="projects" />
+      <Project.list
+        projects={@streams.projects}
+        loading={@loading}
+        id="projects"
+        selected_tags={@selected_tags}
+      />
     </Layouts.app>
     """
   end

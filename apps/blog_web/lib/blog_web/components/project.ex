@@ -8,6 +8,8 @@ defmodule BlogWeb.Components.Project do
   alias BlogWeb.Components.Tag
   alias Phoenix.LiveView.LiveStream
 
+  @base_url "/projects"
+
   @doc """
   Renders a list of projects with optional loading state.
 
@@ -49,9 +51,12 @@ defmodule BlogWeb.Components.Project do
   attr :loading, :boolean, default: false
   attr :id, :string, default: "projects"
   attr :title, :string, default: "All Projects"
+  attr :selected_tags, :list, default: []
   attr :rest, :global, doc: "Additional HTML attributes to add to the list element"
 
   def list(assigns) do
+    assigns = assign(assigns, :base_url, @base_url)
+
     ~H"""
     <section>
       <Badge.badge id={"#{@id}-title"}>{@title}</Badge.badge>
@@ -94,6 +99,8 @@ defmodule BlogWeb.Components.Project do
               id={dom_id}
               project={project}
               index={index}
+              base_url={@base_url}
+              selected_tags={@selected_tags}
             />
           </ol>
       <% end %>
@@ -152,7 +159,12 @@ defmodule BlogWeb.Components.Project do
             <p class="project-description">{@project.description}</p>
             <div class="project-meta">
               <time :if={@project.inserted_at} datetime={@datetime_iso}>{@formatted_date}</time>
-              <Tag.list :if={@project.tags != []} tags={@project.tags} />
+              <Tag.list
+                :if={@project.tags != []}
+                tags={@project.tags}
+                base_url={@base_url}
+                selected_tags={@selected_tags}
+              />
             </div>
           </div>
         </div>
