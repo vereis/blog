@@ -13,6 +13,7 @@ defmodule BlogWeb.GalleryLive do
     test_post = Blog.Posts.get_post(slug: "test")
     posts = Blog.Posts.list_posts(order_by: [desc: :published_at])
     projects = Blog.Projects.list_projects(order_by: [desc: :inserted_at])
+    all_tags = Blog.Tags.list_tags()
 
     socket =
       socket
@@ -20,8 +21,15 @@ defmodule BlogWeb.GalleryLive do
       |> assign(:posts, posts)
       |> assign(:empty_posts, [])
       |> assign(:projects, projects)
+      |> assign(:all_tags, all_tags)
 
     {:ok, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_params(params, _uri, socket) do
+    selected_tags = Tag.labels_from_params(params)
+    {:noreply, assign(socket, :selected_tags, selected_tags)}
   end
 
   @impl Phoenix.LiveView
@@ -65,44 +73,18 @@ defmodule BlogWeb.GalleryLive do
         <.navbar />
       </Gallery.item>
 
-      <Gallery.item title="Tags" description="Tag components with normal and active states">
-        <div style="display: flex; flex-direction: column; gap: var(--space-line);">
-          <div>
-            <p style="margin-block-end: var(--space-1); color: var(--color-fg-secondary);">
-              Normal tags (clickable, hover to see effect):
-            </p>
-            <nav class="tags" aria-label="Tags">
-              <Tag.single tag="elixir" href="#" />
-              <Tag.single tag="phoenix" href="#" />
-              <Tag.single tag="liveview" href="#" />
-              <Tag.single tag="webdev" href="#" />
-            </nav>
-          </div>
+      <Gallery.item
+        title="Tag Filter (Interactive)"
+        description="Tag filter component with multi-select - click tags to test!"
+      >
+        <Tag.filter tags={@all_tags} base_url="/gallery" selected_tags={@selected_tags} />
+      </Gallery.item>
 
-          <div>
-            <p style="margin-block-end: var(--space-1); color: var(--color-fg-secondary);">
-              Active/selected tags (with .tag-active class):
-            </p>
-            <nav class="tags" aria-label="Tags">
-              <Tag.single tag="elixir" href="#" class="tag-active" />
-              <Tag.single tag="phoenix" href="#" class="tag-active" />
-              <Tag.single tag="liveview" href="#" />
-              <Tag.single tag="webdev" href="#" />
-            </nav>
-          </div>
-
-          <div>
-            <p style="margin-block-end: var(--space-1); color: var(--color-fg-secondary);">
-              Tag filter bar (active filters with clear buttons):
-            </p>
-            <nav class="tag-filter" aria-label="Active filters">
-              <span class="tag-filter-label">Filtering by:</span>
-              <Tag.single tag="elixir" href="#" class="tag-active" />
-              <Tag.single tag="phoenix" href="#" class="tag-active" />
-              <.link href="#" class="tag-filter-clear">Clear all</.link>
-            </nav>
-          </div>
-        </div>
+      <Gallery.item
+        title="Tag Filter - Empty State"
+        description="Tag filter when no tags are available"
+      >
+        <Tag.filter tags={[]} base_url="/gallery" selected_tags={[]} />
       </Gallery.item>
 
       <Gallery.item title="Post Component" description="Full post rendering with metadata">

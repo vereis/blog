@@ -9,6 +9,8 @@ defmodule BlogWeb.Components.Post do
   alias BlogWeb.Components.Tag
   alias Phoenix.LiveView.LiveStream
 
+  @base_url "/posts"
+
   @doc """
   Renders a full blog post with metadata and content.
 
@@ -18,12 +20,14 @@ defmodule BlogWeb.Components.Post do
   attr :post, Post, required: true
 
   def full(assigns) do
+    assigns = assign(assigns, :base_url, @base_url)
+
     ~H"""
     <article class="post">
       <header>
         <hgroup class="post-title">
           <Badge.badge id={@post.slug}>{@post.title}</Badge.badge>
-          <Tag.list tags={@post.tags} />
+          <Tag.list tags={@post.tags} base_url={@base_url} selected_tags={[]} />
         </hgroup>
         <time
           :if={@post.published_at}
@@ -69,9 +73,12 @@ defmodule BlogWeb.Components.Post do
   attr :loading, :boolean, default: false
   attr :id, :string, default: "posts"
   attr :title, :string, default: "All Posts"
+  attr :selected_tags, :list, default: []
   attr :rest, :global, doc: "Additional HTML attributes to add to the list element"
 
   def list(assigns) do
+    assigns = assign(assigns, :base_url, @base_url)
+
     ~H"""
     <section>
       <Badge.badge id={"#{@id}-title"}>{@title}</Badge.badge>
@@ -109,6 +116,8 @@ defmodule BlogWeb.Components.Post do
               id={dom_id}
               post={post}
               index={index}
+              base_url={@base_url}
+              selected_tags={@selected_tags}
             />
           </ol>
       <% end %>
@@ -166,7 +175,12 @@ defmodule BlogWeb.Components.Post do
             <div class="post-meta">
               <time :if={@post.published_at} datetime={@datetime_iso}>{@formatted_date}</time>
               <span class="post-read-time">~{@post.reading_time_minutes} min</span>
-              <Tag.list :if={@post.tags != []} tags={@post.tags} />
+              <Tag.list
+                :if={@post.tags != []}
+                tags={@post.tags}
+                base_url={@base_url}
+                selected_tags={@selected_tags}
+              />
             </div>
           </div>
         </div>

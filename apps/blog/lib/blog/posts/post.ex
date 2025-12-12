@@ -57,6 +57,9 @@ defmodule Blog.Posts.Post do
   @impl EctoUtils.Queryable
   def query(base_query, filters) do
     Enum.reduce(filters, base_query, fn
+      {:tags, tags}, query when empty?(tags) ->
+        query
+
       {:tags, tags}, query ->
         from post in query,
           join: t in assoc(post, :tags),

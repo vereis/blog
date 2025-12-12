@@ -34,4 +34,10 @@
     color: var(--color-fg-secondary);
     margin-inline-end: var(--space-1);
   }
+
+  .tags-empty {
+    color: var(--color-fg-secondary);
+    font-style: italic;
+    margin: 0;
+  }
 }

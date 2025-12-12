@@ -7,6 +7,8 @@ defmodule Blog.Projects.Project do
     preprocess: &Blog.Tags.label_to_id/1,
     import: &Blog.Projects.upsert_project/1
 
+  import Blog.Utils.Guards
+
   @castable_fields [:name, :url, :description]
 
   schema "projects" do
@@ -34,6 +36,9 @@ defmodule Blog.Projects.Project do
   @impl EctoUtils.Queryable
   def query(base_query, filters) do
     Enum.reduce(filters, base_query, fn
+      {:tags, tags}, query when empty?(tags) ->
+        query
+
       {:tags, tags}, query ->
         from project in query,
           join: t in assoc(project, :tags),
