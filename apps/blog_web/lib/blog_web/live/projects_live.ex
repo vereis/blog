@@ -11,11 +11,9 @@ defmodule BlogWeb.ProjectsLive do
       Phoenix.PubSub.subscribe(Blog.PubSub, "project:reload")
     end
 
-    all_tags = Blog.Tags.list_tags()
-
     socket =
       socket
-      |> assign(:all_tags, all_tags)
+      |> assign(:all_tags, Blog.Tags.list_tags(having: :projects))
       |> assign(:projects, [])
 
     {:ok, socket}
