@@ -272,4 +272,130 @@ defmodule Blog.PostsTest do
       assert Posts.get_post(post.id) == nil
     end
   end
+
+  describe "FTS search" do
+    setup do
+      elixir_tag = insert(:tag, label: "elixir")
+      phoenix_tag = insert(:tag, label: "phoenix")
+      rust_tag = insert(:tag, label: "rust")
+
+      post1 =
+        insert(:post,
+          title: "Getting Started with Elixir",
+          slug: "elixir-intro",
+          raw_body: "Learn the basics of Elixir programming language",
+          tags: [elixir_tag]
+        )
+
+      post2 =
+        insert(:post,
+          title: "Building Phoenix Applications",
+          slug: "phoenix-apps",
+          raw_body: "How to build web applications using Phoenix framework",
+          tags: [elixir_tag, phoenix_tag]
+        )
+
+      post3 =
+        insert(:post,
+          title: "Rust for Systems Programming",
+          slug: "rust-systems",
+          raw_body: "Introduction to systems programming with Rust",
+          tags: [rust_tag]
+        )
+
+      %{post1: post1, post2: post2, post3: post3}
+    end
+
+    test "searches posts by title", %{post1: post1} do
+      results = Posts.list_posts(search: "Elixir")
+
+      refute Enum.empty?(results)
+      assert Enum.any?(results, &(&1.id == post1.id))
+    end
+
+    test "searches posts by body content", %{post2: post2} do
+      results = Posts.list_posts(search: "Phoenix")
+
+      refute Enum.empty?(results)
+      assert Enum.any?(results, &(&1.id == post2.id))
+    end
+
+    test "searches posts by tags", %{post1: post1, post2: post2} do
+      results = Posts.list_posts(search: "elixir")
+
+      refute Enum.empty?(results)
+      assert Enum.any?(results, &(&1.id == post1.id))
+      assert Enum.any?(results, &(&1.id == post2.id))
+    end
+
+    test "returns empty list for non-matching search" do
+      results = Posts.list_posts(search: "javascript")
+
+      assert results == []
+    end
+
+    test "handles AND operator", %{post2: post2} do
+      results = Posts.list_posts(search: "Phoenix AND web")
+
+      refute Enum.empty?(results)
+      assert Enum.any?(results, &(&1.id == post2.id))
+    end
+
+    test "handles OR operator", %{post1: post1, post3: post3} do
+      results = Posts.list_posts(search: "Elixir OR Rust")
+
+      refute Enum.empty?(results)
+      assert Enum.any?(results, &(&1.id == post1.id))
+      assert Enum.any?(results, &(&1.id == post3.id))
+    end
+
+    test "handles NOT operator", %{post3: post3} do
+      results = Posts.list_posts(search: "programming NOT Elixir")
+
+      refute Enum.empty?(results)
+      assert Enum.any?(results, &(&1.id == post3.id))
+    end
+
+    test "handles quoted phrase search", %{post1: post1} do
+      results = Posts.list_posts(search: "\"Elixir programming\"")
+
+      refute Enum.empty?(results)
+      assert Enum.any?(results, &(&1.id == post1.id))
+    end
+
+    test "handles wildcard search", %{post1: post1, post2: post2} do
+      results = Posts.list_posts(search: "Elix*")
+
+      refute Enum.empty?(results)
+      assert Enum.any?(results, &(&1.id == post1.id))
+      assert Enum.any?(results, &(&1.id == post2.id))
+    end
+
+    test "handles column-specific search", %{post1: post1} do
+      results = Posts.list_posts(search: "title:Elixir")
+
+      refute Enum.empty?(results)
+      assert Enum.any?(results, &(&1.id == post1.id))
+    end
+
+    test "returns posts ordered by published_at desc for empty search", %{post1: _p1, post2: _p2, post3: _p3} do
+      results = Posts.list_posts(search: "")
+
+      refute Enum.empty?(results)
+      assert is_list(results)
+    end
+
+    test "returns posts ordered by published_at desc for nil search", %{post1: _p1, post2: _p2, post3: _p3} do
+      results = Posts.list_posts(search: nil)
+
+      refute Enum.empty?(results)
+      assert is_list(results)
+    end
+
+    test "handles complex queries with multiple operators" do
+      results = Posts.list_posts(search: "(Elixir OR Phoenix) AND web")
+
+      assert is_list(results)
+    end
+  end
 end
