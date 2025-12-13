@@ -98,26 +98,12 @@ defmodule BlogWeb.GalleryLive do
         <Bluescreen.bluescreen error={nil} href="/gallery" />
       </Gallery.item>
 
-      <Gallery.item
-        title="Post List - Loading State"
-        description="Loading state with skeleton placeholders"
-      >
-        <Post.list posts={[]} loading={true} />
-      </Gallery.item>
-
       <Gallery.item title="Post List - With Posts" description="Multiple posts in list view">
         <Post.list posts={@posts} all_tags={@all_tags} selected_tags={@selected_tags} />
       </Gallery.item>
 
       <Gallery.item title="Post List - Empty State" description="Empty state when no posts exist">
         <Post.list posts={[]} all_tags={@all_tags} selected_tags={@selected_tags} />
-      </Gallery.item>
-
-      <Gallery.item
-        title="Project List - Loading State"
-        description="Loading state with skeleton placeholders"
-      >
-        <Project.list projects={[]} loading={true} />
       </Gallery.item>
 
       <Gallery.item title="Project List - With Projects" description="Multiple projects in list view">

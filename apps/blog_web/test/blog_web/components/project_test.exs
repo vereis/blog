@@ -7,19 +7,6 @@ defmodule BlogWeb.Components.ProjectTest do
   alias BlogWeb.Components.Project
 
   describe "list/1" do
-    test "renders loading state with skeletons" do
-      html =
-        render_component(&Project.list/1,
-          projects: [],
-          loading: true,
-          id: "test-projects"
-        )
-
-      assert html =~ "projects-loading"
-      assert html =~ "project-skeleton"
-      assert html =~ ~s(<span data-count>0</span> items)
-    end
-
     test "renders empty state when no projects exist" do
       html =
         render_component(&Project.list/1,
@@ -46,7 +33,6 @@ defmodule BlogWeb.Components.ProjectTest do
       assert html =~ "My Project"
       assert html =~ "A cool project"
       assert html =~ "1 items"
-      refute html =~ "project-skeleton"
     end
 
     test "renders list with multiple projects" do
@@ -166,18 +152,6 @@ defmodule BlogWeb.Components.ProjectTest do
         )
 
       assert html =~ ~s(aria-label="View project: Test Project")
-    end
-
-    test "loading skeleton has proper aria attributes" do
-      html =
-        render_component(&Project.list/1,
-          projects: [],
-          loading: true,
-          id: "test-projects"
-        )
-
-      assert html =~ ~s(aria-busy="true")
-      assert html =~ ~s(aria-label="Loading project")
     end
   end
 end

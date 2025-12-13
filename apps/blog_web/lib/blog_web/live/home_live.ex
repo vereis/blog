@@ -8,21 +8,12 @@ defmodule BlogWeb.HomeLive do
   @slug "hello-world"
 
   @impl Phoenix.LiveView
-  def mount(params, _session, socket) do
+  def mount(_params, _session, socket) do
     if connected?(socket) do
       Phoenix.PubSub.subscribe(Blog.PubSub, "post:reload")
     end
 
-    if params["_debug"] == "slow" do
-      Process.sleep(5000)
-    end
-
-    {:ok,
-     assign(
-       socket,
-       :post,
-       (params["_debug"] != "empty" && Blog.Posts.get_post(slug: @slug)) || nil
-     )}
+    {:ok, assign(socket, :post, Blog.Posts.get_post(slug: @slug))}
   end
 
   @impl Phoenix.LiveView

@@ -7,7 +7,6 @@ defmodule BlogWeb.Components.Post do
   alias Blog.Posts.Post
   alias BlogWeb.Components.Badge
   alias BlogWeb.Components.Tag
-  alias Phoenix.LiveView.LiveStream
 
   @base_url "/posts"
 
@@ -69,8 +68,7 @@ defmodule BlogWeb.Components.Post do
       # In your template with regular assigns:
       <Post.list posts={@streams.posts} id="posts-stream" />
   """
-  attr :posts, :any, default: [], doc: "List of Post structs or LiveView stream"
-  attr :loading, :boolean, default: false
+  attr :posts, :list, default: [], doc: "List of Post structs"
   attr :id, :string, default: "posts"
   attr :title, :string, default: "Blog Posts"
   attr :all_tags, :list, default: []
@@ -90,66 +88,28 @@ defmodule BlogWeb.Components.Post do
         selected_tags={@selected_tags}
       />
       <div class="post-list-content">
-        <%= cond do %>
-          <% @loading -> %>
-            <p id={"#{@id}-loading-text"} phx-hook=".ScrambleCount">
-              <span data-count>0</span> items
-            </p>
-            <ol id={"#{@id}-loading"} class={["posts-list", "posts-loading"]} aria-busy="true" {@rest}>
-              <.skeleton :for={_ <- 1..5} />
-            </ol>
-            <script :type={Phoenix.LiveView.ColocatedHook} name=".ScrambleCount">
-              export default {
-                mounted() {
-                  const span = this.el.querySelector('[data-count]');
-                  this.interval = setInterval(() => {
-                    span.textContent = Math.floor(Math.random() * 10);
-                  }, 50);
-                },
-                destroyed() {
-                  clearInterval(this.interval);
-                }
-              }
-            </script>
-          <% match?(%LiveStream{inserts: []}, @posts) or @posts == [] -> %>
-            <p>No items</p>
-            <ol id={"#{@id}-empty"} class="posts-list" {@rest}>
-              <li class="posts-list-empty">
-                No posts yet. Check back soon!
-              </li>
-            </ol>
-          <% true -> %>
-            <p>{Enum.count(@posts)} items</p>
-            <ol id={@id} class="posts-list" phx-update={phx_update(@posts)} {@rest}>
-              <.item
-                :for={{dom_id, {post, index}} <- normalize_posts(@posts)}
-                id={dom_id}
-                post={post}
-                index={index}
-                base_url={@base_url}
-                selected_tags={@selected_tags}
-              />
-            </ol>
+        <%= if @posts == [] do %>
+          <p>No items</p>
+          <ol id={"#{@id}-empty"} class="posts-list" {@rest}>
+            <li class="posts-list-empty">
+              No posts yet. Check back soon!
+            </li>
+          </ol>
+        <% else %>
+          <p>{length(@posts)} items</p>
+          <ol id={@id} class="posts-list" {@rest}>
+            <.item
+              :for={{post, index} <- Enum.with_index(@posts, 1)}
+              id={"post-#{post.id}"}
+              post={post}
+              index={index}
+              base_url={@base_url}
+              selected_tags={@selected_tags}
+            />
+          </ol>
         <% end %>
       </div>
     </section>
-    """
-  end
-
-  defp skeleton(assigns) do
-    ~H"""
-    <li class="post-skeleton" aria-busy="true" aria-label="Loading post">
-      <article>
-        <div class="post-header">
-          <span class="skeleton-text skeleton-index"></span>
-          <div class="post-content">
-            <span class="skeleton-text skeleton-title"></span>
-            <span class="skeleton-text skeleton-excerpt"></span>
-            <span class="skeleton-text skeleton-meta"></span>
-          </div>
-        </div>
-      </article>
-    </li>
     """
   end
 
@@ -201,19 +161,6 @@ defmodule BlogWeb.Components.Post do
       </article>
     </li>
     """
-  end
-
-  defp phx_update(%LiveStream{}), do: "stream"
-  defp phx_update(_), do: nil
-
-  defp normalize_posts(%LiveStream{} = stream) do
-    stream
-  end
-
-  defp normalize_posts(posts) when is_list(posts) do
-    posts
-    |> Enum.with_index(1)
-    |> Enum.map(fn {post, index} -> {"post-#{post.id}", {post, index}} end)
   end
 
   defp reading_time_text(0), do: "Less than 1 minute read"

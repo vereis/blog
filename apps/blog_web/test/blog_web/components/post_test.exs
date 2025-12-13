@@ -7,79 +7,32 @@ defmodule BlogWeb.Components.PostTest do
   alias Blog.Tags.Tag
   alias BlogWeb.Components.Post
 
-  describe "Post.list/1 - loading state" do
-    test "renders skeleton loading indicators" do
-      html = render_component(&Post.list/1, %{posts: [], loading: true})
-
-      assert html =~ ~s(class="posts-list posts-loading")
-      assert html =~ ~s(aria-busy="true")
-      assert html =~ ~s(class="post-skeleton")
-      assert html =~ ~s(class="skeleton-text skeleton-index")
-      assert html =~ ~s(class="skeleton-text skeleton-title")
-      assert html =~ ~s(class="skeleton-text skeleton-meta")
-    end
-
-    test "renders 5 skeleton items by default" do
-      html = render_component(&Post.list/1, %{posts: [], loading: true})
-
-      skeleton_count =
-        html |> String.split(~s(class="post-skeleton")) |> length() |> Kernel.-(1)
-
-      assert skeleton_count == 5
-    end
-
-    test "includes accessibility attributes for loading state" do
-      html = render_component(&Post.list/1, %{posts: [], loading: true})
-
-      assert html =~ ~s(aria-busy="true")
-      assert html =~ ~s(aria-label="Loading post")
-    end
-
-    test "renders semantic list structure during loading" do
-      html = render_component(&Post.list/1, %{posts: [], loading: true})
-
-      assert html =~ "<ol"
-      assert html =~ "<li"
-      assert html =~ "<article>"
-    end
-  end
-
   describe "Post.list/1 - empty state" do
     test "renders empty state message when empty is true" do
-      html = render_component(&Post.list/1, %{posts: [], empty: true})
+      html = render_component(&Post.list/1, %{posts: []})
 
       assert html =~ ~s(class="posts-list-empty")
       assert html =~ "No posts yet. Check back soon!"
     end
 
     test "renders list structure for empty state" do
-      html = render_component(&Post.list/1, %{posts: [], empty: true})
+      html = render_component(&Post.list/1, %{posts: []})
 
       assert html =~ "<ol"
       assert html =~ "posts-list"
-      refute html =~ "posts-loading"
-      refute html =~ "post-skeleton"
-    end
-
-    test "does not render empty state when loading is true" do
-      html = render_component(&Post.list/1, %{posts: [], loading: true, empty: true})
-
-      # Loading state takes precedence
-      assert html =~ "post-skeleton"
-      refute html =~ "posts-list-empty"
     end
   end
 
   describe "Post.list/1 - with title" do
     test "renders default title badge 'Blog Posts'" do
-      html = render_component(&Post.list/1, %{posts: [], empty: true})
+      html = render_component(&Post.list/1, %{posts: []})
 
       assert html =~ "Blog Posts"
       assert html =~ "badge"
     end
 
     test "renders custom title badge when provided" do
-      html = render_component(&Post.list/1, %{posts: [], empty: true, title: "Recent Posts"})
+      html = render_component(&Post.list/1, %{posts: [], title: "Recent Posts"})
 
       assert html =~ "Recent Posts"
       assert html =~ "badge"
@@ -115,28 +68,28 @@ defmodule BlogWeb.Components.PostTest do
     end
 
     test "renders all posts in the list", %{posts: posts} do
-      html = render_component(&Post.list/1, %{posts: posts, empty: false})
+      html = render_component(&Post.list/1, %{posts: posts})
 
       assert html =~ "First Post"
       assert html =~ "Second Post"
     end
 
     test "renders posts with correct index numbers", %{posts: posts} do
-      html = render_component(&Post.list/1, %{posts: posts, empty: false})
+      html = render_component(&Post.list/1, %{posts: posts})
 
       assert html =~ ~s(<span class="post-index">#1</span>)
       assert html =~ ~s(<span class="post-index">#2</span>)
     end
 
     test "renders post metadata (date)", %{posts: posts} do
-      html = render_component(&Post.list/1, %{posts: posts, empty: false})
+      html = render_component(&Post.list/1, %{posts: posts})
 
       assert html =~ "Jan 15, 2024"
       assert html =~ "Jan 20, 2024"
     end
 
     test "renders links to individual posts", %{posts: posts} do
-      html = render_component(&Post.list/1, %{posts: posts, empty: false})
+      html = render_component(&Post.list/1, %{posts: posts})
 
       assert html =~ ~s(href="/posts/first-post")
       assert html =~ ~s(href="/posts/second-post")
@@ -144,14 +97,14 @@ defmodule BlogWeb.Components.PostTest do
     end
 
     test "includes aria-label on links for accessibility", %{posts: posts} do
-      html = render_component(&Post.list/1, %{posts: posts, empty: false})
+      html = render_component(&Post.list/1, %{posts: posts})
 
       assert html =~ ~s(aria-label="Read post: First Post")
       assert html =~ ~s(aria-label="Read post: Second Post")
     end
 
     test "renders post tags", %{posts: posts} do
-      html = render_component(&Post.list/1, %{posts: posts, empty: false})
+      html = render_component(&Post.list/1, %{posts: posts})
 
       assert html =~ "elixir"
       assert html =~ "phoenix"
@@ -159,7 +112,7 @@ defmodule BlogWeb.Components.PostTest do
     end
 
     test "renders semantic HTML structure", %{posts: posts} do
-      html = render_component(&Post.list/1, %{posts: posts, empty: false})
+      html = render_component(&Post.list/1, %{posts: posts})
 
       assert html =~ "<ol"
       assert html =~ "posts-list"
@@ -171,21 +124,21 @@ defmodule BlogWeb.Components.PostTest do
     end
 
     test "includes proper datetime attributes on time elements", %{posts: posts} do
-      html = render_component(&Post.list/1, %{posts: posts, empty: false})
+      html = render_component(&Post.list/1, %{posts: posts})
 
       assert html =~ ~s(datetime="2024-01-15T10:00:00Z")
       assert html =~ ~s(datetime="2024-01-20T14:00:00Z")
     end
 
     test "assigns correct DOM IDs to list items", %{posts: posts} do
-      html = render_component(&Post.list/1, %{posts: posts, empty: false})
+      html = render_component(&Post.list/1, %{posts: posts})
 
       assert html =~ ~s(id="post-1")
       assert html =~ ~s(id="post-2")
     end
 
     test "accepts custom id attribute for the list", %{posts: posts} do
-      html = render_component(&Post.list/1, %{posts: posts, empty: false, id: "custom-posts"})
+      html = render_component(&Post.list/1, %{posts: posts, id: "custom-posts"})
 
       assert html =~ ~s(id="custom-posts")
     end

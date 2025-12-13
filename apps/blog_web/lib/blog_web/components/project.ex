@@ -6,7 +6,6 @@ defmodule BlogWeb.Components.Project do
 
   alias BlogWeb.Components.Badge
   alias BlogWeb.Components.Tag
-  alias Phoenix.LiveView.LiveStream
 
   @base_url "/projects"
 
@@ -47,8 +46,7 @@ defmodule BlogWeb.Components.Project do
 
       <Project.list projects={@streams.projects} empty={@projects_empty} id="projects-stream" />
   """
-  attr :projects, :any, default: [], doc: "List of Project structs or LiveView stream"
-  attr :loading, :boolean, default: false
+  attr :projects, :list, default: [], doc: "List of Project structs"
   attr :id, :string, default: "projects"
   attr :title, :string, default: "Projects"
   attr :all_tags, :list, default: []
@@ -68,71 +66,28 @@ defmodule BlogWeb.Components.Project do
         selected_tags={@selected_tags}
       />
       <div class="project-list-content">
-        <%= cond do %>
-          <% @loading -> %>
-            <p id={"#{@id}-loading-text"} phx-hook=".ScrambleCount">
-              <span data-count>0</span> items
-            </p>
-            <ol
-              id={"#{@id}-loading"}
-              class={["projects-list", "projects-loading"]}
-              aria-busy="true"
-              {@rest}
-            >
-              <.skeleton :for={_ <- 1..5} />
-            </ol>
-            <script :type={Phoenix.LiveView.ColocatedHook} name=".ScrambleCount">
-              export default {
-                mounted() {
-                  const span = this.el.querySelector('[data-count]');
-                  this.interval = setInterval(() => {
-                    span.textContent = Math.floor(Math.random() * 10);
-                  }, 50);
-                },
-                destroyed() {
-                  clearInterval(this.interval);
-                }
-              }
-            </script>
-          <% match?(%LiveStream{inserts: []}, @projects) or @projects == [] -> %>
-            <p>No items</p>
-            <ol id={"#{@id}-empty"} class="projects-list" {@rest}>
-              <li class="projects-list-empty">
-                No projects yet. Check back soon!
-              </li>
-            </ol>
-          <% true -> %>
-            <p>{Enum.count(@projects)} items</p>
-            <ol id={@id} class="projects-list" phx-update={phx_update(@projects)} {@rest}>
-              <.item
-                :for={{dom_id, {project, index}} <- normalize_projects(@projects)}
-                id={dom_id}
-                project={project}
-                index={index}
-                base_url={@base_url}
-                selected_tags={@selected_tags}
-              />
-            </ol>
+        <%= if @projects == [] do %>
+          <p>No items</p>
+          <ol id={"#{@id}-empty"} class="projects-list" {@rest}>
+            <li class="projects-list-empty">
+              No projects yet. Check back soon!
+            </li>
+          </ol>
+        <% else %>
+          <p>{length(@projects)} items</p>
+          <ol id={@id} class="projects-list" {@rest}>
+            <.item
+              :for={{project, index} <- Enum.with_index(@projects, 1)}
+              id={"project-#{project.id}"}
+              project={project}
+              index={index}
+              base_url={@base_url}
+              selected_tags={@selected_tags}
+            />
+          </ol>
         <% end %>
       </div>
     </section>
-    """
-  end
-
-  defp skeleton(assigns) do
-    ~H"""
-    <li class="project-skeleton" aria-busy="true" aria-label="Loading project">
-      <article>
-        <div class="project-header">
-          <span class="skeleton-text skeleton-index"></span>
-          <div class="project-content">
-            <span class="skeleton-text skeleton-name"></span>
-            <span class="skeleton-text skeleton-description"></span>
-            <span class="skeleton-text skeleton-meta"></span>
-          </div>
-        </div>
-      </article>
-    </li>
     """
   end
 
@@ -182,18 +137,5 @@ defmodule BlogWeb.Components.Project do
       </article>
     </li>
     """
-  end
-
-  defp phx_update(%LiveStream{}), do: "stream"
-  defp phx_update(_), do: nil
-
-  defp normalize_projects(%LiveStream{} = stream) do
-    stream
-  end
-
-  defp normalize_projects(projects) when is_list(projects) do
-    projects
-    |> Enum.with_index(1)
-    |> Enum.map(fn {project, index} -> {"project-#{project.id}", {project, index}} end)
   end
 end
