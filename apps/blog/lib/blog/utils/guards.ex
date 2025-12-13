@@ -8,4 +8,7 @@ defmodule Blog.Utils.Guards do
 
   defguard changes?(changeset, field)
            when is_struct(changeset, Ecto.Changeset) and is_map_key(changeset.changes, field)
+
+  defguard empty?(value)
+           when is_nil(value) or value == []
 end

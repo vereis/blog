@@ -61,4 +61,26 @@ defmodule Blog.Utils.GuardsTest do
       refute changes?(%{changes: %{title: "Test"}}, :title)
     end
   end
+
+  describe "empty?/1" do
+    test "returns true for nil" do
+      assert empty?(nil)
+    end
+
+    test "returns true for empty list" do
+      assert empty?([])
+    end
+
+    test "returns false for non-empty list" do
+      refute empty?(["elixir"])
+      refute empty?([1, 2, 3])
+    end
+
+    test "returns false for non-nil, non-list values" do
+      refute empty?("string")
+      refute empty?(0)
+      refute empty?(%{})
+      refute empty?(false)
+    end
+  end
 end
