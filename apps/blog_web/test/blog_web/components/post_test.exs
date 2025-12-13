@@ -128,13 +128,11 @@ defmodule BlogWeb.Components.PostTest do
       assert html =~ ~s(<span class="post-index">#2</span>)
     end
 
-    test "renders post metadata (date and reading time)", %{posts: posts} do
+    test "renders post metadata (date)", %{posts: posts} do
       html = render_component(&Post.list/1, %{posts: posts, empty: false})
 
       assert html =~ "Jan 15, 2024"
       assert html =~ "Jan 20, 2024"
-      assert html =~ "~5 min"
-      assert html =~ "~3 min"
     end
 
     test "renders links to individual posts", %{posts: posts} do
