@@ -6,7 +6,7 @@ defmodule BlogWeb.Components.Tag do
 
   alias Blog.Tags.Tag
   alias BlogWeb.Components.EmptyState
-  alias BlogWeb.Components.Search
+  alias BlogWeb.Utils.QueryParams
 
   @doc """
   Renders a list of tags as navigation links.
@@ -89,7 +89,7 @@ defmodule BlogWeb.Components.Tag do
     assigns =
       assigns
       |> assign(:selected_set, MapSet.new(assigns.selected_tags))
-      |> assign(:clear_url, build_clear_tags_url(assigns.base_url, assigns.search_query))
+      |> assign(:clear_url, QueryParams.clear_tags(assigns.base_url, assigns.search_query))
 
     ~H"""
     <fieldset class="tag-filter">
@@ -163,36 +163,7 @@ defmodule BlogWeb.Components.Tag do
 
   @doc false
   def tag_filter_href(base_url, tag, selected, search_query \\ "") do
-    cur = tag_label(tag)
-
-    # HACK: Traverse selected tags in `O(n)`, if we find the current tag during
-    #       enumeration, we drop it from the acc, if we never find it, we add it at the end.
-    #
-    # NOTE: This does not preserve the order of tags, but currently filtering is commutative
-    #       so order does not matter. For preserving order we'd need to eat another enumeration
-    #       to reverse the list before joining.
-    acc = {false, []}
-
-    new_selected_tags =
-      selected
-      |> Enum.reduce(acc, fn tag, {found, acc} -> (tag == cur && {true, acc}) || {found, [tag | acc]} end)
-      |> then(fn {found?, acc} -> (found? && acc) || [cur | acc] end)
-
-    query_params = Search.build_query_params(search_query, new_selected_tags)
-
-    if query_params == "" do
-      base_url
-    else
-      "#{base_url}?#{query_params}"
-    end
-  end
-
-  defp build_clear_tags_url(base_url, search_query) do
-    if search_query == "" do
-      base_url
-    else
-      query = URI.encode_query(%{"q" => search_query})
-      "#{base_url}?#{query}"
-    end
+    new_selected_tags = QueryParams.toggle_tag(selected, tag_label(tag))
+    QueryParams.build_url(base_url, search_query, new_selected_tags)
   end
 end

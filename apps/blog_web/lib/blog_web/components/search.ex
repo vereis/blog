@@ -7,6 +7,8 @@ defmodule BlogWeb.Components.Search do
   """
   use Phoenix.Component
 
+  alias BlogWeb.Utils.QueryParams
+
   @doc """
   Renders a search input filter with debounced updates.
 
@@ -34,7 +36,7 @@ defmodule BlogWeb.Components.Search do
   attr :class, :string, default: nil
 
   def input(assigns) do
-    assigns = assign(assigns, :clear_url, build_clear_search_url(assigns.base_url, assigns.selected_tags))
+    assigns = assign(assigns, :clear_url, QueryParams.clear_search(assigns.base_url, assigns.selected_tags))
 
     ~H"""
     <fieldset class={["search-filter", @class]}>
@@ -98,6 +100,8 @@ defmodule BlogWeb.Components.Search do
   @doc """
   Builds query parameters string combining search and tags for URL.
 
+  Delegates to `BlogWeb.Utils.QueryParams.build_params/2`.
+
   ## Examples
 
       iex> BlogWeb.Components.Search.build_query_params("elixir", ["phoenix"])
@@ -113,32 +117,5 @@ defmodule BlogWeb.Components.Search do
       ""
 
   """
-  def build_query_params(search_query, selected_tags) do
-    params = %{}
-
-    params =
-      if search_query == "" do
-        params
-      else
-        Map.put(params, "q", search_query)
-      end
-
-    params =
-      if selected_tags == [] do
-        params
-      else
-        Map.put(params, "tags", Enum.join(selected_tags, ","))
-      end
-
-    URI.encode_query(params)
-  end
-
-  defp build_clear_search_url(base_url, selected_tags) do
-    if selected_tags == [] do
-      base_url
-    else
-      query = URI.encode_query(%{"tags" => Enum.join(selected_tags, ",")})
-      "#{base_url}?#{query}"
-    end
-  end
+  defdelegate build_query_params(search_query, selected_tags), to: QueryParams, as: :build_params
 end
