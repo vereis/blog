@@ -1,11 +1,12 @@
 defmodule BlogWeb.Components.Project do
   @moduledoc """
-  Project-related components for displaying project listings.
+  Project-related components for displaying portfolio items.
   """
   use Phoenix.Component
 
   alias BlogWeb.Components.Badge
   alias BlogWeb.Components.EmptyState
+  alias BlogWeb.Components.Search
   alias BlogWeb.Components.Tag
 
   @base_url "/projects"
@@ -52,6 +53,7 @@ defmodule BlogWeb.Components.Project do
   attr :title, :string, default: "Projects"
   attr :all_tags, :list, default: []
   attr :selected_tags, :list, default: []
+  attr :search_query, :string, default: ""
   attr :rest, :global, doc: "Additional HTML attributes to add to the list element"
 
   def list(assigns) do
@@ -60,20 +62,27 @@ defmodule BlogWeb.Components.Project do
     ~H"""
     <section class="project-list-section">
       <Badge.badge id={"#{@id}-title"}>{@title}</Badge.badge>
+      <Search.input
+        value={@search_query}
+        base_url={@base_url}
+        placeholder="(Web || CLI) && !Boring"
+        selected_tags={@selected_tags}
+      />
       <Tag.filter
         :if={@all_tags != []}
         tags={@all_tags}
         base_url={@base_url}
         selected_tags={@selected_tags}
+        search_query={@search_query}
       />
       <div class="project-list-content">
         <%= if @projects == [] do %>
-          <p>No items</p>
+          <p aria-live="polite">No items</p>
           <EmptyState.block>
             No projects found. <.link navigate="/">Return home</.link> or check back later!
           </EmptyState.block>
         <% else %>
-          <p>{length(@projects)} items</p>
+          <p aria-live="polite">{length(@projects)} items</p>
           <ol id={@id} class="projects-list" {@rest}>
             <.item
               :for={{project, index} <- Enum.with_index(@projects, 1)}
@@ -129,6 +138,7 @@ defmodule BlogWeb.Components.Project do
                 tags={@project.tags}
                 base_url={@base_url}
                 selected_tags={@selected_tags}
+                search_query=""
               />
             </div>
           </div>

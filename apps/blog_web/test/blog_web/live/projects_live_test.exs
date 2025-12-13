@@ -118,7 +118,7 @@ defmodule BlogWeb.ProjectsLiveTest do
 
   describe "PubSub hot reload" do
     test "reloads projects when resource_reload event is received", %{conn: conn} do
-      project = insert(:project, name: "Original Name", url: "https://original.com")
+      project = insert(:project, name: "Original Name", url: "https://example.com")
 
       {:ok, view, _html} = live(conn, ~p"/projects")
 
@@ -136,6 +136,93 @@ defmodule BlogWeb.ProjectsLiveTest do
 
       assert render(view) =~ "Updated Name"
       refute render(view) =~ "Original Name"
+    end
+  end
+
+  describe "search functionality" do
+    test "renders search input", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/projects")
+
+      assert has_element?(view, "input[name='q']")
+      assert has_element?(view, "input[placeholder='(Web || CLI) && !Boring']")
+    end
+
+    test "updates URL when search query is entered", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/projects")
+
+      view
+      |> form("form", %{"q" => "web"})
+      |> render_change()
+
+      assert_patch(view, ~p"/projects?q=web")
+    end
+
+    test "displays search results for matching query", %{conn: conn} do
+      insert(:project, name: "Web Framework", url: "https://example.com", description: "A web framework")
+      insert(:project, name: "CLI Tool", url: "https://example.com", description: "A CLI tool")
+
+      {:ok, view, _html} = live(conn, ~p"/projects?q=web")
+
+      html = render(view)
+      assert html =~ "Web Framework"
+      refute html =~ "CLI Tool"
+    end
+
+    test "combines search with tag filtering", %{conn: conn} do
+      web_tag = insert(:tag, label: "web")
+      cli_tag = insert(:tag, label: "cli")
+
+      insert(:project, name: "Web App", url: "https://example.com", description: "Web app", tags: [web_tag])
+      insert(:project, name: "CLI App", url: "https://example.com", description: "CLI app", tags: [cli_tag])
+      insert(:project, name: "Both App", url: "https://example.com", description: "Web CLI app", tags: [web_tag, cli_tag])
+
+      {:ok, view, _html} = live(conn, ~p"/projects?q=Web&tags=cli")
+
+      html = render(view)
+      assert html =~ "Both App"
+      refute html =~ "Web App"
+      refute html =~ "CLI App"
+    end
+
+    test "shows clear link when search query is present", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/projects?q=test")
+
+      assert has_element?(view, "a[aria-label='Clear search']", "(clear ✕)")
+    end
+
+    test "clears search when clear link is clicked", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/projects?q=test")
+
+      view
+      |> element("a[aria-label='Clear search']")
+      |> render_click()
+
+      assert_patch(view, ~p"/projects")
+    end
+
+    test "displays flash error for invalid FTS syntax", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/projects")
+
+      view
+      |> form("form", %{"q" => "\""})
+      |> render_change()
+
+      assert render(view) =~ "Invalid search query syntax"
+      assert has_element?(view, ".flash-error")
+    end
+
+    test "shows empty results on FTS error without crashing", %{conn: conn} do
+      insert(:project, name: "Test Project", url: "https://example.com")
+
+      {:ok, view, _html} = live(conn, ~p"/projects")
+
+      view
+      |> form("form", %{"q" => "\""})
+      |> render_change()
+
+      html = render(view)
+      refute html =~ "Test Project"
+      assert html =~ "No projects found"
     end
   end
 end

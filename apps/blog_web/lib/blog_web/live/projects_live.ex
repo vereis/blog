@@ -2,8 +2,12 @@ defmodule BlogWeb.ProjectsLive do
   @moduledoc false
   use BlogWeb, :live_view
 
+  alias Blog.Schema.FTS
   alias BlogWeb.Components.Project
+  alias BlogWeb.Components.Search
   alias BlogWeb.Components.Tag
+
+  @base_url "/projects"
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
@@ -22,8 +26,20 @@ defmodule BlogWeb.ProjectsLive do
   @impl Phoenix.LiveView
   def handle_params(params, _uri, socket) do
     selected_tags = Tag.labels_from_params(params)
-    socket = assign(socket, :selected_tags, selected_tags)
+    search_query = Search.query_from_params(params)
+
+    socket =
+      socket
+      |> assign(:selected_tags, selected_tags)
+      |> assign(:search_query, search_query)
+
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_event("search", %{"q" => query}, socket) do
+    params = Search.build_query_params(query, socket.assigns.selected_tags)
+    {:noreply, push_patch(socket, to: "#{@base_url}?#{params}")}
   end
 
   @impl Phoenix.LiveView
@@ -32,11 +48,27 @@ defmodule BlogWeb.ProjectsLive do
   end
 
   defp apply_action(socket, :index, _params) do
-    projects = Blog.Projects.list_projects(tags: socket.assigns[:selected_tags], order_by: [desc: :inserted_at])
+    filters = [
+      search: socket.assigns[:search_query],
+      tags: socket.assigns[:selected_tags],
+      order_by: [desc: :inserted_at]
+    ]
+
+    projects = Blog.Projects.list_projects(filters)
 
     socket
     |> assign(:page_title, "Projects")
     |> assign(:projects, projects)
+  rescue
+    e in Exqlite.Error ->
+      if FTS.fts_error?(e) do
+        socket
+        |> assign(:page_title, "Projects")
+        |> assign(:projects, [])
+        |> put_flash(:error, "Invalid search query syntax")
+      else
+        reraise e, __STACKTRACE__
+      end
   end
 
   @impl Phoenix.LiveView
@@ -48,6 +80,7 @@ defmodule BlogWeb.ProjectsLive do
         id="projects"
         all_tags={@all_tags}
         selected_tags={@selected_tags}
+        search_query={@search_query}
       />
     </Layouts.app>
     """

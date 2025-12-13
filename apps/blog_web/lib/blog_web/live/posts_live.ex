@@ -2,9 +2,13 @@ defmodule BlogWeb.PostsLive do
   @moduledoc false
   use BlogWeb, :live_view
 
+  alias Blog.Schema.FTS
   alias BlogWeb.Components.Bluescreen
   alias BlogWeb.Components.Post
+  alias BlogWeb.Components.Search
   alias BlogWeb.Components.Tag
+
+  @base_url "/posts"
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
@@ -23,8 +27,20 @@ defmodule BlogWeb.PostsLive do
   @impl Phoenix.LiveView
   def handle_params(params, _uri, socket) do
     selected_tags = Tag.labels_from_params(params)
-    socket = assign(socket, :selected_tags, selected_tags)
+    search_query = Search.query_from_params(params)
+
+    socket =
+      socket
+      |> assign(:selected_tags, selected_tags)
+      |> assign(:search_query, search_query)
+
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_event("search", %{"q" => query}, socket) do
+    params = Search.build_query_params(query, socket.assigns.selected_tags)
+    {:noreply, push_patch(socket, to: "#{@base_url}?#{params}")}
   end
 
   @impl Phoenix.LiveView
@@ -33,11 +49,27 @@ defmodule BlogWeb.PostsLive do
   end
 
   defp apply_action(socket, :index, _params) do
-    posts = Blog.Posts.list_posts(tags: socket.assigns[:selected_tags], order_by: [desc: :published_at])
+    filters = [
+      search: socket.assigns[:search_query],
+      tags: socket.assigns[:selected_tags],
+      order_by: [desc: :published_at]
+    ]
+
+    posts = Blog.Posts.list_posts(filters)
 
     socket
     |> assign(:page_title, "Posts")
     |> assign(:posts, posts)
+  rescue
+    e in Exqlite.Error ->
+      if FTS.fts_error?(e) do
+        socket
+        |> assign(:page_title, "Posts")
+        |> assign(:posts, [])
+        |> put_flash(:error, "Invalid search query syntax")
+      else
+        reraise e, __STACKTRACE__
+      end
   end
 
   defp apply_action(socket, :show, %{"slug" => slug}) do
@@ -59,6 +91,7 @@ defmodule BlogWeb.PostsLive do
             id="posts"
             all_tags={@all_tags}
             selected_tags={@selected_tags}
+            search_query={@search_query}
           />
         <% @live_action == :show and is_struct(@post) -> %>
           <Post.full post={@post} />

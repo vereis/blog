@@ -7,6 +7,7 @@ defmodule BlogWeb.Components.Post do
   alias Blog.Posts.Post
   alias BlogWeb.Components.Badge
   alias BlogWeb.Components.EmptyState
+  alias BlogWeb.Components.Search
   alias BlogWeb.Components.Tag
 
   @base_url "/posts"
@@ -27,7 +28,7 @@ defmodule BlogWeb.Components.Post do
       <header>
         <hgroup class="post-title">
           <Badge.badge id={@post.slug}>{@post.title}</Badge.badge>
-          <Tag.list tags={@post.tags} base_url={@base_url} selected_tags={[]} />
+          <Tag.list tags={@post.tags} base_url={@base_url} selected_tags={[]} search_query="" />
         </hgroup>
         <time
           :if={@post.published_at}
@@ -74,6 +75,7 @@ defmodule BlogWeb.Components.Post do
   attr :title, :string, default: "Blog Posts"
   attr :all_tags, :list, default: []
   attr :selected_tags, :list, default: []
+  attr :search_query, :string, default: ""
   attr :rest, :global, doc: "Additional HTML attributes to add to the list element"
 
   def list(assigns) do
@@ -82,20 +84,27 @@ defmodule BlogWeb.Components.Post do
     ~H"""
     <section class="post-list-section">
       <Badge.badge id={"#{@id}-title"}>{@title}</Badge.badge>
+      <Search.input
+        value={@search_query}
+        base_url={@base_url}
+        placeholder="(Distributed && Elixir) || Fun"
+        selected_tags={@selected_tags}
+      />
       <Tag.filter
         :if={@all_tags != []}
         tags={@all_tags}
         base_url={@base_url}
         selected_tags={@selected_tags}
+        search_query={@search_query}
       />
       <div class="post-list-content">
         <%= if @posts == [] do %>
-          <p>No items</p>
+          <p aria-live="polite">No items</p>
           <EmptyState.block>
             No posts found. <.link navigate="/">Return home</.link> or check back later!
           </EmptyState.block>
         <% else %>
-          <p>{length(@posts)} items</p>
+          <p aria-live="polite">{length(@posts)} items</p>
           <ol id={@id} class="posts-list" {@rest}>
             <.item
               :for={{post, index} <- Enum.with_index(@posts, 1)}
@@ -153,6 +162,7 @@ defmodule BlogWeb.Components.Post do
                 tags={@post.tags}
                 base_url={@base_url}
                 selected_tags={@selected_tags}
+                search_query=""
               />
             </div>
           </div>

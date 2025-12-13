@@ -7,6 +7,7 @@ defmodule BlogWeb.GalleryLive do
   alias BlogWeb.Components.Gallery
   alias BlogWeb.Components.Post
   alias BlogWeb.Components.Project
+  alias BlogWeb.Components.Search
   alias BlogWeb.Components.Tag
 
   @impl Phoenix.LiveView
@@ -72,6 +73,21 @@ defmodule BlogWeb.GalleryLive do
 
       <Gallery.item title="Navigation" description="Site navigation component">
         <.navbar />
+      </Gallery.item>
+
+      <Gallery.item title="Search Filter - Empty" description="Text search filter with FTS support">
+        <Search.input value="" base_url="/gallery" placeholder="(Example && Query) Or Search" />
+      </Gallery.item>
+
+      <Gallery.item
+        title="Search Filter - With Value"
+        description="Search filter with active query"
+      >
+        <Search.input
+          value="elixir AND phoenix"
+          base_url="/gallery"
+          placeholder="(Example && Query) Or Search"
+        />
       </Gallery.item>
 
       <Gallery.item
