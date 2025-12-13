@@ -7,7 +7,7 @@ defmodule BlogWeb.PostsLive do
   alias BlogWeb.Components.Tag
 
   @impl Phoenix.LiveView
-  def mount(params, _session, socket) do
+  def mount(_params, _session, socket) do
     if connected?(socket) do
       Phoenix.PubSub.subscribe(Blog.PubSub, "post:reload")
     end
@@ -16,13 +16,8 @@ defmodule BlogWeb.PostsLive do
 
     socket =
       socket
-      |> assign(:loading, true)
-      |> assign(:debug_params, Map.take(params, ["_debug"]))
       |> assign(:all_tags, all_tags)
-      |> stream_configure(:posts, dom_id: fn {post, _index} -> "post-#{post.id}" end)
-      |> stream(:posts, [])
-
-    send(self(), :load_posts)
+      |> assign(:posts, [])
 
     {:ok, socket}
   end
@@ -30,44 +25,21 @@ defmodule BlogWeb.PostsLive do
   @impl Phoenix.LiveView
   def handle_params(params, _uri, socket) do
     selected_tags = Tag.labels_from_params(params)
-    tags_changed? = Map.get(socket.assigns, :selected_tags) != selected_tags
-
-    socket =
-      socket
-      |> assign(:debug_params, Map.take(params, ["_debug"]))
-      |> assign(:selected_tags, selected_tags)
-
-    if tags_changed? and socket.assigns.live_action == :index do
-      send(self(), :load_posts)
-    end
-
+    socket = assign(socket, :selected_tags, selected_tags)
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
   @impl Phoenix.LiveView
-  def handle_info(:load_posts, socket) do
-    if socket.assigns.debug_params["_debug"] == "slow" do
-      Process.sleep(5000)
-    end
-
-    socket =
-      if socket.assigns.live_action == :index and socket.assigns.debug_params["_debug"] != "empty" do
-        posts = Blog.Posts.list_posts(tags: socket.assigns[:selected_tags], order_by: [desc: :published_at])
-        stream(socket, :posts, Enum.with_index(posts, 1), reset: true)
-      else
-        socket
-      end
-
-    {:noreply, assign(socket, :loading, false)}
-  end
-
   def handle_info({:resource_reload, Blog.Posts.Post, _id}, socket) do
-    send(self(), :load_posts)
-    {:noreply, socket}
+    {:noreply, apply_action(socket, socket.assigns.live_action, %{})}
   end
 
   defp apply_action(socket, :index, _params) do
-    assign(socket, :page_title, "Posts")
+    posts = Blog.Posts.list_posts(tags: socket.assigns[:selected_tags], order_by: [desc: :published_at])
+
+    socket
+    |> assign(:page_title, "Posts")
+    |> assign(:posts, posts)
   end
 
   defp apply_action(socket, :show, %{"slug" => slug}) do
@@ -85,8 +57,7 @@ defmodule BlogWeb.PostsLive do
       <%= cond do %>
         <% @live_action == :index -> %>
           <Post.list
-            posts={@streams.posts}
-            loading={@loading}
+            posts={@posts}
             id="posts"
             all_tags={@all_tags}
             selected_tags={@selected_tags}

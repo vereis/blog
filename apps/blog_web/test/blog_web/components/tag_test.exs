@@ -1,5 +1,5 @@
 defmodule BlogWeb.Components.TagTest do
-  use ExUnit.Case, async: true
+  use BlogWeb.ConnCase
 
   alias BlogWeb.Components.Tag
 

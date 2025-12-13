@@ -147,26 +147,4 @@ defmodule BlogWeb.HomeLiveTest do
       assert has_element?(projects_view, ".badge", "Projects")
     end
   end
-
-  describe "debug params" do
-    test "forces empty state with ?_debug=empty", %{conn: conn} do
-      insert(:post, slug: "hello-world", title: "Hello World")
-
-      {:ok, view, _html} = live(conn, ~p"/?_debug=empty")
-
-      assert has_element?(view, ".bluescreen")
-      refute has_element?(view, "article.post")
-    end
-
-    test "adds 5 second delay with ?_debug=slow", %{conn: conn} do
-      insert(:post, slug: "hello-world", title: "Hello World")
-
-      start_time = System.monotonic_time(:millisecond)
-      {:ok, view, _html} = live(conn, ~p"/?_debug=slow")
-      elapsed = System.monotonic_time(:millisecond) - start_time
-
-      assert elapsed >= 5000
-      assert has_element?(view, "#hello-world", "Hello World")
-    end
-  end
 end

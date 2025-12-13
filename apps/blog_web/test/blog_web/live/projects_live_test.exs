@@ -5,13 +5,11 @@ defmodule BlogWeb.ProjectsLiveTest do
   import Phoenix.LiveViewTest
 
   describe ":index" do
-    test "mounts successfully and displays loading state initially", %{conn: conn} do
+    test "mounts successfully and displays projects list", %{conn: conn} do
       {:ok, _view, html} = live(conn, ~p"/projects")
 
       assert html =~ "Projects"
       assert html =~ "projects-list"
-      assert html =~ "projects-loading"
-      assert html =~ "project-skeleton"
     end
 
     test "loads and displays projects after mount", %{conn: conn} do
@@ -21,7 +19,6 @@ defmodule BlogWeb.ProjectsLiveTest do
 
       assert render(view) =~ "My First Project"
       assert has_element?(view, "a[href='https://example.com'][target='_blank']")
-      refute has_element?(view, ".project-skeleton")
     end
 
     test "displays empty state when no projects exist", %{conn: conn} do
