@@ -85,7 +85,14 @@ defmodule BlogWeb.Components.Tag do
 
     ~H"""
     <fieldset class="tag-filter">
-      <legend class="tag-filter-label">Filter by tag:</legend>
+      <legend class="tag-filter-label">
+        Filter by tag<.link
+          :if={@selected_tags != []}
+          patch={@base_url}
+          class="tag-filter-clear"
+          aria-label="Clear all tag filters"
+        > (clear ✕)</.link>:
+      </legend>
       <nav class="tags" aria-label="Filter tags">
         <%= if @tags == [] do %>
           <p class="tags-empty">No tags available</p>
@@ -98,14 +105,6 @@ defmodule BlogWeb.Components.Tag do
           />
         <% end %>
       </nav>
-      <.link
-        :if={@selected_tags != []}
-        patch={@base_url}
-        class="tag-filter-clear"
-        aria-label="Clear all tag filters"
-      >
-        Clear all
-      </.link>
     </fieldset>
     """
   end

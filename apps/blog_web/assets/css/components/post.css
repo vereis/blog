@@ -1,4 +1,22 @@
 @layer components {
+  .post-list-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-line) 0;
+
+    /* Prevent badge from stretching */
+    & > .badge {
+      align-self: flex-start;
+    }
+  }
+
+  .post-list-content {
+    & > p {
+      margin: 0;
+      color: var(--color-fg-secondary);
+    }
+  }
+
   .post {
     margin-block-end: var(--space-line);
   }
@@ -13,12 +31,6 @@
 
   .post-published,
   .post-read-time {
-    color: var(--color-fg-secondary);
-  }
-
-  section:has(.posts-list)>p {
-    margin-block-start: var(--space-line);
-    margin-block-end: 0;
     color: var(--color-fg-secondary);
   }
 

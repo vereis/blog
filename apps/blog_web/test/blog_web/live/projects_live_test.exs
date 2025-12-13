@@ -8,7 +8,7 @@ defmodule BlogWeb.ProjectsLiveTest do
     test "mounts successfully and displays loading state initially", %{conn: conn} do
       {:ok, _view, html} = live(conn, ~p"/projects")
 
-      assert html =~ "All Projects"
+      assert html =~ "Projects"
       assert html =~ "projects-list"
       assert html =~ "projects-loading"
       assert html =~ "project-skeleton"
@@ -115,7 +115,7 @@ defmodule BlogWeb.ProjectsLiveTest do
         |> follow_redirect(conn, ~p"/posts")
 
       assert posts_view.module == BlogWeb.PostsLive
-      assert has_element?(posts_view, ".badge", "All Posts")
+      assert has_element?(posts_view, ".badge", "Blog Posts")
     end
   end
 

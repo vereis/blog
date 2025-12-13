@@ -26,14 +26,21 @@
 
   .tag-filter {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    margin-block-end: var(--space-line);
+    flex-direction: column;
+    gap: var(--space-line) 0;
   }
 
   .tag-filter-label {
     color: var(--color-fg-secondary);
-    margin-inline-end: var(--space-1);
+  }
+
+  .tag-filter-clear {
+    color: var(--color-link);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   .tags-empty {

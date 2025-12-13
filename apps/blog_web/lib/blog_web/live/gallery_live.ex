@@ -106,11 +106,11 @@ defmodule BlogWeb.GalleryLive do
       </Gallery.item>
 
       <Gallery.item title="Post List - With Posts" description="Multiple posts in list view">
-        <Post.list posts={@posts} />
+        <Post.list posts={@posts} all_tags={@all_tags} selected_tags={@selected_tags} />
       </Gallery.item>
 
       <Gallery.item title="Post List - Empty State" description="Empty state when no posts exist">
-        <Post.list posts={[]} />
+        <Post.list posts={[]} all_tags={@all_tags} selected_tags={@selected_tags} />
       </Gallery.item>
 
       <Gallery.item
@@ -121,14 +121,14 @@ defmodule BlogWeb.GalleryLive do
       </Gallery.item>
 
       <Gallery.item title="Project List - With Projects" description="Multiple projects in list view">
-        <Project.list projects={@projects} />
+        <Project.list projects={@projects} all_tags={@all_tags} selected_tags={@selected_tags} />
       </Gallery.item>
 
       <Gallery.item
         title="Project List - Empty State"
         description="Empty state when no projects exist"
       >
-        <Project.list projects={[]} />
+        <Project.list projects={[]} all_tags={@all_tags} selected_tags={@selected_tags} />
       </Gallery.item>
     </Layouts.app>
     """

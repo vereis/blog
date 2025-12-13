@@ -139,7 +139,7 @@ defmodule BlogWeb.Components.ProjectTest do
           id: "test-projects"
         )
 
-      assert html =~ "All Projects"
+      assert html =~ "Projects"
     end
 
     test "renders with custom DOM ID" do
