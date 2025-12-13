@@ -18,6 +18,25 @@ defmodule Blog.Tags.Tag do
     timestamps()
   end
 
+  @impl EctoUtils.Queryable
+  def query(base_query, filters) do
+    Enum.reduce(filters, base_query, fn
+      {:having, association_name}, query ->
+        %Ecto.Association.ManyToMany{} = association = __schema__(:association, association_name)
+
+        from query,
+          where:
+            exists(
+              from row in association.join_through,
+                where: row.tag_id == parent_as(:self).id,
+                select: 1
+            )
+
+      {key, value}, query ->
+        EctoUtils.Queryable.apply_filter(query, key, value)
+    end)
+  end
+
   @doc false
   @spec changeset(t() | Ecto.Changeset.t(t()), map()) :: Ecto.Changeset.t(t())
   def changeset(tag, attrs) do

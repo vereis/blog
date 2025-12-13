@@ -41,6 +41,37 @@ defmodule Blog.TagsTest do
       assert t2.label == "bravo"
       assert t3.label == "zulu"
     end
+
+    test "filters tags having posts" do
+      tag_with_post = insert(:tag, label: "elixir")
+      tag_without_post = insert(:tag, label: "unused")
+      _post = insert(:post, tags: [tag_with_post])
+
+      tags = Tags.list_tags(having: :posts)
+
+      assert length(tags) == 1
+      assert hd(tags).id == tag_with_post.id
+      refute Enum.any?(tags, &(&1.id == tag_without_post.id))
+    end
+
+    test "filters tags having projects" do
+      tag_with_project = insert(:tag, label: "elixir")
+      tag_without_project = insert(:tag, label: "unused")
+      _project = insert(:project, tags: [tag_with_project])
+
+      tags = Tags.list_tags(having: :projects)
+
+      assert length(tags) == 1
+      assert hd(tags).id == tag_with_project.id
+      refute Enum.any?(tags, &(&1.id == tag_without_project.id))
+    end
+
+    test "returns empty list when filtering by association with no items" do
+      insert(:tag, label: "unused")
+
+      assert Tags.list_tags(having: :posts) == []
+      assert Tags.list_tags(having: :projects) == []
+    end
   end
 
   describe "get_tag/1" do
