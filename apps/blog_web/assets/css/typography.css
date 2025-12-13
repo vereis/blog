@@ -1,10 +1,42 @@
 @layer base {
+  @font-face {
+    font-family: 'Maple Mono';
+    src: url('/fonts/MapleMono-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Maple Mono';
+    src: url('/fonts/MapleMono-Italic.ttf') format('truetype');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Maple Mono';
+    src: url('/fonts/MapleMono-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Maple Mono';
+    src: url('/fonts/MapleMono-BoldItalic.ttf') format('truetype');
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+  }
+
   :root {
     /* Typography variables */
     --grid-base: 16px;
-    --line-height: 1.3;
+    --line-height: 1.4;
     --font-size-base: var(--grid-base);
-    --font-mono: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+    --font-mono: 'Maple Mono', ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 
     /* Font weights */
     --font-weight-normal: 400;
