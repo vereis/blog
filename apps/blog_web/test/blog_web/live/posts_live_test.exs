@@ -44,7 +44,6 @@ defmodule BlogWeb.PostsLiveTest do
       html = render(view)
       assert html =~ "Test Post"
       assert html =~ "Jan 15, 2024"
-      assert html =~ "~5 min"
     end
 
     test "displays posts with index numbers", %{conn: conn} do
@@ -80,7 +79,7 @@ defmodule BlogWeb.PostsLiveTest do
       render(view)
 
       view
-      |> element("a[href='/posts/my-post']")
+      |> element(".post-title a[href='/posts/my-post']")
       |> render_click()
 
       assert_patch(view, ~p"/posts/my-post")

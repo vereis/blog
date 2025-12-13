@@ -52,7 +52,6 @@
     & .project-description {
       margin: 0;
       margin-block-start: var(--space-line);
-      color: var(--color-fg-secondary);
     }
 
     & .tags {
