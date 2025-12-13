@@ -12,6 +12,7 @@ defmodule Blog.Posts.Post do
   alias Blog.Assets
   alias Blog.Assets.Asset
   alias Blog.Markdown
+  alias Blog.Schema.FTS
 
   @castable_fields [:title, :raw_body, :slug, :is_draft, :published_at]
   @slug_format ~r/^[a-z0-9_-]+$/
@@ -57,6 +58,19 @@ defmodule Blog.Posts.Post do
   @impl EctoUtils.Queryable
   def query(base_query, filters) do
     Enum.reduce(filters, base_query, fn
+      {:search, search_term}, query ->
+        case FTS.sanitize_fts_query(search_term) do
+          nil ->
+            from post in query, order_by: [desc: :published_at]
+
+          sanitized_term ->
+            from post in query,
+              join: fts in "posts_fts",
+              on: post.id == fts.post_id,
+              where: fragment("posts_fts MATCH ?", ^sanitized_term),
+              order_by: [asc: fts.rank]
+        end
+
       {:tags, tags}, query when empty?(tags) ->
         query
 

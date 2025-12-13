@@ -225,4 +225,130 @@ defmodule Blog.ProjectsTest do
       assert Projects.get_project(project.id) == nil
     end
   end
+
+  describe "FTS search" do
+    setup do
+      elixir_tag = insert(:tag, label: "elixir")
+      web_tag = insert(:tag, label: "web")
+      cli_tag = insert(:tag, label: "cli")
+
+      project1 =
+        insert(:project,
+          name: "ExampleElixir",
+          url: "https://github.com/example/elixir",
+          description: "A library for Elixir development with powerful features",
+          tags: [elixir_tag]
+        )
+
+      project2 =
+        insert(:project,
+          name: "PhoenixWeb",
+          url: "https://github.com/example/phoenix",
+          description: "Web framework built with Elixir for modern applications",
+          tags: [elixir_tag, web_tag]
+        )
+
+      project3 =
+        insert(:project,
+          name: "RustCLI",
+          url: "https://github.com/example/rust-cli",
+          description: "Command line interface tool written in Rust",
+          tags: [cli_tag]
+        )
+
+      %{project1: project1, project2: project2, project3: project3}
+    end
+
+    test "searches projects by name", %{project1: project1} do
+      results = Projects.list_projects(search: "Elixir")
+
+      refute Enum.empty?(results)
+      assert Enum.any?(results, &(&1.id == project1.id))
+    end
+
+    test "searches projects by description", %{project2: project2} do
+      results = Projects.list_projects(search: "framework")
+
+      refute Enum.empty?(results)
+      assert Enum.any?(results, &(&1.id == project2.id))
+    end
+
+    test "searches projects by tags", %{project1: project1, project2: project2} do
+      results = Projects.list_projects(search: "elixir")
+
+      refute Enum.empty?(results)
+      assert Enum.any?(results, &(&1.id == project1.id))
+      assert Enum.any?(results, &(&1.id == project2.id))
+    end
+
+    test "returns empty list for non-matching search" do
+      results = Projects.list_projects(search: "python")
+
+      assert results == []
+    end
+
+    test "handles AND operator", %{project2: project2} do
+      results = Projects.list_projects(search: "Elixir AND web")
+
+      refute Enum.empty?(results)
+      assert Enum.any?(results, &(&1.id == project2.id))
+    end
+
+    test "handles OR operator", %{project1: project1, project3: project3} do
+      results = Projects.list_projects(search: "library OR tool")
+
+      refute Enum.empty?(results)
+      assert Enum.any?(results, &(&1.id == project1.id))
+      assert Enum.any?(results, &(&1.id == project3.id))
+    end
+
+    test "handles NOT operator", %{project3: project3} do
+      results = Projects.list_projects(search: "tool NOT Elixir")
+
+      refute Enum.empty?(results)
+      assert Enum.any?(results, &(&1.id == project3.id))
+    end
+
+    test "handles quoted phrase search", %{project1: project1} do
+      results = Projects.list_projects(search: "\"Elixir development\"")
+
+      refute Enum.empty?(results)
+      assert Enum.any?(results, &(&1.id == project1.id))
+    end
+
+    test "handles wildcard search", %{project1: project1, project2: project2} do
+      results = Projects.list_projects(search: "Elix*")
+
+      refute Enum.empty?(results)
+      assert Enum.any?(results, &(&1.id == project1.id))
+      assert Enum.any?(results, &(&1.id == project2.id))
+    end
+
+    test "handles column-specific search", %{project1: project1} do
+      results = Projects.list_projects(search: "name:ExampleElixir")
+
+      refute Enum.empty?(results)
+      assert Enum.any?(results, &(&1.id == project1.id))
+    end
+
+    test "returns projects ordered by name asc for empty search", %{project1: _p1, project2: _p2, project3: _p3} do
+      results = Projects.list_projects(search: "")
+
+      refute Enum.empty?(results)
+      assert is_list(results)
+    end
+
+    test "returns projects ordered by name asc for nil search", %{project1: _p1, project2: _p2, project3: _p3} do
+      results = Projects.list_projects(search: nil)
+
+      refute Enum.empty?(results)
+      assert is_list(results)
+    end
+
+    test "handles complex queries with multiple operators" do
+      results = Projects.list_projects(search: "(Elixir OR Rust) AND tool")
+
+      assert is_list(results)
+    end
+  end
 end

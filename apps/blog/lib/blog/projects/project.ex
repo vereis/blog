@@ -9,6 +9,8 @@ defmodule Blog.Projects.Project do
 
   import Blog.Utils.Guards
 
+  alias Blog.Schema.FTS
+
   @castable_fields [:name, :url, :description]
 
   schema "projects" do
@@ -36,6 +38,19 @@ defmodule Blog.Projects.Project do
   @impl EctoUtils.Queryable
   def query(base_query, filters) do
     Enum.reduce(filters, base_query, fn
+      {:search, search_term}, query ->
+        case FTS.sanitize_fts_query(search_term) do
+          nil ->
+            from project in query, order_by: [asc: :name]
+
+          sanitized_term ->
+            from project in query,
+              join: fts in "projects_fts",
+              on: project.id == fts.project_id,
+              where: fragment("projects_fts MATCH ?", ^sanitized_term),
+              order_by: [asc: fts.rank]
+        end
+
       {:tags, tags}, query when empty?(tags) ->
         query
 
