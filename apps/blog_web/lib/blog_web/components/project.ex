@@ -50,7 +50,8 @@ defmodule BlogWeb.Components.Project do
   attr :projects, :any, default: [], doc: "List of Project structs or LiveView stream"
   attr :loading, :boolean, default: false
   attr :id, :string, default: "projects"
-  attr :title, :string, default: "All Projects"
+  attr :title, :string, default: "Projects"
+  attr :all_tags, :list, default: []
   attr :selected_tags, :list, default: []
   attr :rest, :global, doc: "Additional HTML attributes to add to the list element"
 
@@ -58,52 +59,62 @@ defmodule BlogWeb.Components.Project do
     assigns = assign(assigns, :base_url, @base_url)
 
     ~H"""
-    <section>
+    <section class="project-list-section">
       <Badge.badge id={"#{@id}-title"}>{@title}</Badge.badge>
-      <%= cond do %>
-        <% @loading -> %>
-          <p id={"#{@id}-loading-text"} phx-hook=".ScrambleCount"><span data-count>0</span> items</p>
-          <ol
-            id={"#{@id}-loading"}
-            class={["projects-list", "projects-loading"]}
-            aria-busy="true"
-            {@rest}
-          >
-            <.skeleton :for={_ <- 1..5} />
-          </ol>
-          <script :type={Phoenix.LiveView.ColocatedHook} name=".ScrambleCount">
-            export default {
-              mounted() {
-                const span = this.el.querySelector('[data-count]');
-                this.interval = setInterval(() => {
-                  span.textContent = Math.floor(Math.random() * 10);
-                }, 50);
-              },
-              destroyed() {
-                clearInterval(this.interval);
+      <Tag.filter
+        :if={@all_tags != []}
+        tags={@all_tags}
+        base_url={@base_url}
+        selected_tags={@selected_tags}
+      />
+      <div class="project-list-content">
+        <%= cond do %>
+          <% @loading -> %>
+            <p id={"#{@id}-loading-text"} phx-hook=".ScrambleCount">
+              <span data-count>0</span> items
+            </p>
+            <ol
+              id={"#{@id}-loading"}
+              class={["projects-list", "projects-loading"]}
+              aria-busy="true"
+              {@rest}
+            >
+              <.skeleton :for={_ <- 1..5} />
+            </ol>
+            <script :type={Phoenix.LiveView.ColocatedHook} name=".ScrambleCount">
+              export default {
+                mounted() {
+                  const span = this.el.querySelector('[data-count]');
+                  this.interval = setInterval(() => {
+                    span.textContent = Math.floor(Math.random() * 10);
+                  }, 50);
+                },
+                destroyed() {
+                  clearInterval(this.interval);
+                }
               }
-            }
-          </script>
-        <% match?(%LiveStream{inserts: []}, @projects) or @projects == [] -> %>
-          <p>No items</p>
-          <ol id={"#{@id}-empty"} class="projects-list" {@rest}>
-            <li class="projects-list-empty">
-              No projects yet. Check back soon!
-            </li>
-          </ol>
-        <% true -> %>
-          <p>{Enum.count(@projects)} items</p>
-          <ol id={@id} class="projects-list" phx-update={phx_update(@projects)} {@rest}>
-            <.item
-              :for={{dom_id, {project, index}} <- normalize_projects(@projects)}
-              id={dom_id}
-              project={project}
-              index={index}
-              base_url={@base_url}
-              selected_tags={@selected_tags}
-            />
-          </ol>
-      <% end %>
+            </script>
+          <% match?(%LiveStream{inserts: []}, @projects) or @projects == [] -> %>
+            <p>No items</p>
+            <ol id={"#{@id}-empty"} class="projects-list" {@rest}>
+              <li class="projects-list-empty">
+                No projects yet. Check back soon!
+              </li>
+            </ol>
+          <% true -> %>
+            <p>{Enum.count(@projects)} items</p>
+            <ol id={@id} class="projects-list" phx-update={phx_update(@projects)} {@rest}>
+              <.item
+                :for={{dom_id, {project, index}} <- normalize_projects(@projects)}
+                id={dom_id}
+                project={project}
+                index={index}
+                base_url={@base_url}
+                selected_tags={@selected_tags}
+              />
+            </ol>
+        <% end %>
+      </div>
     </section>
     """
   end

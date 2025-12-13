@@ -71,10 +71,10 @@ defmodule BlogWeb.Components.PostTest do
   end
 
   describe "Post.list/1 - with title" do
-    test "renders default title badge 'All Posts'" do
+    test "renders default title badge 'Blog Posts'" do
       html = render_component(&Post.list/1, %{posts: [], empty: true})
 
-      assert html =~ "All Posts"
+      assert html =~ "Blog Posts"
       assert html =~ "badge"
     end
 
@@ -83,7 +83,7 @@ defmodule BlogWeb.Components.PostTest do
 
       assert html =~ "Recent Posts"
       assert html =~ "badge"
-      refute html =~ "All Posts"
+      refute html =~ "Blog Posts"
     end
   end
 

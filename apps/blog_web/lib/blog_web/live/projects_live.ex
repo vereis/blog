@@ -11,10 +11,13 @@ defmodule BlogWeb.ProjectsLive do
       Phoenix.PubSub.subscribe(Blog.PubSub, "project:reload")
     end
 
+    all_tags = Blog.Tags.list_tags()
+
     socket =
       socket
       |> assign(:loading, true)
       |> assign(:debug_params, Map.take(params, ["_debug"]))
+      |> assign(:all_tags, all_tags)
       |> stream_configure(:projects, dom_id: fn {project, _index} -> "project-#{project.id}" end)
       |> stream(:projects, [])
 
@@ -74,6 +77,7 @@ defmodule BlogWeb.ProjectsLive do
         projects={@streams.projects}
         loading={@loading}
         id="projects"
+        all_tags={@all_tags}
         selected_tags={@selected_tags}
       />
     </Layouts.app>

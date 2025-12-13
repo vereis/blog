@@ -12,10 +12,13 @@ defmodule BlogWeb.PostsLive do
       Phoenix.PubSub.subscribe(Blog.PubSub, "post:reload")
     end
 
+    all_tags = Blog.Tags.list_tags()
+
     socket =
       socket
       |> assign(:loading, true)
       |> assign(:debug_params, Map.take(params, ["_debug"]))
+      |> assign(:all_tags, all_tags)
       |> stream_configure(:posts, dom_id: fn {post, _index} -> "post-#{post.id}" end)
       |> stream(:posts, [])
 
@@ -85,6 +88,7 @@ defmodule BlogWeb.PostsLive do
             posts={@streams.posts}
             loading={@loading}
             id="posts"
+            all_tags={@all_tags}
             selected_tags={@selected_tags}
           />
         <% @live_action == :show and is_struct(@post) -> %>
