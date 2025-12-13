@@ -4,6 +4,12 @@ defmodule Blog.Resource.WatcherTest do
   alias Blog.Posts.Post
   alias Blog.Resource.Watcher
 
+  setup do
+    # Start the watcher for these tests since it's not started in test env
+    start_supervised!({Watcher, schemas: [Blog.Assets.Asset, Post, Blog.Projects.Project]})
+    :ok
+  end
+
   describe "initialization" do
     test "does not trigger import in test environment on boot" do
       initial_count = length(Blog.Posts.list_posts())
