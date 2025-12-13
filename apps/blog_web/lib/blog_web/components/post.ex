@@ -6,6 +6,7 @@ defmodule BlogWeb.Components.Post do
 
   alias Blog.Posts.Post
   alias BlogWeb.Components.Badge
+  alias BlogWeb.Components.EmptyState
   alias BlogWeb.Components.Tag
 
   @base_url "/posts"
@@ -90,11 +91,9 @@ defmodule BlogWeb.Components.Post do
       <div class="post-list-content">
         <%= if @posts == [] do %>
           <p>No items</p>
-          <ol id={"#{@id}-empty"} class="posts-list" {@rest}>
-            <li class="posts-list-empty">
-              No posts yet. Check back soon!
-            </li>
-          </ol>
+          <EmptyState.block>
+            No posts found. <.link navigate="/">Return home</.link> or check back later!
+          </EmptyState.block>
         <% else %>
           <p>{length(@posts)} items</p>
           <ol id={@id} class="posts-list" {@rest}>

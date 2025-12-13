@@ -5,6 +5,7 @@ defmodule BlogWeb.Components.Tag do
   use Phoenix.Component
 
   alias Blog.Tags.Tag
+  alias BlogWeb.Components.EmptyState
 
   @doc """
   Renders a list of tags as navigation links.
@@ -95,7 +96,7 @@ defmodule BlogWeb.Components.Tag do
       </legend>
       <nav class="tags" aria-label="Filter tags">
         <%= if @tags == [] do %>
-          <p class="tags-empty">No tags available</p>
+          <EmptyState.inline>No tags available</EmptyState.inline>
         <% else %>
           <.single
             :for={tag <- @tags}

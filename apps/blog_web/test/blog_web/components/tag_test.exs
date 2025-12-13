@@ -1,6 +1,8 @@
 defmodule BlogWeb.Components.TagTest do
   use BlogWeb.ConnCase
 
+  import Phoenix.LiveViewTest
+
   alias BlogWeb.Components.Tag
 
   describe "labels_from_params/1" do
@@ -37,6 +39,21 @@ defmodule BlogWeb.Components.TagTest do
 
     test "returns string label as-is" do
       assert Tag.tag_label("phoenix") == "phoenix"
+    end
+  end
+
+  describe "filter/1" do
+    test "renders inline empty state with accessibility when no tags available" do
+      html =
+        render_component(&Tag.filter/1, %{
+          tags: [],
+          base_url: "/posts",
+          selected_tags: []
+        })
+
+      assert html =~ ~s(class="empty-state-inline")
+      assert html =~ ~s(role="status")
+      assert html =~ "No tags available"
     end
   end
 

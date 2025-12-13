@@ -7,7 +7,7 @@ defmodule BlogWeb.Components.ProjectTest do
   alias BlogWeb.Components.Project
 
   describe "list/1" do
-    test "renders empty state when no projects exist" do
+    test "renders block empty state when no projects exist" do
       html =
         render_component(&Project.list/1,
           projects: [],
@@ -15,8 +15,10 @@ defmodule BlogWeb.Components.ProjectTest do
           id: "test-projects"
         )
 
-      assert html =~ "No projects yet. Check back soon!"
-      assert html =~ "projects-list-empty"
+      assert html =~ "No projects found"
+      assert html =~ "Return home"
+      assert html =~ ~s(class="empty-state")
+      assert html =~ ~s(role="status")
       assert html =~ "No items"
     end
 

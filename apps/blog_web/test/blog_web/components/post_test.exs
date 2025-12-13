@@ -8,18 +8,21 @@ defmodule BlogWeb.Components.PostTest do
   alias BlogWeb.Components.Post
 
   describe "Post.list/1 - empty state" do
-    test "renders empty state message when empty is true" do
+    test "renders block empty state when posts are empty" do
       html = render_component(&Post.list/1, %{posts: []})
 
-      assert html =~ ~s(class="posts-list-empty")
-      assert html =~ "No posts yet. Check back soon!"
+      assert html =~ ~s(class="empty-state")
+      assert html =~ ~s(role="status")
+      assert html =~ "No posts found"
+      assert html =~ "Return home"
     end
 
-    test "renders list structure for empty state" do
+    test "does not render list structure when empty" do
       html = render_component(&Post.list/1, %{posts: []})
 
-      assert html =~ "<ol"
-      assert html =~ "posts-list"
+      refute html =~ "<ol"
+      refute html =~ "posts-list"
+      assert html =~ "empty-state"
     end
   end
 
