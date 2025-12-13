@@ -5,6 +5,7 @@ defmodule BlogWeb.Components.Project do
   use Phoenix.Component
 
   alias BlogWeb.Components.Badge
+  alias BlogWeb.Components.EmptyState
   alias BlogWeb.Components.Tag
 
   @base_url "/projects"
@@ -68,11 +69,9 @@ defmodule BlogWeb.Components.Project do
       <div class="project-list-content">
         <%= if @projects == [] do %>
           <p>No items</p>
-          <ol id={"#{@id}-empty"} class="projects-list" {@rest}>
-            <li class="projects-list-empty">
-              No projects yet. Check back soon!
-            </li>
-          </ol>
+          <EmptyState.block>
+            No projects found. <.link navigate="/">Return home</.link> or check back later!
+          </EmptyState.block>
         <% else %>
           <p>{length(@projects)} items</p>
           <ol id={@id} class="projects-list" {@rest}>

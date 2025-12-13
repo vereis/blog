@@ -9,7 +9,6 @@ defmodule BlogWeb.ProjectsLiveTest do
       {:ok, _view, html} = live(conn, ~p"/projects")
 
       assert html =~ "Projects"
-      assert html =~ "projects-list"
     end
 
     test "loads and displays projects after mount", %{conn: conn} do
@@ -22,10 +21,11 @@ defmodule BlogWeb.ProjectsLiveTest do
     end
 
     test "displays empty state when no projects exist", %{conn: conn} do
-      {:ok, view, _html} = live(conn, ~p"/projects?_debug=empty")
+      {:ok, view, _html} = live(conn, ~p"/projects")
 
-      assert render(view) =~ "No projects yet. Check back soon!"
-      assert has_element?(view, ".projects-list-empty")
+      assert render(view) =~ "No projects found"
+      assert render(view) =~ "Return home"
+      assert has_element?(view, ".empty-state")
     end
 
     test "displays projects with metadata", %{conn: conn} do

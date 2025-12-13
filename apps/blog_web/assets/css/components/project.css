@@ -88,9 +88,4 @@
     }
   }
 
-  .projects-list-empty {
-    padding-block: var(--space-line);
-    text-align: center;
-    color: var(--color-fg-secondary);
-  }
 }

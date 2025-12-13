@@ -3,6 +3,7 @@ defmodule BlogWeb.GalleryLive do
   use BlogWeb, :live_view
 
   alias BlogWeb.Components.Bluescreen
+  alias BlogWeb.Components.EmptyState
   alias BlogWeb.Components.Gallery
   alias BlogWeb.Components.Post
   alias BlogWeb.Components.Project
@@ -96,6 +97,31 @@ defmodule BlogWeb.GalleryLive do
 
       <Gallery.item title="Bluescreen" description="Windows 95-style error screen">
         <Bluescreen.bluescreen error={nil} href="/gallery" />
+      </Gallery.item>
+
+      <Gallery.item
+        title="Empty State - Block"
+        description="Terminal-style block empty state with diagonal backslash hatching pattern"
+      >
+        <EmptyState.block>
+          No content found. Check back later!
+        </EmptyState.block>
+      </Gallery.item>
+
+      <Gallery.item
+        title="Empty State - Block with Link"
+        description="Block empty state with navigation link"
+      >
+        <EmptyState.block>
+          Nothing here yet. <.link navigate="/">Return home</.link> or browse the gallery instead!
+        </EmptyState.block>
+      </Gallery.item>
+
+      <Gallery.item title="Empty State - Inline" description="Inline empty state for minor contexts">
+        <p>
+          Available tags:
+          <EmptyState.inline>No tags available</EmptyState.inline>
+        </p>
       </Gallery.item>
 
       <Gallery.item title="Post List - With Posts" description="Multiple posts in list view">
