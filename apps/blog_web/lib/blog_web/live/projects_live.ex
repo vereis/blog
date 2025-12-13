@@ -48,24 +48,23 @@ defmodule BlogWeb.ProjectsLive do
   end
 
   defp apply_action(socket, :index, _params) do
-    filters = [
-      search: socket.assigns[:search_query],
-      tags: socket.assigns[:selected_tags],
-      order_by: [desc: :inserted_at]
-    ]
-
-    projects = Blog.Projects.list_projects(filters)
-
     socket
     |> assign(:page_title, "Projects")
-    |> assign(:projects, projects)
+    |> assign(
+      :projects,
+      Blog.Projects.list_projects(
+        search: socket.assigns[:search_query],
+        tags: socket.assigns[:selected_tags],
+        order_by: [desc: :inserted_at]
+      )
+    )
   rescue
     e in Exqlite.Error ->
       if FTS.fts_error?(e) do
         socket
         |> assign(:page_title, "Projects")
         |> assign(:projects, [])
-        |> put_flash(:error, "Invalid search query syntax")
+        |> put_flash(:error, {"Search Error!", "Invalid search query syntax"})
       else
         reraise e, __STACKTRACE__
       end

@@ -55,7 +55,7 @@ defmodule BlogWeb.Components.Search do
           value={@value}
           placeholder={@placeholder}
           class="search-input"
-          phx-debounce="300"
+          phx-debounce="350"
           autocomplete="off"
         />
       </form>

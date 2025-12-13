@@ -61,19 +61,19 @@ defmodule BlogWeb.Layouts do
 
   def flash_group(assigns) do
     ~H"""
-    <div id={@id} aria-live="polite">
+    <div id={@id} class="flash-group" aria-live="polite">
       <.flash kind={:info} flash={@flash} />
       <.flash kind={:error} flash={@flash} />
 
       <.flash
         id="client-error"
         kind={:error}
-        title="We can't find the internet"
+        title="No Connection!"
         phx-disconnected={show(".phx-client-error #client-error") |> JS.remove_attribute("hidden")}
         phx-connected={hide("#client-error") |> JS.set_attribute({"hidden", ""})}
         hidden
       >
-        Attempting to reconnect <.icon name="spinner" class="icon-spin" />
+        Attempting to reconnect
       </.flash>
 
       <.flash
@@ -84,7 +84,7 @@ defmodule BlogWeb.Layouts do
         phx-connected={hide("#server-error") |> JS.set_attribute({"hidden", ""})}
         hidden
       >
-        Attempting to reconnect <.icon name="spinner" class="icon-spin" />
+        Attempting to reconnect
       </.flash>
     </div>
     """

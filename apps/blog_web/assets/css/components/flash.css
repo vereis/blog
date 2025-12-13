@@ -1,0 +1,77 @@
+@layer components {
+  #flash-group {
+    position: fixed;
+    bottom: 2lh;
+    left: 4ch;
+  }
+
+  .flash-group {
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 1lh 0;
+    pointer-events: none;
+  }
+
+  .flash {
+    padding: 1lh 2ch;
+    background-color: var(--color-bg-primary);
+    pointer-events: auto;
+    max-width: 50ch;
+    box-shadow: 1ch 1lh 0 0 rgba(0, 0, 0, 0.75);
+
+    & p {
+      margin: 0;
+    }
+  }
+
+  .flash-info {
+    border-left: 1px solid var(--ansi-bright-cyan);
+    border-right: 1px solid var(--ansi-bright-cyan);
+  }
+
+  .flash-error {
+    border-left: 1px solid var(--color-error);
+    border-right: 1px solid var(--color-error);
+  }
+
+  .flash-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .flash-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1ch;
+  }
+
+  .flash-title {
+    flex: 1;
+    font-weight: bold;
+  }
+
+  .flash-message {
+    font-style: italic;
+  }
+
+  .flash-close {
+    background: none;
+    border: none;
+    color: var(--color-fg-secondary);
+    cursor: pointer;
+    padding: 0;
+    display: inline-block;
+    vertical-align: baseline;
+  }
+
+  .flash-close .icon {
+    display: inline-block;
+    vertical-align: baseline;
+  }
+
+  .flash-close:hover {
+    color: var(--color-fg-primary);
+  }
+}

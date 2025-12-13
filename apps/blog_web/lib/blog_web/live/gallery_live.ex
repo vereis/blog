@@ -63,12 +63,14 @@ defmodule BlogWeb.GalleryLive do
       </Gallery.item>
 
       <Gallery.item title="Flash Messages" description="Flash notifications for user feedback">
-        <.flash kind={:info} title="Info Flash">
-          This is an informational message.
-        </.flash>
-        <.flash kind={:error} title="Error Flash">
-          This is an error message.
-        </.flash>
+        <div id="gallery-flash-group" class="flash-group" aria-live="polite">
+          <.flash kind={:info} title="Info Flash">
+            This is an informational message.
+          </.flash>
+          <.flash kind={:error} title="Error Flash">
+            This is an error message.
+          </.flash>
+        </div>
       </Gallery.item>
 
       <Gallery.item title="Navigation" description="Site navigation component">
