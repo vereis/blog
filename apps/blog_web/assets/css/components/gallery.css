@@ -25,7 +25,7 @@
   .icon-gallery {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(12ch, 1fr));
-    gap: var(--space-4);
+    gap: var(--space-line) var(--space-4);
   }
 
   .icon-item {

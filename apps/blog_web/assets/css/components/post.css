@@ -6,7 +6,7 @@
   .post-title {
     display: flex;
     align-items: baseline;
-    gap: var(--space-2);
+    gap: 0 var(--space-2);
     flex-wrap: wrap;
     margin-block-end: var(--space-line);
   }
@@ -41,7 +41,7 @@
     & .post-header {
       display: flex;
       align-items: flex-start;
-      gap: var(--space-1);
+      gap: 0 var(--space-1);
     }
 
     & .post-index {
@@ -105,7 +105,7 @@
     & .post-header {
       display: flex;
       align-items: flex-start;
-      gap: var(--space-1);
+      gap: 0 var(--space-1);
     }
 
     & .post-content {
