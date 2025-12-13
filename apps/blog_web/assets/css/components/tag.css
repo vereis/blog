@@ -2,7 +2,7 @@
   .tags {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-1);
+    gap: 0 var(--space-1);
   }
 
   .tag {
@@ -14,11 +14,13 @@
       margin-inline-end: -1ch;
     }
 
-    &.tag-active,
-    &:hover {
+    &.tag-active {
       background-color: var(--color-accent);
       color: var(--color-bg-primary);
-      padding: 0 var(--space-1);
+    }
+
+    &:hover {
+      text-decoration: underline;
     }
   }
 
@@ -26,7 +28,6 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--space-1);
     margin-block-end: var(--space-line);
   }
 

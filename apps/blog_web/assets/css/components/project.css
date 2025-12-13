@@ -24,7 +24,7 @@
     & .project-header {
       display: flex;
       align-items: flex-start;
-      gap: var(--space-1);
+      gap: 0 var(--space-1);
     }
 
     & .project-index {
@@ -89,7 +89,7 @@
     & .project-header {
       display: flex;
       align-items: flex-start;
-      gap: var(--space-1);
+      gap: 0 var(--space-1);
     }
 
     & .project-content {
