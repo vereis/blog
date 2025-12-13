@@ -25,22 +25,33 @@ defmodule BlogWeb.CoreComponents do
 
     ~H"""
     <div
-      :if={msg = render_slot(@inner_block) || Phoenix.Flash.get(@flash, @kind)}
+      :if={flash_data = render_slot(@inner_block) || Phoenix.Flash.get(@flash, @kind)}
       id={@id}
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
       role="alert"
       class={["flash", "flash-#{@kind}"]}
       {@rest}
     >
-      <.icon :if={@kind == :info} name="info" />
-      <.icon :if={@kind == :error} name="error" />
       <div class="flash-content">
-        <p :if={@title} class="flash-title">{@title}</p>
-        <p>{msg}</p>
+        <%= case flash_data do %>
+          <% {title, msg} -> %>
+            <div class="flash-header">
+              <p class="flash-title">{title}</p>
+              <button type="button" class="flash-close" aria-label="Close notification">
+                <.icon name="close" />
+              </button>
+            </div>
+            <p class="flash-message">{msg}</p>
+          <% msg -> %>
+            <div class="flash-header">
+              <p :if={@title} class="flash-title">{@title}</p>
+              <button type="button" class="flash-close" aria-label="Close notification">
+                <.icon name="close" />
+              </button>
+            </div>
+            <p class="flash-message">{msg}</p>
+        <% end %>
       </div>
-      <button type="button" class="flash-close" aria-label="close">
-        <.icon name="close" />
-      </button>
     </div>
     """
   end

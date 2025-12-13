@@ -49,24 +49,23 @@ defmodule BlogWeb.PostsLive do
   end
 
   defp apply_action(socket, :index, _params) do
-    filters = [
-      search: socket.assigns[:search_query],
-      tags: socket.assigns[:selected_tags],
-      order_by: [desc: :published_at]
-    ]
-
-    posts = Blog.Posts.list_posts(filters)
-
     socket
     |> assign(:page_title, "Posts")
-    |> assign(:posts, posts)
+    |> assign(
+      :posts,
+      Blog.Posts.list_posts(
+        search: socket.assigns[:search_query],
+        tags: socket.assigns[:selected_tags],
+        order_by: [desc: :published_at]
+      )
+    )
   rescue
     e in Exqlite.Error ->
       if FTS.fts_error?(e) do
         socket
         |> assign(:page_title, "Posts")
         |> assign(:posts, [])
-        |> put_flash(:error, "Invalid search query syntax")
+        |> put_flash(:error, {"Search Error!", "Invalid search query syntax"})
       else
         reraise e, __STACKTRACE__
       end
@@ -76,7 +75,7 @@ defmodule BlogWeb.PostsLive do
     post = Blog.Posts.get_post(slug: slug)
 
     socket
-    |> assign(:page_title, if(post, do: post.title, else: "Post Not Found"))
+    |> assign(:page_title, (post && post.title) || "Post Not Found")
     |> assign(:post, post)
   end
 
