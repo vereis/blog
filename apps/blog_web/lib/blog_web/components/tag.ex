@@ -6,6 +6,7 @@ defmodule BlogWeb.Components.Tag do
 
   alias Blog.Tags.Tag
   alias BlogWeb.Components.EmptyState
+  alias BlogWeb.Components.Search
 
   @doc """
   Renders a list of tags as navigation links.
@@ -16,11 +17,13 @@ defmodule BlogWeb.Components.Tag do
     * `class` - Optional additional CSS classes for the container
     * `base_url` - Base URL for filter links (e.g., "/posts")
     * `selected_tags` - List of currently selected tag labels
+    * `search_query` - Current search query to preserve in URLs
   """
   attr :tags, :list, required: true
   attr :class, :string, default: nil
   attr :base_url, :string, required: true
   attr :selected_tags, :list, default: []
+  attr :search_query, :string, default: ""
 
   def list(assigns) do
     assigns = assign(assigns, :selected_set, MapSet.new(assigns.selected_tags))
@@ -34,7 +37,7 @@ defmodule BlogWeb.Components.Tag do
       <.single
         :for={tag <- @tags}
         tag={tag}
-        href={tag_filter_href(@base_url, tag, @selected_tags)}
+        href={tag_filter_href(@base_url, tag, @selected_tags, @search_query)}
         selected={MapSet.member?(@selected_set, tag_label(tag))}
       />
     </nav>
@@ -80,16 +83,20 @@ defmodule BlogWeb.Components.Tag do
   attr :tags, :list, required: true
   attr :selected_tags, :list, default: []
   attr :base_url, :string, required: true
+  attr :search_query, :string, default: ""
 
   def filter(assigns) do
-    assigns = assign(assigns, :selected_set, MapSet.new(assigns.selected_tags))
+    assigns =
+      assigns
+      |> assign(:selected_set, MapSet.new(assigns.selected_tags))
+      |> assign(:clear_url, build_clear_tags_url(assigns.base_url, assigns.search_query))
 
     ~H"""
     <fieldset class="tag-filter">
       <legend class="tag-filter-label">
         Filter by tag<.link
           :if={@selected_tags != []}
-          patch={@base_url}
+          patch={@clear_url}
           class="tag-filter-clear"
           aria-label="Clear all tag filters"
         > (clear ✕)</.link>:
@@ -101,7 +108,7 @@ defmodule BlogWeb.Components.Tag do
           <.single
             :for={tag <- @tags}
             tag={tag}
-            href={tag_filter_href(@base_url, tag, @selected_tags)}
+            href={tag_filter_href(@base_url, tag, @selected_tags, @search_query)}
             selected={MapSet.member?(@selected_set, tag_label(tag))}
           />
         <% end %>
@@ -155,7 +162,7 @@ defmodule BlogWeb.Components.Tag do
   end
 
   @doc false
-  def tag_filter_href(base_url, tag, selected) do
+  def tag_filter_href(base_url, tag, selected, search_query \\ "") do
     cur = tag_label(tag)
 
     # HACK: Traverse selected tags in `O(n)`, if we find the current tag during
@@ -166,12 +173,26 @@ defmodule BlogWeb.Components.Tag do
     #       to reverse the list before joining.
     acc = {false, []}
 
-    tags =
+    new_selected_tags =
       selected
       |> Enum.reduce(acc, fn tag, {found, acc} -> (tag == cur && {true, acc}) || {found, [tag | acc]} end)
       |> then(fn {found?, acc} -> (found? && acc) || [cur | acc] end)
-      |> Enum.join(",")
 
-    "#{base_url}?#{URI.encode_query(%{"tags" => tags})}"
+    query_params = Search.build_query_params(search_query, new_selected_tags)
+
+    if query_params == "" do
+      base_url
+    else
+      "#{base_url}?#{query_params}"
+    end
+  end
+
+  defp build_clear_tags_url(base_url, search_query) do
+    if search_query == "" do
+      base_url
+    else
+      query = URI.encode_query(%{"q" => search_query})
+      "#{base_url}?#{query}"
+    end
   end
 end

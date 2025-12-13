@@ -209,4 +209,91 @@ defmodule BlogWeb.PostsLiveTest do
       refute render(view) =~ "Original Title"
     end
   end
+
+  describe "search functionality" do
+    test "renders search input", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/posts")
+
+      assert has_element?(view, "input[name='q']")
+      assert has_element?(view, "input[placeholder='(Distributed && Elixir) || Fun']")
+    end
+
+    test "updates URL when search query is entered", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/posts")
+
+      view
+      |> form("form", %{"q" => "elixir"})
+      |> render_change()
+
+      assert_patch(view, ~p"/posts?q=elixir")
+    end
+
+    test "displays search results for matching query", %{conn: conn} do
+      insert(:post, title: "Elixir is great", slug: "elixir-post", raw_body: "Elixir content")
+      insert(:post, title: "Phoenix framework", slug: "phoenix-post", raw_body: "Phoenix content")
+
+      {:ok, view, _html} = live(conn, ~p"/posts?q=Elixir")
+
+      html = render(view)
+      assert html =~ "Elixir is great"
+      refute html =~ "Phoenix framework"
+    end
+
+    test "combines search with tag filtering", %{conn: conn} do
+      elixir_tag = insert(:tag, label: "elixir")
+      phoenix_tag = insert(:tag, label: "phoenix")
+
+      insert(:post, title: "Elixir Post", slug: "elixir-post", raw_body: "Elixir", tags: [elixir_tag])
+      insert(:post, title: "Phoenix Post", slug: "phoenix-post", raw_body: "Phoenix", tags: [phoenix_tag])
+      insert(:post, title: "Elixir Phoenix", slug: "both", raw_body: "Both", tags: [elixir_tag, phoenix_tag])
+
+      {:ok, view, _html} = live(conn, ~p"/posts?q=Elixir&tags=phoenix")
+
+      html = render(view)
+      assert html =~ "Elixir Phoenix"
+      refute html =~ "Elixir Post"
+      refute html =~ "Phoenix Post"
+    end
+
+    test "shows clear link when search query is present", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/posts?q=test")
+
+      assert has_element?(view, "a[aria-label='Clear search']", "(clear ✕)")
+    end
+
+    test "clears search when clear link is clicked", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/posts?q=test")
+
+      view
+      |> element("a[aria-label='Clear search']")
+      |> render_click()
+
+      assert_patch(view, ~p"/posts")
+    end
+
+    test "displays flash error for invalid FTS syntax", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/posts")
+
+      view
+      |> form("form", %{"q" => "\""})
+      |> render_change()
+
+      assert render(view) =~ "Invalid search query syntax"
+      assert has_element?(view, ".flash-error")
+    end
+
+    test "shows empty results on FTS error without crashing", %{conn: conn} do
+      insert(:post, title: "Test Post", slug: "test")
+
+      {:ok, view, _html} = live(conn, ~p"/posts")
+
+      view
+      |> form("form", %{"q" => "\""})
+      |> render_change()
+
+      html = render(view)
+      refute html =~ "Test Post"
+      assert html =~ "No posts found"
+    end
+  end
 end

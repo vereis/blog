@@ -78,8 +78,8 @@ defmodule BlogWeb.Components.TagTest do
                "/posts?tags=phoenix"
     end
 
-    test "returns base_url with empty tags param when removing last tag" do
-      assert Tag.tag_filter_href("/posts", "elixir", ["elixir"]) == "/posts?tags="
+    test "returns base_url when removing last tag" do
+      assert Tag.tag_filter_href("/posts", "elixir", ["elixir"]) == "/posts"
     end
 
     test "works with Tag struct" do
