@@ -14,6 +14,10 @@ defmodule BlogWeb.GalleryLive do
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
+    if connected?(socket) do
+      Phoenix.PubSub.subscribe(Blog.PubSub, "discord:presence")
+    end
+
     test_post = Blog.Posts.get_post(slug: "test")
     posts = Blog.Posts.list_posts(order_by: [desc: :published_at])
     projects = Blog.Projects.list_projects(order_by: [desc: :inserted_at])
@@ -30,6 +34,11 @@ defmodule BlogWeb.GalleryLive do
       |> assign(:presence, presence)
 
     {:ok, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({:presence_updated, presence}, socket) do
+    {:noreply, assign(socket, :presence, presence)}
   end
 
   @impl Phoenix.LiveView

@@ -3,8 +3,10 @@ defmodule BlogWeb.ProjectsLive do
   use BlogWeb, :live_view
 
   alias Blog.Schema.FTS
+  alias BlogWeb.Components.Discord
   alias BlogWeb.Components.Project
   alias BlogWeb.Components.Search
+  alias BlogWeb.Components.TableOfContents
   alias BlogWeb.Components.Tag
 
   @base_url "/projects"
@@ -13,12 +15,14 @@ defmodule BlogWeb.ProjectsLive do
   def mount(_params, _session, socket) do
     if connected?(socket) do
       Phoenix.PubSub.subscribe(Blog.PubSub, "project:reload")
+      Phoenix.PubSub.subscribe(Blog.PubSub, "discord:presence")
     end
 
     socket =
       socket
       |> assign(:all_tags, Blog.Tags.list_tags(having: :projects))
       |> assign(:projects, [])
+      |> assign(:presence, Blog.Discord.get_presence())
 
     {:ok, socket}
   end
@@ -45,6 +49,11 @@ defmodule BlogWeb.ProjectsLive do
   @impl Phoenix.LiveView
   def handle_info({:resource_reload, Blog.Projects.Project, _id}, socket) do
     {:noreply, apply_action(socket, socket.assigns.live_action, %{})}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({:presence_updated, presence}, socket) do
+    {:noreply, assign(socket, :presence, presence)}
   end
 
   defp apply_action(socket, :index, _params) do
@@ -74,6 +83,12 @@ defmodule BlogWeb.ProjectsLive do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
+      <:aside>
+        <Discord.presence presence={@presence} />
+
+        <TableOfContents.toc headings={[]} id="toc" />
+      </:aside>
+
       <Project.list
         projects={@projects}
         id="projects"
