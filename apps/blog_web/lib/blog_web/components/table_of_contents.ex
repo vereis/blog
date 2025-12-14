@@ -18,13 +18,15 @@ defmodule BlogWeb.Components.TableOfContents do
   def toc(assigns) do
     ~H"""
     <nav id={@id} class="toc" phx-hook=".Scrollspy" aria-label="Table of contents">
+      <h2 class="toc-header">Table of Contents</h2>
       <%= if @headings == [] do %>
-        <p>No headings available</p>
+        <p class="toc-empty">No headings available</p>
       <% else %>
-        <ol class="toc-list">
+        <ol class="toc-list" aria-live="polite">
           <%= for heading <- @headings do %>
             <li class="toc-item" data-level={heading.level} data-heading-id={heading.link}>
               <a href={"##{heading.link}"} class="toc-link">
+                <span class="toc-marker">{String.duplicate("#", heading.level)}</span>
                 {heading.title}
               </a>
             </li>
@@ -36,7 +38,6 @@ defmodule BlogWeb.Components.TableOfContents do
     <script :type={Phoenix.LiveView.ColocatedHook} name=".Scrollspy">
       export default {
         mounted() {
-          // Find all headings in the post body that match TOC entries
           const headingIds = Array.from(this.el.querySelectorAll('[data-heading-id]'))
             .map(item => item.getAttribute('data-heading-id'));
 
@@ -46,42 +47,54 @@ defmodule BlogWeb.Components.TableOfContents do
 
           if (headings.length === 0) return;
 
-          // Create IntersectionObserver to track visible headings
-          const observerOptions = {
-            // Trigger when heading is near the top of viewport
-            rootMargin: '-20% 0px -70% 0px',
-            threshold: 0
-          };
+          // NOTE: Cache heading positions on mount to avoid layout thrashing.
+          const headingPositions = headings.map(h => ({ id: h.id, top: h.offsetTop }));
 
-          this.observer = new IntersectionObserver((entries) => {
-            // Find all currently visible headings
-            const visibleHeadings = entries
-              .filter(entry => entry.isIntersecting)
-              .map(entry => entry.target.id);
+          const SCROLL_OFFSET = 100;
 
-            // Clear all active states
+          const updateActive = () => {
+            const scrollTop = window.scrollY + SCROLL_OFFSET;
+            let activeId = headingPositions[0].id;
+
+            for (const pos of headingPositions) {
+              if (pos.top <= scrollTop) {
+                activeId = pos.id;
+              } else {
+                break;
+              }
+            }
+
             this.el.querySelectorAll('[data-active]').forEach(item => {
               delete item.dataset.active;
             });
 
-            // If we have visible headings, mark the first one as active
-            if (visibleHeadings.length > 0) {
-              const activeId = visibleHeadings[0];
-              const activeItem = this.el.querySelector(`[data-heading-id="${activeId}"]`);
-              if (activeItem) {
-                activeItem.dataset.active = 'true';
-              }
+            const activeItem = this.el.querySelector(`[data-heading-id="${activeId}"]`);
+            if (activeItem) {
+              activeItem.dataset.active = 'true';
             }
-          }, observerOptions);
+          };
 
-          // Observe all headings
-          headings.forEach(heading => this.observer.observe(heading));
+          // Throttle scroll updates to once per animation frame (60fps) for performance
+          let ticking = false;
+          this.handleScroll = () => {
+            if (!ticking) {
+              requestAnimationFrame(() => {
+                updateActive();
+                ticking = false;
+              });
+              ticking = true;
+            }
+          };
+
+          this.scrollOptions = { passive: true };
+          window.addEventListener('scroll', this.handleScroll, this.scrollOptions);
+
+          requestAnimationFrame(() => updateActive());
         },
 
         destroyed() {
-          // Clean up observer when component is destroyed
-          if (this.observer) {
-            this.observer.disconnect();
+          if (this.handleScroll) {
+            window.removeEventListener('scroll', this.handleScroll, this.scrollOptions);
           }
         }
       }

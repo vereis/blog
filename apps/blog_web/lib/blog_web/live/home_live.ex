@@ -4,6 +4,7 @@ defmodule BlogWeb.HomeLive do
 
   alias BlogWeb.Components.Bluescreen
   alias BlogWeb.Components.Post
+  alias BlogWeb.Components.TableOfContents
 
   @slug "hello-world"
 
@@ -37,6 +38,13 @@ defmodule BlogWeb.HomeLive do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
+      <:aside :if={@post && is_struct(@post) && length(@post.headings) > 1}>
+        <TableOfContents.toc
+          headings={@post.headings}
+          id={"toc-#{@post.slug}"}
+        />
+      </:aside>
+
       <%= if @post do %>
         <Post.full post={@post} />
       <% else %>

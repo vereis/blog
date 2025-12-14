@@ -1,7 +1,25 @@
 @layer components {
-  .toc {
-    border: 1px solid var(--color-bg-secondary);
-    padding: var(--space-line);
+  .page-aside h1::before,
+  .page-aside h2::before,
+  .page-aside h3::before,
+  .page-aside h4::before,
+  .page-aside h5::before,
+  .page-aside h6::before {
+    content: '';
+  }
+
+  .toc-header {
+    color: var(--color-fg-secondary);
+    font-size: inherit;
+    font-weight: var(--font-weight-normal);
+    margin: 0;
+    margin-block-end: var(--space-line);
+    overflow: hidden;
+    white-space: nowrap;
+    
+    &::after {
+      content: ' ────────────────────────────────────────';
+    }
   }
 
   .toc-list {
@@ -11,44 +29,53 @@
   }
 
   .toc-item {
-    margin-block-end: 0;
-    
-    /* Indent based on heading level */
+    /* Indent: cumulative (+2ch, +3ch, +4ch, +5ch, +6ch) */
     &[data-level="2"] {
       padding-inline-start: var(--space-2);
     }
     
     &[data-level="3"] {
-      padding-inline-start: var(--space-4);
+      padding-inline-start: calc(var(--space-4) + var(--space-1));
     }
     
     &[data-level="4"] {
-      padding-inline-start: calc(var(--space-4) + var(--space-2));
+      padding-inline-start: calc(var(--space-8) + var(--space-1));
     }
     
     &[data-level="5"] {
-      padding-inline-start: calc(var(--space-4) + var(--space-4));
+      padding-inline-start: calc(var(--space-8) + var(--space-4) + var(--space-2) + var(--space-1));
     }
     
     &[data-level="6"] {
-      padding-inline-start: calc(var(--space-4) + var(--space-4) + var(--space-2));
+      padding-inline-start: calc(var(--space-8) + var(--space-8) + var(--space-4) + var(--space-1));
     }
 
-    /* Active state - NO TRANSITIONS */
     &[data-active="true"] {
       & .toc-link {
+        color: var(--color-accent);
+      }
+      
+      & .toc-marker {
         color: var(--color-accent);
       }
     }
   }
 
   .toc-link {
-    color: var(--color-fg-primary);
+    color: var(--ansi-cyan);
     text-decoration: none;
     display: block;
     
     &:hover {
-      color: var(--color-link-hover);
+      text-decoration: underline;
     }
+  }
+
+  .toc-marker {
+    color: var(--ansi-cyan);
+  }
+
+  .toc-empty {
+    color: var(--color-bg-secondary);
   }
 }

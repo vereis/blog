@@ -1,9 +1,60 @@
 @layer base {
-  main {
-    max-inline-size: 80ch;
+  body {
+    /* NOTE: Layout dimensions
+     * --content-max: 80ch (optimal reading width for prose)
+     * --aside-width: 32ch (fits "### Working on Something Cool" without wrapping)
+     * Responsive breakpoint: 116ch (80ch + 32ch + ~4ch gap)
+     */
+    --content-max: 80ch;
+    --aside-width: 32ch;
+    
+    display: grid;
+    grid-template-columns: minmax(0, var(--content-max)) var(--aside-width);
+    grid-template-areas:
+      "header ."
+      "content aside"
+      "footer .";
+    gap: 0 var(--space-4);
+    max-inline-size: calc(var(--content-max) + var(--aside-width) + var(--space-4));
     margin-inline: auto;
     padding-block: var(--space-line-4);
     padding-inline: var(--space-4);
+  }
+
+  .page-header {
+    grid-area: header;
+  }
+
+  .page-content {
+    grid-area: content;
+  }
+
+  .page-aside {
+    grid-area: aside;
+    position: sticky;
+    top: var(--space-line);
+    align-self: start;
+  }
+
+  .page-footer {
+    grid-area: footer;
+  }
+
+  @media (max-width: calc(var(--content-max) + var(--aside-width) + var(--space-4))) {
+    body {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "header"
+        "aside"
+        "content"
+        "footer";
+      max-inline-size: var(--content-max);
+    }
+
+    .page-aside {
+      position: static;
+      margin-block-end: var(--space-line);
+    }
   }
 
   section {
