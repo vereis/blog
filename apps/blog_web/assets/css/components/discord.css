@@ -1,0 +1,61 @@
+/* Discord Presence Component */
+
+@layer components {
+  .page-aside .discord-header::before {
+    content: '';
+  }
+
+  .discord-header {
+    color: var(--color-fg-secondary);
+    font-size: inherit;
+    font-weight: var(--font-weight-normal);
+    margin: 0;
+    margin-block-end: var(--space-line);
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .discord-header::after {
+    content: ' ────────────────────────────────────────';
+    color: var(--color-bg-secondary);
+  }
+
+  .discord-status {
+    margin: 0;
+  }
+
+  .discord-bullet {
+    color: var(--color-fg-primary);
+  }
+
+  .discord-bullet.bullet-online {
+    color: var(--color-success);
+  }
+
+  .discord-bullet.bullet-idle {
+    color: var(--color-warning);
+  }
+
+  .discord-bullet.bullet-dnd {
+    color: var(--color-error);
+  }
+
+  .discord-bullet.bullet-offline {
+    color: var(--color-fg-dim);
+  }
+
+  .discord-username {
+    color: var(--color-fg-primary);
+  }
+
+  .discord-status-text {
+    color: var(--color-fg-secondary);
+  }
+
+  .discord-activity,
+  .discord-spotify {
+    margin: 0;
+    padding-inline-start: var(--space-2);
+    color: var(--color-fg-secondary);
+  }
+}
