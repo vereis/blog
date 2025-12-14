@@ -3,6 +3,7 @@ defmodule BlogWeb.GalleryLive do
   use BlogWeb, :live_view
 
   alias BlogWeb.Components.Bluescreen
+  alias BlogWeb.Components.Discord
   alias BlogWeb.Components.EmptyState
   alias BlogWeb.Components.Gallery
   alias BlogWeb.Components.Post
@@ -17,6 +18,7 @@ defmodule BlogWeb.GalleryLive do
     posts = Blog.Posts.list_posts(order_by: [desc: :published_at])
     projects = Blog.Projects.list_projects(order_by: [desc: :inserted_at])
     all_tags = Blog.Tags.list_tags()
+    presence = Blog.Discord.get_presence()
 
     socket =
       socket
@@ -25,6 +27,7 @@ defmodule BlogWeb.GalleryLive do
       |> assign(:empty_posts, [])
       |> assign(:projects, projects)
       |> assign(:all_tags, all_tags)
+      |> assign(:presence, presence)
 
     {:ok, socket}
   end
@@ -170,22 +173,163 @@ defmodule BlogWeb.GalleryLive do
       </Gallery.item>
 
       <Gallery.item title="Post List - With Posts" description="Multiple posts in list view">
-        <Post.list posts={@posts} all_tags={@all_tags} selected_tags={@selected_tags} />
+        <Post.list
+          id="gallery-posts-with-data"
+          posts={@posts}
+          all_tags={@all_tags}
+          selected_tags={@selected_tags}
+        />
       </Gallery.item>
 
       <Gallery.item title="Post List - Empty State" description="Empty state when no posts exist">
-        <Post.list posts={[]} all_tags={@all_tags} selected_tags={@selected_tags} />
+        <Post.list
+          id="gallery-posts-empty"
+          posts={[]}
+          all_tags={@all_tags}
+          selected_tags={@selected_tags}
+        />
       </Gallery.item>
 
       <Gallery.item title="Project List - With Projects" description="Multiple projects in list view">
-        <Project.list projects={@projects} all_tags={@all_tags} selected_tags={@selected_tags} />
+        <Project.list
+          id="gallery-projects-with-data"
+          projects={@projects}
+          all_tags={@all_tags}
+          selected_tags={@selected_tags}
+        />
       </Gallery.item>
 
       <Gallery.item
         title="Project List - Empty State"
         description="Empty state when no projects exist"
       >
-        <Project.list projects={[]} all_tags={@all_tags} selected_tags={@selected_tags} />
+        <Project.list
+          id="gallery-projects-empty"
+          projects={[]}
+          all_tags={@all_tags}
+          selected_tags={@selected_tags}
+        />
+      </Gallery.item>
+
+      <Gallery.item
+        title="Discord Presence - Online"
+        description="User is online, no activity or spotify"
+      >
+        <Discord.presence
+          id="gallery-discord-online"
+          presence={
+            %Blog.Discord.Presence{
+              connected?: true,
+              discord_user: %{"username" => "vereis"},
+              discord_status: "online",
+              activities: [],
+              listening_to_spotify: false
+            }
+          }
+        />
+      </Gallery.item>
+
+      <Gallery.item
+        title="Discord Presence - Online with Activity"
+        description="User is online and playing a game"
+      >
+        <Discord.presence
+          id="gallery-discord-activity"
+          presence={
+            %Blog.Discord.Presence{
+              connected?: true,
+              discord_user: %{"username" => "vereis"},
+              discord_status: "online",
+              activities: [%{"name" => "Elixir"}],
+              listening_to_spotify: false
+            }
+          }
+        />
+      </Gallery.item>
+
+      <Gallery.item
+        title="Discord Presence - Online with Spotify"
+        description="User is online and listening to Spotify (no activity)"
+      >
+        <Discord.presence
+          id="gallery-discord-spotify"
+          presence={
+            %Blog.Discord.Presence{
+              connected?: true,
+              discord_user: %{"username" => "vereis"},
+              discord_status: "online",
+              activities: [],
+              listening_to_spotify: true,
+              spotify: %{"song" => "Never Gonna Give You Up", "artist" => "Rick Astley"}
+            }
+          }
+        />
+      </Gallery.item>
+
+      <Gallery.item
+        title="Discord Presence - Online with Activity and Spotify"
+        description="User is online, playing a game, and listening to Spotify"
+      >
+        <Discord.presence
+          id="gallery-discord-full"
+          presence={
+            %Blog.Discord.Presence{
+              connected?: true,
+              discord_user: %{"username" => "vereis"},
+              discord_status: "online",
+              activities: [%{"name" => "Visual Studio Code"}],
+              listening_to_spotify: true,
+              spotify: %{"song" => "Lofi Beats", "artist" => "ChilledCow"}
+            }
+          }
+        />
+      </Gallery.item>
+
+      <Gallery.item
+        title="Discord Presence - Idle"
+        description="User is idle with activity"
+      >
+        <Discord.presence
+          id="gallery-discord-idle"
+          presence={
+            %Blog.Discord.Presence{
+              connected?: true,
+              discord_user: %{"username" => "vereis"},
+              discord_status: "idle",
+              activities: [%{"name" => "Phoenix LiveView"}],
+              listening_to_spotify: false
+            }
+          }
+        />
+      </Gallery.item>
+
+      <Gallery.item
+        title="Discord Presence - Do Not Disturb"
+        description="User is in do not disturb mode"
+      >
+        <Discord.presence
+          id="gallery-discord-dnd"
+          presence={
+            %Blog.Discord.Presence{
+              connected?: true,
+              discord_user: %{"username" => "vereis"},
+              discord_status: "dnd",
+              activities: [%{"name" => "Deep Work"}],
+              listening_to_spotify: true,
+              spotify: %{"song" => "Focus Music", "artist" => "Study Vibes"}
+            }
+          }
+        />
+      </Gallery.item>
+
+      <Gallery.item
+        title="Discord Presence - Offline"
+        description="User is disconnected"
+      >
+        <Discord.presence
+          id="gallery-discord-offline"
+          presence={%Blog.Discord.Presence{connected?: false}}
+        />
       </Gallery.item>
     </Layouts.app>
     """

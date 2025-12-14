@@ -19,6 +19,7 @@
     
     &::after {
       content: ' ────────────────────────────────────────';
+      color: var(--color-bg-secondary);
     }
   }
 

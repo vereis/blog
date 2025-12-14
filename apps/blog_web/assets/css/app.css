@@ -13,6 +13,7 @@
 /* Components */
 @import "components/badge.css" layer(components);
 @import "components/bluescreen.css" layer(components);
+@import "components/discord.css" layer(components);
 @import "components/empty-state.css" layer(components);
 @import "components/flash.css" layer(components);
 @import "components/gallery.css" layer(components);
