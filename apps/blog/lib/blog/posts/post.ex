@@ -119,16 +119,17 @@ defmodule Blog.Posts.Post do
   defp process_markdown(changeset) do
     raw_body = get_change(changeset, :raw_body)
     title = get_field(changeset, :title)
+    slug = get_field(changeset, :slug)
 
     case Markdown.render(raw_body, &process_html/2) do
       {:ok, [html, %{headings: headings, excerpt: excerpt}]} ->
         reading_time = calculate_reading_time(raw_body)
 
-        # Always include title as the top-level heading
+        # Always include title as the top-level heading (use slug as link to match badge ID)
         title_heading = %{
           level: 1,
           title: title,
-          link: slugify(title)
+          link: slug
         }
 
         all_headings = [title_heading | headings]
