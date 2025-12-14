@@ -9,7 +9,7 @@
   cursor: wait;
 }
 
-.phx-change-loading {
+.phx-change-loading:not(input):not(form) {
   opacity: 0.5;
   cursor: wait;
 }
