@@ -14,6 +14,7 @@ defmodule Blog.Application do
           {Ecto.Migrator, repos: Application.fetch_env!(:blog, :ecto_repos), skip: skip_migrations?()},
           {DNSCluster, query: Application.get_env(:blog, :dns_cluster_query) || :ignore},
           {Phoenix.PubSub, name: Blog.PubSub},
+          Blog.env() != :test && Blog.Discord.Presence,
           Blog.env() != :test &&
             {Blog.Resource.Watcher, schemas: [Blog.Assets.Asset, Blog.Posts.Post, Blog.Projects.Project]}
         ],

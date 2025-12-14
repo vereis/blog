@@ -245,6 +245,7 @@ defmodule Blog.Discord.PresenceTest do
       assert {:ok, ^state} = Presence.handle_frame({:text, unknown_msg}, state)
     end
 
+    @tag :capture_log
     test "handles invalid JSON gracefully" do
       state = %Presence.State{heartbeat_timer: nil, heartbeat_interval: nil}
 
@@ -270,6 +271,7 @@ defmodule Blog.Discord.PresenceTest do
   end
 
   describe "handle_disconnect/2" do
+    @tag :capture_log
     test "cancels heartbeat timer and returns reconnect" do
       timer = Process.send_after(self(), :heartbeat, 10_000)
       state = %Presence.State{heartbeat_timer: timer, heartbeat_interval: 30_000}
@@ -281,6 +283,7 @@ defmodule Blog.Discord.PresenceTest do
       assert new_state.heartbeat_interval == 30_000
     end
 
+    @tag :capture_log
     test "handles disconnect when no timer exists" do
       state = %Presence.State{heartbeat_timer: nil, heartbeat_interval: 30_000}
 
