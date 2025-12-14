@@ -11,6 +11,7 @@
 @import "animations.css" layer(base);
 
 /* Components */
+@import "components/aside.css" layer(components);
 @import "components/badge.css" layer(components);
 @import "components/bluescreen.css" layer(components);
 @import "components/discord.css" layer(components);

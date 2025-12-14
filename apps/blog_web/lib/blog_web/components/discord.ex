@@ -19,7 +19,7 @@ defmodule BlogWeb.Components.Discord do
   def presence(assigns) do
     ~H"""
     <aside id={@id} class="discord-presence" aria-label="Discord Presence">
-      <h2 class="discord-header">Presence</h2>
+      <h2 class="aside-section-header">Presence</h2>
 
       <p class="discord-status">
         <span class={["discord-bullet", bullet_class(@presence)]}>•</span>

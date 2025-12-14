@@ -1,24 +1,6 @@
 /* Discord Presence Component */
 
 @layer components {
-  .page-aside .discord-header::before {
-    content: '';
-  }
-
-  .discord-header {
-    color: var(--color-fg-secondary);
-    font-size: inherit;
-    font-weight: var(--font-weight-normal);
-    margin: 0;
-    margin-block-end: var(--space-line);
-    overflow: hidden;
-    white-space: nowrap;
-  }
-
-  .discord-header::after {
-    content: ' ────────────────────────────────────────';
-    color: var(--color-bg-secondary);
-  }
 
   .discord-status {
     margin: 0;

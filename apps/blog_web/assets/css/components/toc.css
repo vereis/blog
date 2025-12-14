@@ -1,27 +1,4 @@
 @layer components {
-  .page-aside h1::before,
-  .page-aside h2::before,
-  .page-aside h3::before,
-  .page-aside h4::before,
-  .page-aside h5::before,
-  .page-aside h6::before {
-    content: '';
-  }
-
-  .toc-header {
-    color: var(--color-fg-secondary);
-    font-size: inherit;
-    font-weight: var(--font-weight-normal);
-    margin: 0;
-    margin-block-end: var(--space-line);
-    overflow: hidden;
-    white-space: nowrap;
-    
-    &::after {
-      content: ' ────────────────────────────────────────';
-      color: var(--color-bg-secondary);
-    }
-  }
 
   .toc-list {
     list-style: none;

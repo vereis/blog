@@ -18,7 +18,7 @@ defmodule BlogWeb.Components.TableOfContents do
   def toc(assigns) do
     ~H"""
     <nav id={@id} class="toc" phx-hook=".Scrollspy" aria-label="Table of contents">
-      <h2 class="toc-header">Table of Contents</h2>
+      <h2 class="aside-section-header">Table of Contents</h2>
       <%= if @headings == [] do %>
         <p class="toc-empty">No headings available</p>
       <% else %>
