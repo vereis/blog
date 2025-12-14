@@ -48,9 +48,10 @@ defmodule BlogWeb.Components.Search do
           aria-label="Clear search"
         > (clear ✕)</.link>:
       </legend>
-      <form phx-change="search" class="search-input-wrapper">
+      <form id="search-form" phx-change="search" class="search-input-wrapper">
         <input
           type="text"
+          id="search-query-input"
           name={@name}
           value={@value}
           placeholder={@placeholder}
