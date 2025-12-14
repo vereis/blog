@@ -159,6 +159,41 @@ defmodule BlogWeb.PostsLiveTest do
       assert html2 =~ "Second Post"
       assert html2 =~ "Second content"
     end
+
+    test "displays table of contents when post has multiple headings", %{conn: conn} do
+      insert(:post,
+        title: "Test Post",
+        slug: "test-post",
+        body: "<p>Content</p>",
+        headings: [
+          %{title: "Test Post", link: "test-post", level: 1},
+          %{title: "Introduction", link: "introduction", level: 2},
+          %{title: "Conclusion", link: "conclusion", level: 2}
+        ]
+      )
+
+      {:ok, view, html} = live(conn, ~p"/posts/test-post")
+
+      assert html =~ ~s(class="toc")
+      assert has_element?(view, ".toc")
+      assert has_element?(view, "a[href='#introduction']")
+      assert has_element?(view, "a[href='#conclusion']")
+    end
+
+    test "does not display TOC when post has only title heading", %{conn: conn} do
+      insert(:post,
+        title: "Test Post",
+        slug: "test-post",
+        body: "<p>Content</p>",
+        headings: [
+          %{title: "Test Post", link: "test-post", level: 1}
+        ]
+      )
+
+      {:ok, _view, html} = live(conn, ~p"/posts/test-post")
+
+      refute html =~ ~s(class="toc")
+    end
   end
 
   describe "cross-LiveView navigation" do
