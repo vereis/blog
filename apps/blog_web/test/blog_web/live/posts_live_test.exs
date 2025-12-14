@@ -180,7 +180,7 @@ defmodule BlogWeb.PostsLiveTest do
       assert has_element?(view, "a[href='#conclusion']")
     end
 
-    test "does not display TOC when post has only title heading", %{conn: conn} do
+    test "displays TOC empty state when post has only title heading", %{conn: conn} do
       insert(:post,
         title: "Test Post",
         slug: "test-post",
@@ -190,10 +190,11 @@ defmodule BlogWeb.PostsLiveTest do
         ]
       )
 
-      {:ok, _view, html} = live(conn, ~p"/posts/test-post")
+      {:ok, view, html} = live(conn, ~p"/posts/test-post")
 
-      refute html =~ ~s(class="toc")
-      assert html =~ ~s(<aside class="page-aside" hidden=""></aside>)
+      assert html =~ ~s(class="toc")
+      assert has_element?(view, ".toc-empty", "No headings available")
+      assert has_element?(view, ".page-aside .discord-presence")
     end
   end
 

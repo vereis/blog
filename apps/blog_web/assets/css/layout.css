@@ -34,6 +34,9 @@
     position: sticky;
     top: var(--space-line);
     align-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-line);
   }
 
   .page-footer {

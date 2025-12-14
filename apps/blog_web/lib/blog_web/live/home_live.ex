@@ -3,6 +3,7 @@ defmodule BlogWeb.HomeLive do
   use BlogWeb, :live_view
 
   alias BlogWeb.Components.Bluescreen
+  alias BlogWeb.Components.Discord
   alias BlogWeb.Components.Post
   alias BlogWeb.Components.TableOfContents
 
@@ -12,9 +13,15 @@ defmodule BlogWeb.HomeLive do
   def mount(_params, _session, socket) do
     if connected?(socket) do
       Phoenix.PubSub.subscribe(Blog.PubSub, "post:reload")
+      Phoenix.PubSub.subscribe(Blog.PubSub, "discord:presence")
     end
 
-    {:ok, assign(socket, :post, Blog.Posts.get_post(slug: @slug))}
+    socket =
+      socket
+      |> assign(:post, Blog.Posts.get_post(slug: @slug))
+      |> assign(:presence, Blog.Discord.get_presence())
+
+    {:ok, socket}
   end
 
   @impl Phoenix.LiveView
@@ -35,13 +42,24 @@ defmodule BlogWeb.HomeLive do
   end
 
   @impl Phoenix.LiveView
+  def handle_info({:presence_updated, presence}, socket) do
+    {:noreply, assign(socket, :presence, presence)}
+  end
+
+  @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
-      <:aside :if={@post && is_struct(@post) && length(@post.headings) > 1}>
+      <:aside>
+        <Discord.presence presence={@presence} />
+
         <TableOfContents.toc
-          headings={@post.headings}
-          id={"toc-#{@post.slug}"}
+          headings={
+            if is_struct(@post) and length(@post.headings || []) > 1,
+              do: @post.headings,
+              else: []
+          }
+          id={if @post, do: "toc-#{@post.slug}", else: "toc"}
         />
       </:aside>
 
