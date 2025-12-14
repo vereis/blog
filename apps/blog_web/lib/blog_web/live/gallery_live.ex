@@ -8,6 +8,7 @@ defmodule BlogWeb.GalleryLive do
   alias BlogWeb.Components.Post
   alias BlogWeb.Components.Project
   alias BlogWeb.Components.Search
+  alias BlogWeb.Components.TableOfContents
   alias BlogWeb.Components.Tag
 
   @impl Phoenix.LiveView
@@ -104,6 +105,32 @@ defmodule BlogWeb.GalleryLive do
         description="Tag filter when no tags are available"
       >
         <Tag.filter tags={[]} base_url="/gallery" selected_tags={[]} />
+      </Gallery.item>
+
+      <Gallery.item
+        title="Table of Contents"
+        description="Navigation component for post headings with scrollspy"
+      >
+        <TableOfContents.toc
+          headings={[
+            %{title: "Introduction", link: "introduction", level: 1},
+            %{title: "Getting Started", link: "getting-started", level: 2},
+            %{title: "Installation", link: "installation", level: 3},
+            %{title: "Configuration", link: "configuration", level: 3},
+            %{title: "Usage", link: "usage", level: 2},
+            %{title: "Basic Example", link: "basic-example", level: 3},
+            %{title: "Advanced Features", link: "advanced-features", level: 2},
+            %{title: "Conclusion", link: "conclusion", level: 1}
+          ]}
+          id="gallery-toc"
+        />
+      </Gallery.item>
+
+      <Gallery.item
+        title="Table of Contents - Empty State"
+        description="TOC when no headings are available"
+      >
+        <TableOfContents.toc headings={[]} id="gallery-toc-empty" />
       </Gallery.item>
 
       <Gallery.item title="Post Component" description="Full post rendering with metadata">
