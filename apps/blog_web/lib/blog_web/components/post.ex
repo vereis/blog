@@ -8,6 +8,7 @@ defmodule BlogWeb.Components.Post do
   alias BlogWeb.Components.Badge
   alias BlogWeb.Components.EmptyState
   alias BlogWeb.Components.Search
+  alias BlogWeb.Components.TableOfContents
   alias BlogWeb.Components.Tag
 
   @base_url "/posts"
@@ -41,9 +42,17 @@ defmodule BlogWeb.Components.Post do
           {reading_time_text(@post.reading_time_minutes)}
         </p>
       </header>
-      <section class="post-body">
-        {Phoenix.HTML.raw(@post.body)}
-      </section>
+
+      <div class="post-with-toc">
+        <TableOfContents.toc
+          :if={length(@post.headings) > 1}
+          headings={@post.headings}
+          id={"toc-#{@post.slug}"}
+        />
+        <section class="post-body">
+          {Phoenix.HTML.raw(@post.body)}
+        </section>
+      </div>
     </article>
     """
   end

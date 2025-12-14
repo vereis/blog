@@ -21,6 +21,37 @@
     margin-block-end: var(--space-line);
   }
 
+  .post-with-toc {
+    display: flex;
+    gap: 0 var(--space-4);
+    align-items: flex-start;
+  }
+
+  .post-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .post .toc {
+    flex-shrink: 0;
+    width: 20ch;
+    position: sticky;
+    top: var(--space-line);
+    align-self: flex-start;
+  }
+
+  @media (max-width: 768px) {
+    .post-with-toc {
+      flex-direction: column;
+    }
+
+    .post .toc {
+      width: 100%;
+      position: static;
+      margin-block-end: var(--space-line);
+    }
+  }
+
   .post-title {
     display: flex;
     align-items: baseline;
