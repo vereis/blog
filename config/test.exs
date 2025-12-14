@@ -11,6 +11,10 @@ config :blog, Blog.Repo,
   pool: Ecto.Adapters.SQL.Sandbox,
   default_transaction_mode: :immediate
 
+# Configure Discord for test environment
+config :blog,
+  discord_user_id: "382588737441497088"
+
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
 config :blog_web, BlogWeb.Endpoint,

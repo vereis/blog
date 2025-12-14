@@ -12,6 +12,10 @@ config :blog, BlogWeb.Endpoint, http: [port: String.to_integer(System.get_env("P
 # Set the runtime environment for Blog
 config :blog, :env, config_env()
 
+# Configure Discord presence integration
+config :blog,
+  discord_user_id: System.get_env("DISCORD_USER_ID", "382588737441497088")
+
 if config_env() == :prod do
   database_path =
     System.get_env("DATABASE_PATH") ||
