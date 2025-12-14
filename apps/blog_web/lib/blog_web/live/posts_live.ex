@@ -6,6 +6,7 @@ defmodule BlogWeb.PostsLive do
   alias BlogWeb.Components.Bluescreen
   alias BlogWeb.Components.Post
   alias BlogWeb.Components.Search
+  alias BlogWeb.Components.TableOfContents
   alias BlogWeb.Components.Tag
 
   @base_url "/posts"
@@ -83,6 +84,13 @@ defmodule BlogWeb.PostsLive do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
+      <:aside :if={@live_action == :show and is_struct(@post) and length(@post.headings) > 1}>
+        <TableOfContents.toc
+          headings={@post.headings}
+          id={"toc-#{@post.slug}"}
+        />
+      </:aside>
+
       <%= cond do %>
         <% @live_action == :index -> %>
           <Post.list

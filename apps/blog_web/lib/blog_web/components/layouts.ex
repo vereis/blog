@@ -32,16 +32,23 @@ defmodule BlogWeb.Layouts do
     doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
 
   slot :inner_block, required: true
+  slot :aside, doc: "optional sidebar content (TOC, future widgets, etc)"
 
   def app(assigns) do
     ~H"""
-    <.navbar />
+    <header class="page-header">
+      <.navbar />
+    </header>
 
-    <main>
+    <main class="page-content">
       {render_slot(@inner_block)}
     </main>
 
-    <footer>
+    <aside class="page-aside" hidden={@aside == []}>
+      {render_slot(@aside)}
+    </aside>
+
+    <footer class="page-footer">
       <p>© {Date.utc_today().year} vereis</p>
     </footer>
 

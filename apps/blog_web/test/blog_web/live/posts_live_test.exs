@@ -175,7 +175,7 @@ defmodule BlogWeb.PostsLiveTest do
       {:ok, view, html} = live(conn, ~p"/posts/test-post")
 
       assert html =~ ~s(class="toc")
-      assert has_element?(view, ".toc")
+      assert has_element?(view, ".page-aside .toc")
       assert has_element?(view, "a[href='#introduction']")
       assert has_element?(view, "a[href='#conclusion']")
     end
@@ -193,6 +193,7 @@ defmodule BlogWeb.PostsLiveTest do
       {:ok, _view, html} = live(conn, ~p"/posts/test-post")
 
       refute html =~ ~s(class="toc")
+      assert html =~ ~s(<aside class="page-aside" hidden=""></aside>)
     end
   end
 
