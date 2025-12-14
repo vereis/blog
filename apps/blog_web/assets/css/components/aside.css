@@ -1,0 +1,29 @@
+/* Shared Aside Component Styles */
+
+@layer components {
+  /* Remove # prefix from all headings in aside */
+  .page-aside h1::before,
+  .page-aside h2::before,
+  .page-aside h3::before,
+  .page-aside h4::before,
+  .page-aside h5::before,
+  .page-aside h6::before {
+    content: '';
+  }
+
+  /* Shared header style for aside sections (TOC, Discord, etc.) */
+  .aside-section-header {
+    color: var(--color-fg-secondary);
+    font-size: inherit;
+    font-weight: var(--font-weight-normal);
+    margin: 0;
+    margin-block-end: var(--space-line);
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .aside-section-header::after {
+    content: ' ────────────────────────────────────────';
+    color: var(--color-bg-secondary);
+  }
+}
