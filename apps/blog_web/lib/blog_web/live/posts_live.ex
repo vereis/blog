@@ -9,6 +9,7 @@ defmodule BlogWeb.PostsLive do
   alias BlogWeb.Components.Search
   alias BlogWeb.Components.TableOfContents
   alias BlogWeb.Components.Tag
+  alias BlogWeb.Viewers
 
   @base_url "/posts"
 
@@ -17,6 +18,10 @@ defmodule BlogWeb.PostsLive do
     if connected?(socket) do
       Phoenix.PubSub.subscribe(Blog.PubSub, "post:reload")
       Phoenix.PubSub.subscribe(Blog.PubSub, "discord:presence")
+
+      # Track on site-wide topic
+      Viewers.track_viewer(self(), Viewers.site_topic(), socket.id)
+      Viewers.subscribe(Viewers.site_topic())
     end
 
     socket =
@@ -24,6 +29,9 @@ defmodule BlogWeb.PostsLive do
       |> assign(:all_tags, Blog.Tags.list_tags(having: :posts))
       |> assign(:posts, [])
       |> assign(:presence, Blog.Discord.get_presence())
+      |> assign(:site_viewer_count, Viewers.get_viewer_count(Viewers.site_topic()))
+      |> assign(:page_viewer_count, 0)
+      |> assign(:current_page_topic, nil)
 
     {:ok, socket}
   end
@@ -37,6 +45,7 @@ defmodule BlogWeb.PostsLive do
       socket
       |> assign(:selected_tags, selected_tags)
       |> assign(:search_query, search_query)
+      |> maybe_switch_page_topic(socket.assigns.live_action, params)
 
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
@@ -56,6 +65,64 @@ defmodule BlogWeb.PostsLive do
   def handle_info({:presence_updated, presence}, socket) do
     {:noreply, assign(socket, :presence, presence)}
   end
+
+  @impl Phoenix.LiveView
+  def handle_info({:viewer_count_updated, topic, count}, socket) do
+    cond do
+      topic == Viewers.site_topic() ->
+        {:noreply, assign(socket, :site_viewer_count, count)}
+
+      topic == socket.assigns.current_page_topic ->
+        {:noreply, assign(socket, :page_viewer_count, count)}
+
+      true ->
+        {:noreply, socket}
+    end
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({:viewer_joined, _topic}, socket), do: {:noreply, socket}
+
+  @impl Phoenix.LiveView
+  def handle_info({:viewer_left, _topic}, socket), do: {:noreply, socket}
+
+  @impl Phoenix.LiveView
+  def handle_info(%Phoenix.Socket.Broadcast{event: "presence_diff"}, socket) do
+    {:noreply, socket}
+  end
+
+  defp maybe_switch_page_topic(socket, live_action, params) do
+    new_topic = get_page_topic(live_action, params)
+    old_topic = socket.assigns[:current_page_topic]
+
+    cond do
+      # First time tracking (mount)
+      is_nil(old_topic) and connected?(socket) ->
+        Viewers.track_viewer(self(), new_topic, socket.id)
+        Viewers.subscribe(new_topic)
+
+        socket
+        |> assign(:current_page_topic, new_topic)
+        |> assign(:page_viewer_count, Viewers.get_viewer_count(new_topic))
+
+      # Topic changed (navigation)
+      old_topic != new_topic and connected?(socket) ->
+        Viewers.untrack_viewer(self(), old_topic, socket.id)
+        Viewers.track_viewer(self(), new_topic, socket.id)
+        Viewers.subscribe(new_topic)
+
+        socket
+        |> assign(:current_page_topic, new_topic)
+        |> assign(:page_viewer_count, Viewers.get_viewer_count(new_topic))
+
+      # No change or not connected
+      true ->
+        socket
+    end
+  end
+
+  defp get_page_topic(:index, _params), do: Viewers.page_topic(:posts)
+  defp get_page_topic(:show, %{"slug" => slug}), do: Viewers.post_topic(slug)
 
   defp apply_action(socket, :index, _params) do
     socket
