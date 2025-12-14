@@ -6,6 +6,7 @@ defmodule BlogWeb.HomeLive do
   alias BlogWeb.Components.Discord
   alias BlogWeb.Components.Post
   alias BlogWeb.Components.TableOfContents
+  alias BlogWeb.Viewers
 
   @slug "hello-world"
 
@@ -14,12 +15,22 @@ defmodule BlogWeb.HomeLive do
     if connected?(socket) do
       Phoenix.PubSub.subscribe(Blog.PubSub, "post:reload")
       Phoenix.PubSub.subscribe(Blog.PubSub, "discord:presence")
+
+      # Track viewer on both site-wide and page-specific topics
+      Viewers.track_viewer(self(), Viewers.site_topic(), socket.id)
+      Viewers.track_viewer(self(), Viewers.page_topic(:home), socket.id)
+
+      # Subscribe to viewer count updates
+      Viewers.subscribe(Viewers.site_topic())
+      Viewers.subscribe(Viewers.page_topic(:home))
     end
 
     socket =
       socket
       |> assign(:post, Blog.Posts.get_post(slug: @slug))
       |> assign(:presence, Blog.Discord.get_presence())
+      |> assign(:site_viewer_count, Viewers.get_viewer_count(Viewers.site_topic()))
+      |> assign(:page_viewer_count, Viewers.get_viewer_count(Viewers.page_topic(:home)))
 
     {:ok, socket}
   end
@@ -44,6 +55,32 @@ defmodule BlogWeb.HomeLive do
   @impl Phoenix.LiveView
   def handle_info({:presence_updated, presence}, socket) do
     {:noreply, assign(socket, :presence, presence)}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({:viewer_count_updated, topic, count}, socket) do
+    cond do
+      topic == Viewers.site_topic() ->
+        {:noreply, assign(socket, :site_viewer_count, count)}
+
+      topic == Viewers.page_topic(:home) ->
+        {:noreply, assign(socket, :page_viewer_count, count)}
+
+      true ->
+        {:noreply, socket}
+    end
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({:viewer_joined, _topic}, socket), do: {:noreply, socket}
+
+  @impl Phoenix.LiveView
+  def handle_info({:viewer_left, _topic}, socket), do: {:noreply, socket}
+
+  @impl Phoenix.LiveView
+  def handle_info(%Phoenix.Socket.Broadcast{event: "presence_diff"}, socket) do
+    # Ignore raw presence_diff broadcasts - we handle viewer count updates via custom messages
+    {:noreply, socket}
   end
 
   @impl Phoenix.LiveView
