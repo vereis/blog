@@ -1,0 +1,40 @@
+@layer components {
+  .checkbox-button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .checkbox-button input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .checkbox-box {
+    background-color: var(--color-bg-secondary);
+    padding-left: var(--space-1);
+    padding-right: var(--space-1);
+    display: inline-block;
+  }
+
+  .checkbox-box::before {
+    content: '\00a0';
+    color: var(--color-fg-secondary);
+  }
+
+  .checkbox-button:has(input[type="checkbox"]:checked) .checkbox-box::before {
+    content: '✓';
+    color: var(--color-accent);
+  }
+
+  .checkbox-button:has(input[type="checkbox"]:focus-visible) {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
