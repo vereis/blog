@@ -44,3 +44,37 @@
     radial-gradient(50% 75% at 83.33% 75%, var(--lqip-cf-clr), rgb(from var(--lqip-cf-clr) r g b / calc(100% - var(--lqip-stop10))) 10%, rgb(from var(--lqip-cf-clr) r g b / calc(100% - var(--lqip-stop20))) 20%, rgb(from var(--lqip-cf-clr) r g b / calc(100% - var(--lqip-stop30))) 30%, rgb(from var(--lqip-cf-clr) r g b / calc(100% - var(--lqip-stop40))) 40%, rgb(from var(--lqip-cf-clr) r g b / calc(var(--lqip-stop40))) 60%, rgb(from var(--lqip-cf-clr) r g b / calc(var(--lqip-stop30))) 70%, rgb(from var(--lqip-cf-clr) r g b / calc(var(--lqip-stop20))) 80%, rgb(from var(--lqip-cf-clr) r g b / calc(var(--lqip-stop10))) 90%, transparent),
     linear-gradient(0deg, var(--lqip-base-clr), var(--lqip-base-clr));
 }
+
+.crt-filter::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 16, 16, 0.1);
+  opacity: 0;
+  pointer-events: none;
+  animation: flicker 0.15s infinite;
+}
+
+.crt-filter::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+}
+
+.crt-filter {
+  animation: phosphor 1.6s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-filter::after,
+  .crt-filter::before {
+    display: none;
+  }
+  
+  .crt-filter {
+    animation: none;
+  }
+}
