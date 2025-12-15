@@ -15,11 +15,10 @@ defmodule BlogWeb.Components.Aside.Discord do
   """
   attr :presence, :map, required: true
   attr :id, :string, default: "discord-presence"
-  attr :open, :boolean, default: true
 
   def presence(assigns) do
     ~H"""
-    <Aside.aside_section title="Presence" id={@id} open={@open}>
+    <Aside.aside_section title="Presence" id={@id}>
       <div class="discord-presence" aria-label="Discord Presence">
         <p class="discord-status">
           <span class={["discord-bullet", bullet_class(@presence)]}>•</span>

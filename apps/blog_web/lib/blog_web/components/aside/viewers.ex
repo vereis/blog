@@ -34,11 +34,10 @@ defmodule BlogWeb.Components.Aside.Viewers do
   attr :site_count, :integer, required: true
   attr :page_count, :integer, required: true
   attr :id, :string, default: "viewer-counts"
-  attr :open, :boolean, default: true
 
   def counts(assigns) do
     ~H"""
-    <Aside.aside_section title="Viewers" id={@id} open={@open}>
+    <Aside.aside_section title="Viewers" id={@id}>
       <div class="viewer-counts" aria-label="Viewer Counts">
         <p class="viewer-stat">
           <span class="viewer-bullet">•</span>
