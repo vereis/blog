@@ -52,8 +52,10 @@ defmodule BlogWeb.Components.Checkbox do
         mounted() {
           this.storageKey = this.el.dataset.storageKey;
           this.bodyClass = this.el.dataset.bodyClass;
+          this.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
           
-          this.el.checked = document.body.classList.contains(this.bodyClass);
+          const stored = localStorage.getItem(this.storageKey);
+          this.el.checked = stored === null ? !this.prefersReducedMotion : stored === 'true';
           
           this.handleChange = () => {
             const enabled = this.el.checked;
@@ -64,7 +66,7 @@ defmodule BlogWeb.Components.Checkbox do
               console.error('[CheckboxToggle] Failed to save preference:', error);
             }
             
-            if (enabled) {
+            if (enabled && !this.prefersReducedMotion) {
               document.body.classList.add(this.bodyClass);
             } else {
               document.body.classList.remove(this.bodyClass);
