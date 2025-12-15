@@ -55,6 +55,7 @@ defmodule BlogWeb.Components.Header do
         class="site-tagline"
         id="site-tagline"
         phx-hook=".Typewriter"
+        phx-update="ignore"
         data-taglines={@taglines_json}
       >
         <span class="tagline-text"></span><span class="tagline-caret">█</span>
@@ -66,7 +67,6 @@ defmodule BlogWeb.Components.Header do
         mounted() {
           this.taglines = JSON.parse(this.el.dataset.taglines)
           this.lastTagline = null
-          this.isTyping = false
           this.typeRandomTagline()
 
           // Re-type on LiveView navigation
@@ -86,12 +86,13 @@ defmodule BlogWeb.Components.Header do
         },
 
         typeRandomTagline() {
-          if (this.isTyping) return
+          // Cancel any in-progress typing
+          if (this.currentTimeout) {
+            clearTimeout(this.currentTimeout)
+          }
 
           const textEl = this.el.querySelector('.tagline-text')
           if (!textEl) return
-
-          this.isTyping = true
 
           let text
           do {
@@ -107,8 +108,6 @@ defmodule BlogWeb.Components.Header do
               textEl.textContent += text.charAt(i)
               i++
               this.currentTimeout = setTimeout(type, 30 + Math.random() * 50)
-            } else {
-              this.isTyping = false
             }
           }
           type()
