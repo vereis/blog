@@ -11,11 +11,21 @@ defmodule BlogWeb.GalleryLive do
   alias BlogWeb.Components.Search
   alias BlogWeb.Components.TableOfContents
   alias BlogWeb.Components.Tag
+  alias BlogWeb.Components.Viewers
+  alias BlogWeb.Viewers, as: ViewersContext
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     if connected?(socket) do
       Phoenix.PubSub.subscribe(Blog.PubSub, "discord:presence")
+
+      # Track viewer on both site-wide and page-specific topics
+      ViewersContext.track_viewer(self(), ViewersContext.site_topic(), socket.id)
+      ViewersContext.track_viewer(self(), ViewersContext.page_topic(:gallery), socket.id)
+
+      # Subscribe to viewer count updates
+      ViewersContext.subscribe(ViewersContext.site_topic())
+      ViewersContext.subscribe(ViewersContext.page_topic(:gallery))
     end
 
     test_post = Blog.Posts.get_post(slug: "test")
@@ -32,6 +42,8 @@ defmodule BlogWeb.GalleryLive do
       |> assign(:projects, projects)
       |> assign(:all_tags, all_tags)
       |> assign(:presence, presence)
+      |> assign(:site_viewer_count, ViewersContext.get_viewer_count(ViewersContext.site_topic()))
+      |> assign(:page_viewer_count, ViewersContext.get_viewer_count(ViewersContext.page_topic(:gallery)))
 
     {:ok, socket}
   end
@@ -39,6 +51,31 @@ defmodule BlogWeb.GalleryLive do
   @impl Phoenix.LiveView
   def handle_info({:presence_updated, presence}, socket) do
     {:noreply, assign(socket, :presence, presence)}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({:viewer_count_updated, topic, count}, socket) do
+    cond do
+      topic == ViewersContext.site_topic() ->
+        {:noreply, assign(socket, :site_viewer_count, count)}
+
+      topic == ViewersContext.page_topic(:gallery) ->
+        {:noreply, assign(socket, :page_viewer_count, count)}
+
+      true ->
+        {:noreply, socket}
+    end
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({:viewer_joined, _topic}, socket), do: {:noreply, socket}
+
+  @impl Phoenix.LiveView
+  def handle_info({:viewer_left, _topic}, socket), do: {:noreply, socket}
+
+  @impl Phoenix.LiveView
+  def handle_info(%Phoenix.Socket.Broadcast{event: "presence_diff"}, socket) do
+    {:noreply, socket}
   end
 
   @impl Phoenix.LiveView
@@ -51,6 +88,13 @@ defmodule BlogWeb.GalleryLive do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
+      <:aside>
+        <Discord.presence presence={@presence} />
+        <Viewers.counts site_count={@site_viewer_count} page_count={@page_viewer_count} />
+
+        <TableOfContents.toc headings={[]} id="toc" />
+      </:aside>
+
       <h1>Component Gallery</h1>
       <p>Preview of available components and their variants.</p>
 
