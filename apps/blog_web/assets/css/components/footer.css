@@ -5,7 +5,7 @@
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     z-index: 100;
-    padding-block-start: 0;
+    padding-block-start: 0.5lh;
     padding-block-end: 1lh;
     margin-inline: calc(var(--space-4) * -1);
     padding-inline: var(--space-4);
