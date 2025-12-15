@@ -11,19 +11,55 @@
     content: '';
   }
 
+  /* Collapsible aside section using details/summary */
+  .aside-section {
+    margin-block-end: var(--space-line);
+  }
+
   /* Shared header style for aside sections (TOC, Discord, etc.) */
   .aside-section-header {
+    cursor: pointer;
+    list-style: none;
     color: var(--color-fg-secondary);
     font-size: inherit;
     font-weight: var(--font-weight-normal);
     margin: 0;
     margin-block-end: var(--space-line);
-    overflow: hidden;
-    white-space: nowrap;
+    user-select: none;
+    display: flex;
+    align-items: center;
   }
 
+  /* Remove default marker in Chrome/Safari */
+  .aside-section-header::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Keyboard focus state for accessibility */
+  .aside-section-header:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  /* Triangle indicator - open state */
+  .aside-section-header::before {
+    content: '▼ ';
+  }
+
+  /* Triangle indicator - closed state */
+  details:not([open]) > .aside-section-header::before {
+    content: '▶ ';
+  }
+
+  /* Dashed line after title (responsive flex-based) */
   .aside-section-header::after {
-    content: ' ────────────────────────────────────────';
-    color: var(--color-bg-secondary);
+    content: '';
+    border-bottom: 1px dashed var(--color-bg-secondary);
+    flex: 1;
+    margin-inline-start: 0.5em;
+  }
+
+  .aside-section-content {
+    /* Content wrapper - styling can be added if needed */
   }
 }
