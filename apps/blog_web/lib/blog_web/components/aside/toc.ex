@@ -40,6 +40,30 @@ defmodule BlogWeb.Components.Aside.Toc do
       <script :type={Phoenix.LiveView.ColocatedHook} name=".Scrollspy">
         export default {
           mounted() {
+            this.initScrollspy();
+            this.setupScrollHandler();
+          },
+
+          updated() {
+            const currentHeadingIds = Array.from(this.el.querySelectorAll('[data-heading-id]'))
+              .map(item => item.getAttribute('data-heading-id'))
+              .join(',');
+            
+            if (this.lastHeadingIds !== currentHeadingIds) {
+              this.lastHeadingIds = currentHeadingIds;
+              requestAnimationFrame(() => {
+                this.initScrollspy();
+              });
+            }
+          },
+
+          destroyed() {
+            if (this.handleScroll) {
+              window.removeEventListener('scroll', this.handleScroll, this.scrollOptions);
+            }
+          },
+
+          initScrollspy() {
             const headingIds = Array.from(this.el.querySelectorAll('[data-heading-id]'))
               .map(item => item.getAttribute('data-heading-id'));
 
@@ -47,41 +71,26 @@ defmodule BlogWeb.Components.Aside.Toc do
               .map(id => document.getElementById(id))
               .filter(el => el !== null);
 
-            if (headings.length === 0) return;
+            if (headings.length === 0) {
+              this.headingPositions = null;
+              return;
+            }
 
-            // NOTE: Cache heading positions on mount to avoid layout thrashing.
-            const headingPositions = headings.map(h => ({ id: h.id, top: h.offsetTop }));
+            this.lastHeadingIds = headingIds.join(',');
+            this.headingPositions = headings.map(h => ({ id: h.id, top: h.offsetTop }));
 
-            const SCROLL_OFFSET = 100;
+            requestAnimationFrame(() => this.updateActive());
+          },
 
-            const updateActive = () => {
-              const scrollTop = window.scrollY + SCROLL_OFFSET;
-              let activeId = headingPositions[0].id;
+          setupScrollHandler() {
+            if (this.scrollHandlerInitialized) return;
+            this.scrollHandlerInitialized = true;
 
-              for (const pos of headingPositions) {
-                if (pos.top <= scrollTop) {
-                  activeId = pos.id;
-                } else {
-                  break;
-                }
-              }
-
-              this.el.querySelectorAll('[data-active]').forEach(item => {
-                delete item.dataset.active;
-              });
-
-              const activeItem = this.el.querySelector(`[data-heading-id="${activeId}"]`);
-              if (activeItem) {
-                activeItem.dataset.active = 'true';
-              }
-            };
-
-            // Throttle scroll updates to once per animation frame (60fps) for performance
             let ticking = false;
             this.handleScroll = () => {
               if (!ticking) {
                 requestAnimationFrame(() => {
-                  updateActive();
+                  this.updateActive();
                   ticking = false;
                 });
                 ticking = true;
@@ -90,13 +99,30 @@ defmodule BlogWeb.Components.Aside.Toc do
 
             this.scrollOptions = { passive: true };
             window.addEventListener('scroll', this.handleScroll, this.scrollOptions);
-
-            requestAnimationFrame(() => updateActive());
           },
 
-          destroyed() {
-            if (this.handleScroll) {
-              window.removeEventListener('scroll', this.handleScroll, this.scrollOptions);
+          updateActive() {
+            if (!this.headingPositions) return;
+            
+            const SCROLL_OFFSET = 100;
+            const scrollTop = window.scrollY + SCROLL_OFFSET;
+            let activeId = this.headingPositions[0].id;
+
+            for (const pos of this.headingPositions) {
+              if (pos.top <= scrollTop) {
+                activeId = pos.id;
+              } else {
+                break;
+              }
+            }
+
+            this.el.querySelectorAll('[data-active]').forEach(item => {
+              delete item.dataset.active;
+            });
+
+            const activeItem = this.el.querySelector(`[data-heading-id="${activeId}"]`);
+            if (activeItem) {
+              activeItem.dataset.active = 'true';
             }
           }
         }
