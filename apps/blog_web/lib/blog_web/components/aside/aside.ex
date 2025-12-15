@@ -4,19 +4,18 @@ defmodule BlogWeb.Components.Aside do
 
   Provides a reusable wrapper for aside sections that:
   - Uses native HTML `<details>`/`<summary>` for accessibility
-  - Persists collapse state in localStorage
   - Displays triangle indicators (`▶`/`▼`) matching the terminal theme
+  - Defaults to open state on page load
   """
   use Phoenix.Component
 
   @doc """
-  Renders a collapsible aside section with localStorage persistence.
+  Renders a collapsible aside section with sessionStorage persistence.
 
   ## Attributes
 
     * `title` - The section header text (required)
-    * `id` - Unique DOM ID, also used as localStorage key (required)
-    * `open` - Default open state, can be overridden by localStorage (default: true)
+    * `id` - Unique DOM ID (required)
 
   ## Examples
 
@@ -24,18 +23,17 @@ defmodule BlogWeb.Components.Aside do
         <p>Discord status content...</p>
       </Aside.aside_section>
 
-      <Aside.aside_section title="Table of Contents" id="toc" open={false}>
+      <Aside.aside_section title="Table of Contents" id="toc">
         <nav>...</nav>
       </Aside.aside_section>
   """
   attr :title, :string, required: true
   attr :id, :string, required: true
-  attr :open, :boolean, default: true
   slot :inner_block, required: true
 
   def aside_section(assigns) do
     ~H"""
-    <details id={@id} class="aside-section" open={@open} phx-hook=".AsideCollapse">
+    <details id={@id} class="aside-section" open phx-hook=".AsideCollapse">
       <summary class="aside-section-header">{@title}</summary>
       <div class="aside-section-content">
         {render_slot(@inner_block)}
@@ -45,18 +43,55 @@ defmodule BlogWeb.Components.Aside do
     <script :type={Phoenix.LiveView.ColocatedHook} name=".AsideCollapse">
       export default {
         mounted() {
-          const key = `aside-collapse-${this.el.id}`;
-          const stored = localStorage.getItem(key);
-
-          // Override default open state if user has a preference
-          if (stored !== null) {
-            this.el.open = stored === 'true';
+          this.storageKey = `aside-collapse-${this.el.id}`;
+          
+          try {
+            const stored = sessionStorage.getItem(this.storageKey);
+            if (stored === 'false') {
+              this.el.open = false;
+            }
+          } catch (error) {
+            console.error('[AsideCollapse] Failed to restore state:', error);
           }
+          
+          this.toggleHandler = () => {
+            try {
+              sessionStorage.setItem(this.storageKey, this.el.open);
+            } catch (error) {
+              console.error('[AsideCollapse] Failed to save state:', error);
+            }
+          };
+          
+          this.el.addEventListener('toggle', this.toggleHandler);
+        },
 
-          // Save state to localStorage whenever toggled
-          this.el.addEventListener('toggle', () => {
-            localStorage.setItem(key, this.el.open);
-          });
+        updated() {
+          if (this.reattachTimeout) {
+            clearTimeout(this.reattachTimeout);
+          }
+          
+          try {
+            const stored = sessionStorage.getItem(this.storageKey);
+            if (stored !== null) {
+              const desiredState = stored === 'true';
+              if (this.el.open !== desiredState) {
+                this.el.removeEventListener('toggle', this.toggleHandler);
+                this.el.open = desiredState;
+                this.reattachTimeout = setTimeout(() => {
+                  this.el.addEventListener('toggle', this.toggleHandler);
+                  this.reattachTimeout = null;
+                }, 0);
+              }
+            }
+          } catch (error) {
+            console.error('[AsideCollapse] Failed to restore state on update:', error);
+          }
+        },
+        
+        destroyed() {
+          if (this.toggleHandler) {
+            this.el.removeEventListener('toggle', this.toggleHandler);
+          }
         }
       }
     </script>

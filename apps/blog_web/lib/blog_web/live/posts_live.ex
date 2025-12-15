@@ -173,7 +173,7 @@ defmodule BlogWeb.PostsLive do
               do: @post.headings,
               else: []
           }
-          id={if @live_action == :show and @post, do: "toc-#{@post.slug}", else: "toc"}
+          id="toc"
         />
       </:aside>
 
