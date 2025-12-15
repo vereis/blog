@@ -83,7 +83,7 @@ defmodule BlogWeb.ProjectsLiveTest do
 
       {:error, {:live_redirect, %{to: path}}} =
         view
-        |> element("nav ul a[href='/']", "Home")
+        |> element("nav.site-nav a[href='/']", "Home")
         |> render_click()
 
       assert path == ~p"/"

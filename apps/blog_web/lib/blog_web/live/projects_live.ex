@@ -119,7 +119,7 @@ defmodule BlogWeb.ProjectsLive do
   @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
+    <Layouts.app flash={@flash} current_path="/projects">
       <:aside>
         <Options.options />
         <Discord.presence presence={@presence} />

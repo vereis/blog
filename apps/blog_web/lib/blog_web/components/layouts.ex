@@ -31,13 +31,15 @@ defmodule BlogWeb.Layouts do
     default: nil,
     doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
 
+  attr :current_path, :string, default: "/", doc: "the current request path for nav highlighting"
+
   slot :inner_block, required: true
   slot :aside, doc: "optional sidebar content (TOC, future widgets, etc)"
 
   def app(assigns) do
     ~H"""
     <header class="page-header">
-      <.navbar />
+      <.navbar current_path={@current_path} />
     </header>
 
     <main class="page-content">

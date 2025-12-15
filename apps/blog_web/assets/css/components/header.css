@@ -1,0 +1,100 @@
+@layer components {
+  .page-header {
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 100;
+    padding-block-start: 1lh;
+    padding-block-end: calc(var(--space-line) / 2);
+    margin-inline: calc(var(--space-4) * -1);
+    padding-inline: var(--space-4);
+  }
+
+  .page-header + .page-content,
+  .page-header ~ .page-aside {
+    padding-block-start: calc(var(--space-line) / 2);
+  }
+
+  .page-header ~ .page-aside {
+    top: calc(var(--space-line) / 2);
+  }
+
+  .site-header {
+    margin: 0;
+  }
+
+  .site-title {
+    color: var(--ansi-magenta);
+    font-weight: var(--font-weight-bold);
+    text-decoration: none;
+    display: block;
+  }
+
+  .site-title:hover {
+    text-decoration: underline;
+  }
+
+  .site-tagline {
+    color: var(--color-fg-secondary);
+    margin-block-end: 0;
+  }
+
+  .tagline-caret {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tagline-caret {
+      animation: none;
+    }
+  }
+
+  .header-separator {
+    height: 1lh;
+    margin: 0;
+    border: none;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    color: var(--color-bg-secondary);
+  }
+
+  .header-separator::before {
+    content: '────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────';
+    white-space: nowrap;
+  }
+
+  .site-nav {
+    display: flex;
+    gap: var(--space-1);
+    margin: 0;
+    align-items: center;
+  }
+
+  .nav-link {
+    color: var(--color-fg-primary);
+    text-decoration: none;
+  }
+
+  .nav-link:hover {
+    color: var(--color-link-hover);
+  }
+
+  .nav-link-active {
+    color: var(--color-link);
+    text-decoration: underline;
+  }
+
+  .nav-separator {
+    color: var(--color-fg-dim);
+    user-select: none;
+  }
+}

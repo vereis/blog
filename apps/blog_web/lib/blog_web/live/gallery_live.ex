@@ -87,7 +87,7 @@ defmodule BlogWeb.GalleryLive do
   @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
+    <Layouts.app flash={@flash} current_path="/gallery">
       <:aside>
         <Options.options />
         <Discord.presence presence={@presence} />
@@ -129,10 +129,6 @@ defmodule BlogWeb.GalleryLive do
             This is an error message.
           </.flash>
         </div>
-      </Gallery.item>
-
-      <Gallery.item title="Navigation" description="Site navigation component">
-        <.navbar />
       </Gallery.item>
 
       <Gallery.item title="Search Filter - Empty" description="Text search filter with FTS support">
