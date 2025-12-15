@@ -16,7 +16,7 @@
   }
 
   .viewer-bullet {
-    color: var(--color-accent);
+    color: var(--color-bg-secondary);
     margin-inline-end: var(--space-half);
   }
 
