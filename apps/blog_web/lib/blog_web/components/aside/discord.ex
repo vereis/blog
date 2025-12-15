@@ -1,40 +1,41 @@
-defmodule BlogWeb.Components.Discord do
+defmodule BlogWeb.Components.Aside.Discord do
   @moduledoc """
   Discord presence component for displaying real-time user status.
   """
   use Phoenix.Component
 
-  alias Blog.Discord.Presence
+  alias BlogWeb.Components.Aside
 
   @doc """
   Renders Discord presence information in the aside.
 
   ## Examples
 
-      <.presence presence={@presence} />
+      <Discord.presence presence={@presence} />
   """
-  attr :presence, Presence, required: true
+  attr :presence, :map, required: true
   attr :id, :string, default: "discord-presence"
+  attr :open, :boolean, default: true
 
   def presence(assigns) do
     ~H"""
-    <aside id={@id} class="discord-presence" aria-label="Discord Presence">
-      <h2 class="aside-section-header">Presence</h2>
+    <Aside.aside_section title="Presence" id={@id} open={@open}>
+      <div class="discord-presence" aria-label="Discord Presence">
+        <p class="discord-status">
+          <span class={["discord-bullet", bullet_class(@presence)]}>•</span>
+          <span class="discord-username">{username(@presence)}</span>
+          <span class="discord-status-text">{status(@presence)}</span>
+        </p>
 
-      <p class="discord-status">
-        <span class={["discord-bullet", bullet_class(@presence)]}>•</span>
-        <span class="discord-username">{username(@presence)}</span>
-        <span class="discord-status-text">{status(@presence)}</span>
-      </p>
+        <p :if={@presence.connected? && activity(@presence)} class="discord-activity">
+          {activity(@presence)}
+        </p>
 
-      <p :if={@presence.connected? && activity(@presence)} class="discord-activity">
-        {activity(@presence)}
-      </p>
-
-      <p :if={@presence.listening_to_spotify && @presence.spotify} class="discord-spotify">
-        {@presence.spotify["song"]} — {@presence.spotify["artist"]}
-      </p>
-    </aside>
+        <p :if={@presence.listening_to_spotify && @presence.spotify} class="discord-spotify">
+          {@presence.spotify["song"]} — {@presence.spotify["artist"]}
+        </p>
+      </div>
+    </Aside.aside_section>
     """
   end
 

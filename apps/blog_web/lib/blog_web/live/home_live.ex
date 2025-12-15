@@ -2,11 +2,11 @@ defmodule BlogWeb.HomeLive do
   @moduledoc false
   use BlogWeb, :live_view
 
+  alias BlogWeb.Components.Aside.Discord
+  alias BlogWeb.Components.Aside.Toc
+  alias BlogWeb.Components.Aside.Viewers
   alias BlogWeb.Components.Bluescreen
-  alias BlogWeb.Components.Discord
   alias BlogWeb.Components.Post
-  alias BlogWeb.Components.TableOfContents
-  alias BlogWeb.Components.Viewers
 
   @slug "hello-world"
 
@@ -91,7 +91,7 @@ defmodule BlogWeb.HomeLive do
         <Discord.presence presence={@presence} />
         <Viewers.counts site_count={@site_viewer_count} page_count={@page_viewer_count} />
 
-        <TableOfContents.toc
+        <Toc.toc
           headings={
             if is_struct(@post) and length(@post.headings || []) > 1,
               do: @post.headings,

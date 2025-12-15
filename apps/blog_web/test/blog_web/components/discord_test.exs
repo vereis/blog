@@ -4,7 +4,7 @@ defmodule BlogWeb.Components.DiscordTest do
   import Phoenix.LiveViewTest
 
   alias Blog.Discord.Presence
-  alias BlogWeb.Components.Discord
+  alias BlogWeb.Components.Aside.Discord
 
   describe "presence/1" do
     test "renders online status with colored bullet" do
