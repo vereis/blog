@@ -3,6 +3,7 @@ defmodule BlogWeb.GalleryLive do
   use BlogWeb, :live_view
 
   alias BlogWeb.Components.Aside.Discord
+  alias BlogWeb.Components.Aside.Options
   alias BlogWeb.Components.Aside.Toc
   alias BlogWeb.Components.Aside.Viewers
   alias BlogWeb.Components.Bluescreen
@@ -88,6 +89,7 @@ defmodule BlogWeb.GalleryLive do
     ~H"""
     <Layouts.app flash={@flash}>
       <:aside>
+        <Options.options />
         <Discord.presence presence={@presence} />
         <Viewers.counts site_count={@site_viewer_count} page_count={@page_viewer_count} />
 
