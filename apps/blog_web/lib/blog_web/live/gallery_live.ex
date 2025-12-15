@@ -2,16 +2,16 @@ defmodule BlogWeb.GalleryLive do
   @moduledoc false
   use BlogWeb, :live_view
 
+  alias BlogWeb.Components.Aside.Discord
+  alias BlogWeb.Components.Aside.Toc
+  alias BlogWeb.Components.Aside.Viewers
   alias BlogWeb.Components.Bluescreen
-  alias BlogWeb.Components.Discord
   alias BlogWeb.Components.EmptyState
   alias BlogWeb.Components.Gallery
   alias BlogWeb.Components.Post
   alias BlogWeb.Components.Project
   alias BlogWeb.Components.Search
-  alias BlogWeb.Components.TableOfContents
   alias BlogWeb.Components.Tag
-  alias BlogWeb.Components.Viewers
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
@@ -91,7 +91,7 @@ defmodule BlogWeb.GalleryLive do
         <Discord.presence presence={@presence} />
         <Viewers.counts site_count={@site_viewer_count} page_count={@page_viewer_count} />
 
-        <TableOfContents.toc headings={[]} id="toc" />
+        <Toc.toc headings={[]} id="toc" />
       </:aside>
 
       <h1>Component Gallery</h1>
@@ -166,7 +166,7 @@ defmodule BlogWeb.GalleryLive do
         title="Table of Contents"
         description="Navigation component for post headings with scrollspy"
       >
-        <TableOfContents.toc
+        <Toc.toc
           headings={[
             %{title: "Introduction", link: "introduction", level: 1},
             %{title: "Getting Started", link: "getting-started", level: 2},
@@ -185,7 +185,7 @@ defmodule BlogWeb.GalleryLive do
         title="Table of Contents - Empty State"
         description="TOC when no headings are available"
       >
-        <TableOfContents.toc headings={[]} id="gallery-toc-empty" />
+        <Toc.toc headings={[]} id="gallery-toc-empty" />
       </Gallery.item>
 
       <Gallery.item title="Post Component" description="Full post rendering with metadata">
