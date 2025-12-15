@@ -8,6 +8,8 @@ defmodule BlogWeb.ProjectsLive do
   alias BlogWeb.Components.Search
   alias BlogWeb.Components.TableOfContents
   alias BlogWeb.Components.Tag
+  alias BlogWeb.Components.Viewers
+  alias BlogWeb.Viewers, as: ViewersContext
 
   @base_url "/projects"
 
@@ -16,6 +18,14 @@ defmodule BlogWeb.ProjectsLive do
     if connected?(socket) do
       Phoenix.PubSub.subscribe(Blog.PubSub, "project:reload")
       Phoenix.PubSub.subscribe(Blog.PubSub, "discord:presence")
+
+      # Track viewer on both site-wide and page-specific topics
+      ViewersContext.track_viewer(self(), ViewersContext.site_topic(), socket.id)
+      ViewersContext.track_viewer(self(), ViewersContext.page_topic(:projects), socket.id)
+
+      # Subscribe to viewer count updates
+      ViewersContext.subscribe(ViewersContext.site_topic())
+      ViewersContext.subscribe(ViewersContext.page_topic(:projects))
     end
 
     socket =
@@ -23,6 +33,8 @@ defmodule BlogWeb.ProjectsLive do
       |> assign(:all_tags, Blog.Tags.list_tags(having: :projects))
       |> assign(:projects, [])
       |> assign(:presence, Blog.Discord.get_presence())
+      |> assign(:site_viewer_count, ViewersContext.get_viewer_count(ViewersContext.site_topic()))
+      |> assign(:page_viewer_count, ViewersContext.get_viewer_count(ViewersContext.page_topic(:projects)))
 
     {:ok, socket}
   end
@@ -56,6 +68,31 @@ defmodule BlogWeb.ProjectsLive do
     {:noreply, assign(socket, :presence, presence)}
   end
 
+  @impl Phoenix.LiveView
+  def handle_info({:viewer_count_updated, topic, count}, socket) do
+    cond do
+      topic == ViewersContext.site_topic() ->
+        {:noreply, assign(socket, :site_viewer_count, count)}
+
+      topic == ViewersContext.page_topic(:projects) ->
+        {:noreply, assign(socket, :page_viewer_count, count)}
+
+      true ->
+        {:noreply, socket}
+    end
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({:viewer_joined, _topic}, socket), do: {:noreply, socket}
+
+  @impl Phoenix.LiveView
+  def handle_info({:viewer_left, _topic}, socket), do: {:noreply, socket}
+
+  @impl Phoenix.LiveView
+  def handle_info(%Phoenix.Socket.Broadcast{event: "presence_diff"}, socket) do
+    {:noreply, socket}
+  end
+
   defp apply_action(socket, :index, _params) do
     socket
     |> assign(:page_title, "Projects")
@@ -85,6 +122,7 @@ defmodule BlogWeb.ProjectsLive do
     <Layouts.app flash={@flash}>
       <:aside>
         <Discord.presence presence={@presence} />
+        <Viewers.counts site_count={@site_viewer_count} page_count={@page_viewer_count} />
 
         <TableOfContents.toc headings={[]} id="toc" />
       </:aside>

@@ -6,7 +6,8 @@ defmodule BlogWeb.HomeLive do
   alias BlogWeb.Components.Discord
   alias BlogWeb.Components.Post
   alias BlogWeb.Components.TableOfContents
-  alias BlogWeb.Viewers
+  alias BlogWeb.Components.Viewers
+  alias BlogWeb.Viewers, as: ViewersContext
 
   @slug "hello-world"
 
@@ -17,20 +18,20 @@ defmodule BlogWeb.HomeLive do
       Phoenix.PubSub.subscribe(Blog.PubSub, "discord:presence")
 
       # Track viewer on both site-wide and page-specific topics
-      Viewers.track_viewer(self(), Viewers.site_topic(), socket.id)
-      Viewers.track_viewer(self(), Viewers.page_topic(:home), socket.id)
+      ViewersContext.track_viewer(self(), ViewersContext.site_topic(), socket.id)
+      ViewersContext.track_viewer(self(), ViewersContext.page_topic(:home), socket.id)
 
       # Subscribe to viewer count updates
-      Viewers.subscribe(Viewers.site_topic())
-      Viewers.subscribe(Viewers.page_topic(:home))
+      ViewersContext.subscribe(ViewersContext.site_topic())
+      ViewersContext.subscribe(ViewersContext.page_topic(:home))
     end
 
     socket =
       socket
       |> assign(:post, Blog.Posts.get_post(slug: @slug))
       |> assign(:presence, Blog.Discord.get_presence())
-      |> assign(:site_viewer_count, Viewers.get_viewer_count(Viewers.site_topic()))
-      |> assign(:page_viewer_count, Viewers.get_viewer_count(Viewers.page_topic(:home)))
+      |> assign(:site_viewer_count, ViewersContext.get_viewer_count(ViewersContext.site_topic()))
+      |> assign(:page_viewer_count, ViewersContext.get_viewer_count(ViewersContext.page_topic(:home)))
 
     {:ok, socket}
   end
@@ -60,10 +61,10 @@ defmodule BlogWeb.HomeLive do
   @impl Phoenix.LiveView
   def handle_info({:viewer_count_updated, topic, count}, socket) do
     cond do
-      topic == Viewers.site_topic() ->
+      topic == ViewersContext.site_topic() ->
         {:noreply, assign(socket, :site_viewer_count, count)}
 
-      topic == Viewers.page_topic(:home) ->
+      topic == ViewersContext.page_topic(:home) ->
         {:noreply, assign(socket, :page_viewer_count, count)}
 
       true ->
@@ -89,6 +90,7 @@ defmodule BlogWeb.HomeLive do
     <Layouts.app flash={@flash}>
       <:aside>
         <Discord.presence presence={@presence} />
+        <Viewers.counts site_count={@site_viewer_count} page_count={@page_viewer_count} />
 
         <TableOfContents.toc
           headings={
