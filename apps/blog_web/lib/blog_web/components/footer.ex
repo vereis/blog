@@ -14,10 +14,7 @@ defmodule BlogWeb.Components.Footer do
   def footer(assigns) do
     ~H"""
     <div class="site-footer">
-      <div class="footer-left">
-        <.link navigate="/rss" class="footer-block">RSS</.link>
-        <span class="footer-copyright">© vereis {Date.utc_today().year}</span>
-      </div>
+      <.link navigate="/rss" class="footer-block">RSS</.link>
       <.link
         href="https://github.com/vereis/blog"
         class="footer-block"

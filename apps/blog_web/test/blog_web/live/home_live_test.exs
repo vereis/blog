@@ -92,14 +92,12 @@ defmodule BlogWeb.HomeLiveTest do
       assert has_element?(view, "a[href='/projects']", "Projects")
     end
 
-    test "renders footer with current year", %{conn: conn} do
+    test "renders footer", %{conn: conn} do
       {:ok, view, _html} = live(conn, ~p"/")
 
-      current_year = Date.utc_today().year
       assert has_element?(view, ".site-footer")
       assert has_element?(view, ".footer-block", "RSS")
       assert has_element?(view, ".footer-block", "Source")
-      assert has_element?(view, ".footer-copyright", "© vereis #{current_year}")
     end
   end
 
