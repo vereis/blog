@@ -1,7 +1,7 @@
 defmodule BlogWeb.Components.ViewersTest do
   use BlogWeb.ConnCase, async: true
 
-  alias BlogWeb.Components.Viewers
+  alias BlogWeb.Components.Aside.Viewers
 
   setup do
     # Generate unique topics for each test to avoid conflicts

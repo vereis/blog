@@ -3,13 +3,13 @@ defmodule BlogWeb.PostsLive do
   use BlogWeb, :live_view
 
   alias Blog.Schema.FTS
+  alias BlogWeb.Components.Aside.Discord
+  alias BlogWeb.Components.Aside.Toc
+  alias BlogWeb.Components.Aside.Viewers
   alias BlogWeb.Components.Bluescreen
-  alias BlogWeb.Components.Discord
   alias BlogWeb.Components.Post
   alias BlogWeb.Components.Search
-  alias BlogWeb.Components.TableOfContents
   alias BlogWeb.Components.Tag
-  alias BlogWeb.Components.Viewers
 
   @base_url "/posts"
 
@@ -167,7 +167,7 @@ defmodule BlogWeb.PostsLive do
         <Discord.presence presence={@presence} />
         <Viewers.counts site_count={@site_viewer_count} page_count={@page_viewer_count} />
 
-        <TableOfContents.toc
+        <Toc.toc
           headings={
             if @live_action == :show and is_struct(@post) and length(@post.headings || []) > 1,
               do: @post.headings,

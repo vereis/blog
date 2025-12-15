@@ -3,12 +3,12 @@ defmodule BlogWeb.ProjectsLive do
   use BlogWeb, :live_view
 
   alias Blog.Schema.FTS
-  alias BlogWeb.Components.Discord
+  alias BlogWeb.Components.Aside.Discord
+  alias BlogWeb.Components.Aside.Toc
+  alias BlogWeb.Components.Aside.Viewers
   alias BlogWeb.Components.Project
   alias BlogWeb.Components.Search
-  alias BlogWeb.Components.TableOfContents
   alias BlogWeb.Components.Tag
-  alias BlogWeb.Components.Viewers
 
   @base_url "/projects"
 
@@ -123,7 +123,7 @@ defmodule BlogWeb.ProjectsLive do
         <Discord.presence presence={@presence} />
         <Viewers.counts site_count={@site_viewer_count} page_count={@page_viewer_count} />
 
-        <TableOfContents.toc headings={[]} id="toc" />
+        <Toc.toc headings={[]} id="toc" />
       </:aside>
 
       <Project.list

@@ -3,11 +3,11 @@ defmodule BlogWeb.Components.TableOfContentsTest do
 
   import Phoenix.LiveViewTest
 
-  alias BlogWeb.Components.TableOfContents
+  alias BlogWeb.Components.Aside.Toc
 
-  describe "TableOfContents.toc/1" do
+  describe "Toc.toc/1" do
     test "renders empty state when no headings provided" do
-      html = render_component(&TableOfContents.toc/1, %{headings: []})
+      html = render_component(&Toc.toc/1, %{headings: []})
 
       assert html =~ "No headings available"
       refute html =~ "toc-list"
@@ -20,7 +20,7 @@ defmodule BlogWeb.Components.TableOfContentsTest do
         %{title: "Conclusion", link: "conclusion", level: 1}
       ]
 
-      html = render_component(&TableOfContents.toc/1, %{headings: headings})
+      html = render_component(&Toc.toc/1, %{headings: headings})
 
       assert html =~ "Introduction"
       assert html =~ "Getting Started"
@@ -34,7 +34,7 @@ defmodule BlogWeb.Components.TableOfContentsTest do
         %{title: "Getting Started", link: "getting-started", level: 2}
       ]
 
-      html = render_component(&TableOfContents.toc/1, %{headings: headings})
+      html = render_component(&Toc.toc/1, %{headings: headings})
 
       assert html =~ ~s(href="#introduction")
       assert html =~ ~s(href="#getting-started")
@@ -46,7 +46,7 @@ defmodule BlogWeb.Components.TableOfContentsTest do
         %{title: "Getting Started", link: "getting-started", level: 2}
       ]
 
-      html = render_component(&TableOfContents.toc/1, %{headings: headings})
+      html = render_component(&Toc.toc/1, %{headings: headings})
 
       assert html =~ ~s(data-heading-id="introduction")
       assert html =~ ~s(data-heading-id="getting-started")
@@ -58,7 +58,7 @@ defmodule BlogWeb.Components.TableOfContentsTest do
         %{title: "Getting Started", link: "getting-started", level: 2}
       ]
 
-      html = render_component(&TableOfContents.toc/1, %{headings: headings})
+      html = render_component(&Toc.toc/1, %{headings: headings})
 
       assert html =~ ~s(data-level="1")
       assert html =~ ~s(data-level="2")
@@ -66,21 +66,21 @@ defmodule BlogWeb.Components.TableOfContentsTest do
 
     test "uses custom id when provided" do
       headings = [%{title: "Test", link: "test", level: 1}]
-      html = render_component(&TableOfContents.toc/1, %{headings: headings, id: "custom-toc"})
+      html = render_component(&Toc.toc/1, %{headings: headings, id: "custom-toc"})
 
       assert html =~ ~s(id="custom-toc")
     end
 
     test "uses default id when not provided" do
       headings = [%{title: "Test", link: "test", level: 1}]
-      html = render_component(&TableOfContents.toc/1, %{headings: headings})
+      html = render_component(&Toc.toc/1, %{headings: headings})
 
       assert html =~ ~s(id="toc")
     end
 
     test "renders semantic HTML with nav and aria-label" do
       headings = [%{title: "Test", link: "test", level: 1}]
-      html = render_component(&TableOfContents.toc/1, %{headings: headings})
+      html = render_component(&Toc.toc/1, %{headings: headings})
 
       assert html =~ ~s(<nav)
       assert html =~ ~s(aria-label="Table of contents")
@@ -92,7 +92,7 @@ defmodule BlogWeb.Components.TableOfContentsTest do
         %{title: "Second", link: "second", level: 1}
       ]
 
-      html = render_component(&TableOfContents.toc/1, %{headings: headings})
+      html = render_component(&Toc.toc/1, %{headings: headings})
 
       assert html =~ "<ol"
       assert html =~ "<li"

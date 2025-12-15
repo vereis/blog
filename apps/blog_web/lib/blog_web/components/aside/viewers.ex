@@ -1,4 +1,4 @@
-defmodule BlogWeb.Components.Viewers do
+defmodule BlogWeb.Components.Aside.Viewers do
   @moduledoc """
   Viewer tracking and display functionality.
 
@@ -16,6 +16,8 @@ defmodule BlogWeb.Components.Viewers do
   """
   use Phoenix.Component
 
+  alias BlogWeb.Components.Aside
+
   @site_topic "viewers:site"
 
   # ============================================================================
@@ -27,29 +29,30 @@ defmodule BlogWeb.Components.Viewers do
 
   ## Examples
 
-      <.counts site_count={@site_viewer_count} page_count={@page_viewer_count} />
+      <Viewers.counts site_count={@site_viewer_count} page_count={@page_viewer_count} />
   """
   attr :site_count, :integer, required: true
   attr :page_count, :integer, required: true
   attr :id, :string, default: "viewer-counts"
+  attr :open, :boolean, default: true
 
   def counts(assigns) do
     ~H"""
-    <aside id={@id} class="viewer-counts" aria-label="Viewer Counts">
-      <h2 class="aside-section-header">Viewers</h2>
+    <Aside.aside_section title="Viewers" id={@id} open={@open}>
+      <div class="viewer-counts" aria-label="Viewer Counts">
+        <p class="viewer-stat">
+          <span class="viewer-bullet">•</span>
+          <span class="viewer-label">Site-wide:</span>
+          <span class="viewer-count">{@site_count}</span>
+        </p>
 
-      <p class="viewer-stat">
-        <span class="viewer-bullet">•</span>
-        <span class="viewer-label">Site-wide:</span>
-        <span class="viewer-count">{@site_count}</span>
-      </p>
-
-      <p class="viewer-stat">
-        <span class="viewer-bullet">•</span>
-        <span class="viewer-label">This page:</span>
-        <span class="viewer-count">{@page_count}</span>
-      </p>
-    </aside>
+        <p class="viewer-stat">
+          <span class="viewer-bullet">•</span>
+          <span class="viewer-label">This page:</span>
+          <span class="viewer-count">{@page_count}</span>
+        </p>
+      </div>
+    </Aside.aside_section>
     """
   end
 
