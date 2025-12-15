@@ -13,16 +13,14 @@ defmodule BlogWeb.Components.Aside.Toc do
 
     * `headings` - List of heading maps with :title, :link, and :level
     * `id` - DOM ID for the table of contents container
-    * `open` - Default open state (default: true)
   """
   attr :headings, :list, required: true
   attr :id, :string, default: "toc"
-  attr :open, :boolean, default: true
 
   def toc(assigns) do
     ~H"""
-    <Aside.aside_section title="Table of Contents" id={"#{@id}-wrapper"} open={@open}>
-      <nav class="toc" phx-hook=".Scrollspy" id={@id} aria-label="Table of contents">
+    <Aside.aside_section title="Table of Contents" id={@id}>
+      <nav class="toc" phx-hook=".Scrollspy" id={"#{@id}-nav"} aria-label="Table of contents">
         <%= if @headings == [] do %>
           <p class="toc-empty">No headings available</p>
         <% else %>
