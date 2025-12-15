@@ -29,6 +29,18 @@
         window.addEventListener("phx:set-theme", (e) => setTheme(e.target.dataset.phxTheme));
       })();
     </script>
+    <script>
+      (() => {
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const stored = localStorage.getItem('crtFilter');
+        
+        const enabled = stored === null ? !prefersReducedMotion : stored === 'true';
+        
+        if (enabled && !prefersReducedMotion) {
+          document.body.classList.add('crt-filter');
+        }
+      })();
+    </script>
   </head>
   <body>
     {@inner_content}
