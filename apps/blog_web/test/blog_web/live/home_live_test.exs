@@ -96,7 +96,10 @@ defmodule BlogWeb.HomeLiveTest do
       {:ok, view, _html} = live(conn, ~p"/")
 
       current_year = Date.utc_today().year
-      assert has_element?(view, "footer p", "© #{current_year} vereis")
+      assert has_element?(view, ".site-footer")
+      assert has_element?(view, ".footer-block", "RSS")
+      assert has_element?(view, ".footer-block", "Source")
+      assert has_element?(view, ".footer-copyright", "© vereis #{current_year}")
     end
   end
 

@@ -91,6 +91,7 @@ defmodule BlogWeb do
 
   defp html_helpers do
     quote do
+      import BlogWeb.Components.Footer
       import BlogWeb.Components.Header
       import BlogWeb.CoreComponents
       # HTML escaping functionality

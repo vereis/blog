@@ -51,7 +51,7 @@ defmodule BlogWeb.Layouts do
     </aside>
 
     <footer class="page-footer">
-      <p>© {Date.utc_today().year} vereis</p>
+      <.footer />
     </footer>
 
     <.flash_group flash={@flash} />
