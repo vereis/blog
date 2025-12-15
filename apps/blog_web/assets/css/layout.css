@@ -17,7 +17,6 @@
     gap: 0 var(--space-4);
     max-inline-size: calc(var(--content-max) + var(--aside-width) + var(--space-4));
     margin-inline: auto;
-    padding-block: var(--space-line-4);
     padding-inline: var(--space-4);
   }
 
