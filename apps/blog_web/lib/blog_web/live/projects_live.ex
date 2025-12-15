@@ -9,7 +9,6 @@ defmodule BlogWeb.ProjectsLive do
   alias BlogWeb.Components.TableOfContents
   alias BlogWeb.Components.Tag
   alias BlogWeb.Components.Viewers
-  alias BlogWeb.Viewers, as: ViewersContext
 
   @base_url "/projects"
 
@@ -20,12 +19,12 @@ defmodule BlogWeb.ProjectsLive do
       Phoenix.PubSub.subscribe(Blog.PubSub, "discord:presence")
 
       # Track viewer on both site-wide and page-specific topics
-      ViewersContext.track_viewer(self(), ViewersContext.site_topic(), socket.id)
-      ViewersContext.track_viewer(self(), ViewersContext.page_topic(:projects), socket.id)
+      Viewers.track_viewer(self(), Viewers.site_topic(), socket.id)
+      Viewers.track_viewer(self(), Viewers.page_topic(:projects), socket.id)
 
       # Subscribe to viewer count updates
-      ViewersContext.subscribe(ViewersContext.site_topic())
-      ViewersContext.subscribe(ViewersContext.page_topic(:projects))
+      Viewers.subscribe(Viewers.site_topic())
+      Viewers.subscribe(Viewers.page_topic(:projects))
     end
 
     socket =
@@ -33,8 +32,8 @@ defmodule BlogWeb.ProjectsLive do
       |> assign(:all_tags, Blog.Tags.list_tags(having: :projects))
       |> assign(:projects, [])
       |> assign(:presence, Blog.Discord.get_presence())
-      |> assign(:site_viewer_count, ViewersContext.get_viewer_count(ViewersContext.site_topic()))
-      |> assign(:page_viewer_count, ViewersContext.get_viewer_count(ViewersContext.page_topic(:projects)))
+      |> assign(:site_viewer_count, Viewers.count())
+      |> assign(:page_viewer_count, Viewers.count(:projects))
 
     {:ok, socket}
   end
@@ -71,10 +70,10 @@ defmodule BlogWeb.ProjectsLive do
   @impl Phoenix.LiveView
   def handle_info({:viewer_count_updated, topic, count}, socket) do
     cond do
-      topic == ViewersContext.site_topic() ->
+      topic == Viewers.site_topic() ->
         {:noreply, assign(socket, :site_viewer_count, count)}
 
-      topic == ViewersContext.page_topic(:projects) ->
+      topic == Viewers.page_topic(:projects) ->
         {:noreply, assign(socket, :page_viewer_count, count)}
 
       true ->
