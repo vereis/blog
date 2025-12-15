@@ -25,7 +25,7 @@
   }
 
   .site-title {
-    color: var(--ansi-magenta);
+    color: var(--color-accent);
     font-weight: var(--font-weight-bold);
     text-decoration: none;
     display: block;
