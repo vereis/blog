@@ -23,6 +23,7 @@
 @import "components/search.css" layer(components);
 @import "components/tag.css" layer(components);
 @import "components/toc.css" layer(components);
+@import "components/viewers.css" layer(components);
 
 /* Utilities (always win over components) */
 @import "phoenix.css" layer(utilities);
