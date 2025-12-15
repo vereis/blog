@@ -52,4 +52,10 @@
     align-items: center;
     flex-shrink: 0;
   }
+
+  .footer-spacer {
+    flex: 1;
+    height: 1lh;
+    background-color: rgba(128, 128, 128, 0.3);
+  }
 }

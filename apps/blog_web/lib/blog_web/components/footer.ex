@@ -15,6 +15,7 @@ defmodule BlogWeb.Components.Footer do
     ~H"""
     <div class="site-footer">
       <.link navigate="/rss" class="footer-block">RSS</.link>
+      <div class="footer-spacer"></div>
       <.link
         href="https://github.com/vereis/blog"
         class="footer-block"
