@@ -10,7 +10,6 @@ defmodule BlogWeb.PostsLive do
   alias BlogWeb.Components.TableOfContents
   alias BlogWeb.Components.Tag
   alias BlogWeb.Components.Viewers
-  alias BlogWeb.Viewers, as: ViewersContext
 
   @base_url "/posts"
 
@@ -21,8 +20,8 @@ defmodule BlogWeb.PostsLive do
       Phoenix.PubSub.subscribe(Blog.PubSub, "discord:presence")
 
       # Track on site-wide topic
-      ViewersContext.track_viewer(self(), ViewersContext.site_topic(), socket.id)
-      ViewersContext.subscribe(ViewersContext.site_topic())
+      Viewers.track_viewer(self(), Viewers.site_topic(), socket.id)
+      Viewers.subscribe(Viewers.site_topic())
     end
 
     socket =
@@ -30,7 +29,7 @@ defmodule BlogWeb.PostsLive do
       |> assign(:all_tags, Blog.Tags.list_tags(having: :posts))
       |> assign(:posts, [])
       |> assign(:presence, Blog.Discord.get_presence())
-      |> assign(:site_viewer_count, ViewersContext.get_viewer_count(ViewersContext.site_topic()))
+      |> assign(:site_viewer_count, Viewers.count())
       |> assign(:page_viewer_count, 0)
       |> assign(:current_page_topic, nil)
 
@@ -70,7 +69,7 @@ defmodule BlogWeb.PostsLive do
   @impl Phoenix.LiveView
   def handle_info({:viewer_count_updated, topic, count}, socket) do
     cond do
-      topic == ViewersContext.site_topic() ->
+      topic == Viewers.site_topic() ->
         {:noreply, assign(socket, :site_viewer_count, count)}
 
       topic == socket.assigns.current_page_topic ->
@@ -94,27 +93,28 @@ defmodule BlogWeb.PostsLive do
 
   defp maybe_switch_page_topic(socket, live_action, params) do
     new_topic = get_page_topic(live_action, params)
+    new_count_arg = get_count_arg(live_action, params)
     old_topic = socket.assigns[:current_page_topic]
 
     cond do
       # First time tracking (mount)
       is_nil(old_topic) and connected?(socket) ->
-        ViewersContext.track_viewer(self(), new_topic, socket.id)
-        ViewersContext.subscribe(new_topic)
+        Viewers.track_viewer(self(), new_topic, socket.id)
+        Viewers.subscribe(new_topic)
 
         socket
         |> assign(:current_page_topic, new_topic)
-        |> assign(:page_viewer_count, ViewersContext.get_viewer_count(new_topic))
+        |> assign(:page_viewer_count, Viewers.count(new_count_arg))
 
       # Topic changed (navigation)
       old_topic != new_topic and connected?(socket) ->
-        ViewersContext.untrack_viewer(self(), old_topic, socket.id)
-        ViewersContext.track_viewer(self(), new_topic, socket.id)
-        ViewersContext.subscribe(new_topic)
+        Viewers.untrack_viewer(self(), old_topic, socket.id)
+        Viewers.track_viewer(self(), new_topic, socket.id)
+        Viewers.subscribe(new_topic)
 
         socket
         |> assign(:current_page_topic, new_topic)
-        |> assign(:page_viewer_count, ViewersContext.get_viewer_count(new_topic))
+        |> assign(:page_viewer_count, Viewers.count(new_count_arg))
 
       # No change or not connected
       true ->
@@ -122,8 +122,11 @@ defmodule BlogWeb.PostsLive do
     end
   end
 
-  defp get_page_topic(:index, _params), do: ViewersContext.page_topic(:posts)
-  defp get_page_topic(:show, %{"slug" => slug}), do: ViewersContext.post_topic(slug)
+  defp get_page_topic(:index, _params), do: Viewers.page_topic(:posts)
+  defp get_page_topic(:show, %{"slug" => slug}), do: Viewers.post_topic(slug)
+
+  defp get_count_arg(:index, _params), do: :posts
+  defp get_count_arg(:show, %{"slug" => slug}), do: [posts: slug]
 
   defp apply_action(socket, :index, _params) do
     socket
