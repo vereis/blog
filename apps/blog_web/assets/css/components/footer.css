@@ -9,7 +9,6 @@
     padding-block-end: 1lh;
     margin-inline: calc(var(--space-4) * -1);
     padding-inline: var(--space-4);
-    margin-block-start: 1lh;
   }
 
   .site-footer {
