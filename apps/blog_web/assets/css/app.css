@@ -14,6 +14,7 @@
 @import "components/aside.css" layer(components);
 @import "components/badge.css" layer(components);
 @import "components/bluescreen.css" layer(components);
+@import "components/checkbox.css" layer(components);
 @import "components/discord.css" layer(components);
 @import "components/empty-state.css" layer(components);
 @import "components/flash.css" layer(components);
