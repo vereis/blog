@@ -18,6 +18,7 @@
 @import "components/discord.css" layer(components);
 @import "components/empty-state.css" layer(components);
 @import "components/flash.css" layer(components);
+@import "components/footer.css" layer(components);
 @import "components/gallery.css" layer(components);
 @import "components/header.css" layer(components);
 @import "components/post.css" layer(components);
