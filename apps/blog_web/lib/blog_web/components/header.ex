@@ -40,7 +40,17 @@ defmodule BlogWeb.Components.Header do
 
     ~H"""
     <div class="site-header">
-      <.link navigate="/" class="site-title">vereis.com</.link>
+      <div class="site-header-row">
+        <.link navigate="/" class="site-title">vereis.com</.link>
+        <div class="site-header-crt">
+          <BlogWeb.Components.Checkbox.checkbox
+            id="crt-filter-toggle-mobile"
+            storage_key="crtFilter"
+            body_class="crt-filter"
+            label="CRT Filter"
+          />
+        </div>
+      </div>
       <p
         class="site-tagline"
         id="site-tagline"
@@ -116,8 +126,6 @@ defmodule BlogWeb.Components.Header do
       <.link navigate="/projects" class={nav_link_class(@current_path, "/projects")}>
         Projects
       </.link>
-      <span class="nav-separator">|</span>
-      <.link navigate="/gallery" class={nav_link_class(@current_path, "/gallery")}>Gallery</.link>
     </nav>
     """
   end

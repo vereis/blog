@@ -57,4 +57,15 @@
     height: 1lh;
     background-color: rgba(128, 128, 128, 0.3);
   }
+
+  /* Remove footer background padding on mobile (< 50ch) */
+  @media (max-width: 50ch) {
+    .page-footer {
+      position: static;
+      padding-block-start: 0;
+      padding-block-end: 0;
+      padding-inline: 0;
+      margin-inline: calc(var(--space-1) * -1);
+    }
+  }
 }

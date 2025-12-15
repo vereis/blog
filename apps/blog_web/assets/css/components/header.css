@@ -24,6 +24,27 @@
     margin: 0;
   }
 
+  .site-header-row {
+    display: contents;
+  }
+
+  .site-header-crt {
+    display: none;
+  }
+
+  /* Show CRT filter in header when aside is hidden (< 100ch) */
+  @media (max-width: 100ch) {
+    .site-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .site-header-crt {
+      display: block;
+    }
+  }
+
   .site-title {
     color: var(--color-accent);
     font-weight: var(--font-weight-bold);
@@ -65,6 +86,7 @@
     align-items: center;
     overflow: hidden;
     color: var(--color-bg-secondary);
+    min-width: 0;
   }
 
   .header-separator::before {
@@ -96,5 +118,16 @@
   .nav-separator {
     color: var(--color-fg-dim);
     user-select: none;
+  }
+
+  /* Mobile adjustments (< 50ch) */
+  @media (max-width: 50ch) {
+    .page-header {
+      position: static;
+      padding-block-start: 0.5lh;
+      padding-block-end: 0.5lh;
+      padding-inline: var(--space-1);
+      margin-inline: calc(var(--space-1) * -1);
+    }
   }
 }

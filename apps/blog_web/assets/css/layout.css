@@ -1,9 +1,16 @@
 @layer base {
+  html {
+    /* Fix for mobile browsers with dynamic URL bars */
+    min-height: 100dvh;
+  }
+
   body {
     /* NOTE: Layout dimensions
      * --content-max: 80ch (optimal reading width for prose)
      * --aside-width: 32ch (fits "### Working on Something Cool" without wrapping)
-     * Responsive breakpoint: 116ch (80ch + 32ch + ~4ch gap)
+     * 
+     * Responsive breakpoint: 100ch
+     * Below this threshold, aside is hidden for mobile/narrow viewports.
      */
     --content-max: 80ch;
     --aside-width: 32ch;
@@ -18,6 +25,7 @@
     max-inline-size: calc(var(--content-max) + var(--aside-width) + var(--space-4));
     margin-inline: auto;
     padding-inline: var(--space-4);
+    min-height: 100dvh;
   }
 
   .page-header {
@@ -42,20 +50,36 @@
     grid-area: footer;
   }
 
-  @media (max-width: calc(var(--content-max) + var(--aside-width) + var(--space-4))) {
+  /* Hide aside on narrow viewports (< 100ch) */
+  @media (max-width: 100ch) {
     body {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       grid-template-areas:
         "header"
-        "aside"
         "content"
         "footer";
       max-inline-size: var(--content-max);
     }
 
     .page-aside {
-      position: static;
-      margin-block-end: var(--space-line);
+      display: none;
+    }
+  }
+
+  /* Reduce padding on mobile (< 50ch) */
+  @media (max-width: 50ch) {
+    body {
+      padding-inline: var(--space-1);
+    }
+
+    .page-header {
+      margin-inline: calc(var(--space-1) * -1);
+      padding-inline: var(--space-1);
+    }
+
+    .page-footer {
+      margin-inline: calc(var(--space-1) * -1);
+      padding-inline: var(--space-1);
     }
   }
 

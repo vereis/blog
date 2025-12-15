@@ -41,7 +41,6 @@ defmodule BlogWeb.Components.HeaderTest do
       assert has_element?(view, "a[href='/']", "Home")
       assert has_element?(view, "a[href='/posts']", "Posts")
       assert has_element?(view, "a[href='/projects']", "Projects")
-      assert has_element?(view, "a[href='/gallery']", "Gallery")
       assert has_element?(view, ".nav-separator", "|")
     end
 
