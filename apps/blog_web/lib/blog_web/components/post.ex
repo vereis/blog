@@ -150,11 +150,6 @@ defmodule BlogWeb.Components.Post do
             </h2>
             <div :if={@post.excerpt} class="post-excerpt">
               {Phoenix.HTML.raw(@post.excerpt)}
-              <p>
-                <.link patch={"/posts/#{@post.slug}"} aria-label={"Read post: #{@post.title}"}>
-                  Continue Reading...
-                </.link>
-              </p>
             </div>
             <div class="post-meta">
               <time :if={@post.published_at} datetime={@datetime_iso}>{@formatted_date}</time>
