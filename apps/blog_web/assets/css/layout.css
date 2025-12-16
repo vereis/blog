@@ -17,6 +17,7 @@
     
     display: grid;
     grid-template-columns: minmax(0, var(--content-max)) var(--aside-width);
+    grid-template-rows: auto 1fr auto;
     grid-template-areas:
       "header ."
       "content aside"
