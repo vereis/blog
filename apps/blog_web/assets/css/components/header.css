@@ -59,6 +59,7 @@
   .site-tagline {
     color: var(--color-fg-secondary);
     margin-block-end: 0;
+    font-style: italic;
   }
 
   .tagline-caret {
