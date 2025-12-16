@@ -71,6 +71,10 @@ defmodule Blog.Posts.Post do
               order_by: [asc: fts.rank]
         end
 
+      {:slug, slug}, query when is_binary(slug) ->
+        normalized_slug = String.replace(slug, "_", "-")
+        from post in query, where: post.slug == ^normalized_slug
+
       {:tags, tags}, query when empty?(tags) ->
         query
 
@@ -230,8 +234,9 @@ defmodule Blog.Posts.Post do
     separator = Keyword.get(opts, :separator, "-")
 
     text
+    |> String.normalize(:nfd)
+    |> String.replace(~r/[^A-Za-z0-9\s-]/u, "")
     |> String.downcase()
-    |> String.replace(~r/[^\w\s-]/, "")
     |> String.replace(~r/\s+/, separator)
     |> String.trim(separator)
   end

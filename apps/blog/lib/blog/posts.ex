@@ -8,6 +8,7 @@ defmodule Blog.Posts do
   def list_posts(filters \\ []) do
     filters
     |> Keyword.put_new(:preload, :tags)
+    |> Keyword.put_new(:is_draft, false)
     |> Post.query()
     |> Repo.all()
   end

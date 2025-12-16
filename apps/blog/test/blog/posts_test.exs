@@ -33,6 +33,16 @@ defmodule Blog.PostsTest do
       assert hd(published).id == published_post.id
     end
 
+    test "excludes draft posts by default" do
+      insert(:post, slug: "draft", is_draft: true)
+      published_post = insert(:post, slug: "published", is_draft: false)
+
+      posts = Posts.list_posts()
+
+      assert length(posts) == 1
+      assert hd(posts).id == published_post.id
+    end
+
     test "limits results" do
       insert(:post, slug: "post-1")
       insert(:post, slug: "post-2")
@@ -124,6 +134,14 @@ defmodule Blog.PostsTest do
 
       assert fetched = Posts.get_post(slug: "test-post")
       assert fetched.id == post.id
+    end
+
+    test "gets post by slug with underscores normalized to hyphens" do
+      post = insert(:post, slug: "test-post")
+
+      assert fetched = Posts.get_post(slug: "test_post")
+      assert fetched.id == post.id
+      assert fetched.slug == "test-post"
     end
 
     test "returns nil when post not found by ID" do
