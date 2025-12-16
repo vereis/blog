@@ -14,7 +14,7 @@ defmodule Blog.Posts.Post do
   alias Blog.Markdown
   alias Blog.Schema.FTS
 
-  @castable_fields [:title, :raw_body, :slug, :is_draft, :published_at]
+  @castable_fields [:title, :raw_body, :slug, :is_draft, :published_at, :raw_description]
   @slug_format ~r/^[a-z0-9_-]+$/
   @reading_speed_wpm 260
 
@@ -22,7 +22,9 @@ defmodule Blog.Posts.Post do
     field :title, :string
     field :body, :string
     field :excerpt, :string
+    field :description, :string
     field :raw_body, :string
+    field :raw_description, :string, virtual: true
     field :slug, :string
     field :reading_time_minutes, :integer
     field :is_draft, :boolean, default: false
@@ -95,6 +97,16 @@ defmodule Blog.Posts.Post do
     # This allows --- to be used as horizontal rules in the markdown body
     with [_front, metadata_yaml, raw_body] <- String.split(content, ~r/^---\n/m, parts: 3),
          {:ok, metadata} <- YamlElixir.read_from_string(metadata_yaml) do
+      # Map description -> raw_description for markdown processing
+      metadata =
+        if Map.has_key?(metadata, "description") do
+          metadata
+          |> Map.put("raw_description", Map.get(metadata, "description"))
+          |> Map.delete("description")
+        else
+          metadata
+        end
+
       metadata
       |> Map.take(Enum.map(@castable_fields, &Atom.to_string/1))
       |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
@@ -126,7 +138,7 @@ defmodule Blog.Posts.Post do
     slug = get_field(changeset, :slug)
 
     case Markdown.render(raw_body, &process_html/2) do
-      {:ok, [html, %{headings: headings, excerpt: excerpt}]} ->
+      {:ok, [html, %{headings: headings, excerpt: auto_excerpt}]} ->
         reading_time = calculate_reading_time(raw_body)
 
         # Always include title as the top-level heading (use slug as link to match badge ID)
@@ -138,14 +150,31 @@ defmodule Blog.Posts.Post do
 
         all_headings = [title_heading | headings]
 
+        # Use custom description from YAML if provided, otherwise use auto-generated excerpt
+        description = get_description(changeset)
+
         changeset
         |> put_change(:body, html)
-        |> put_change(:excerpt, excerpt)
+        |> put_change(:excerpt, auto_excerpt)
+        |> put_change(:description, description)
         |> put_change(:reading_time_minutes, reading_time)
         |> put_embed(:headings, all_headings)
 
       {:error, reason} ->
         add_error(changeset, :raw_body, reason)
+    end
+  end
+
+  defp get_description(changeset) when not changes?(changeset, :raw_description) do
+    nil
+  end
+
+  defp get_description(changeset) do
+    with raw when is_binary(raw) and raw != "" <- get_change(changeset, :raw_description),
+         {:ok, [rendered, _metadata]} <- Markdown.render(raw) do
+      rendered
+    else
+      _ -> nil
     end
   end
 

@@ -148,8 +148,8 @@ defmodule BlogWeb.Components.Post do
                 {@post.title}
               </.link>
             </h2>
-            <div :if={@post.excerpt} class="post-excerpt">
-              {Phoenix.HTML.raw(@post.excerpt)}
+            <div :if={@post.description || @post.excerpt} class="post-excerpt">
+              {Phoenix.HTML.raw(@post.description || @post.excerpt)}
             </div>
             <div class="post-meta">
               <time :if={@post.published_at} datetime={@datetime_iso}>{@formatted_date}</time>

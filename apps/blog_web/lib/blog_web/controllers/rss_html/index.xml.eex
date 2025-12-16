@@ -11,7 +11,7 @@
     <%= for post <- assigns.posts do %>
       <item>
         <title><%= Phoenix.HTML.html_escape(post.title) |> Phoenix.HTML.safe_to_string() %></title>
-        <description><![CDATA[<%= post.excerpt %><p><em>Read more →</em></p>]]></description>
+        <description><![CDATA[<%= post.description || post.excerpt %><p><em>Read more →</em></p>]]></description>
         <link>https://vereis.com/posts/<%= post.slug %></link>
         <guid isPermaLink="false"><%= post.slug %></guid>
         <pubDate><%= BlogWeb.RssController.format_rfc822(post.published_at) %></pubDate>

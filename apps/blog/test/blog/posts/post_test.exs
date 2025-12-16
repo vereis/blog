@@ -477,5 +477,87 @@ defmodule Blog.Posts.PostTest do
       assert is_nil(minimal.published_at)
       assert minimal.body =~ "Just some minimal content"
     end
+
+    test "uses custom description from YAML if provided" do
+      resource = %Blog.Resource{
+        path: "custom-description-post.md",
+        content: """
+        ---
+        title: Custom Description Post
+        slug: custom-description-post
+        description: This is a **custom** description from YAML
+        ---
+
+        # Introduction
+
+        This is the first paragraph of the post.
+
+        This is the second paragraph.
+
+        This is the third paragraph.
+        """
+      }
+
+      attrs = Post.handle_import(resource)
+      assert {:ok, post} = Blog.Posts.create_post(attrs)
+
+      # Should have the custom description rendered as markdown
+      assert post.description =~ "<strong>custom</strong>"
+      # Excerpt should still be auto-generated from body
+      assert post.excerpt =~ "first paragraph"
+    end
+
+    test "description is nil when empty string provided" do
+      resource = %Blog.Resource{
+        path: "empty-description-post.md",
+        content: """
+        ---
+        title: Empty Description Post
+        slug: empty-description-post
+        description: ""
+        ---
+
+        # Introduction
+
+        This is the first paragraph of the post.
+
+        This is the second paragraph.
+        """
+      }
+
+      attrs = Post.handle_import(resource)
+      assert {:ok, post} = Blog.Posts.create_post(attrs)
+
+      # Description should be nil when empty
+      assert is_nil(post.description)
+      # Excerpt should still be auto-generated
+      assert post.excerpt =~ "first paragraph"
+    end
+
+    test "description is nil when not provided" do
+      resource = %Blog.Resource{
+        path: "no-description-post.md",
+        content: """
+        ---
+        title: No Description Post
+        slug: no-description-post
+        ---
+
+        # Introduction
+
+        This is the first paragraph of the post.
+
+        This is the second paragraph.
+        """
+      }
+
+      attrs = Post.handle_import(resource)
+      assert {:ok, post} = Blog.Posts.create_post(attrs)
+
+      # Description should be nil when not provided
+      assert is_nil(post.description)
+      # Excerpt should still be auto-generated
+      assert post.excerpt =~ "first paragraph"
+    end
   end
 end
