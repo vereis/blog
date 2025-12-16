@@ -4,9 +4,15 @@ slug: you-built-an-erlang
 is_draft: false
 reading_time_minutes:
 published_at: 2024-11-26 14:19:59Z
+description: |
+  You wanted a simple service notification system, so you added HTTP callbacks, then queues, then retries, then supervision...
+
+  Congratulations! You've built an ad-hoc, informally-specified, bug-ridden slow implementation of half of Erlang.
+
+  A satirical journey through accidentally reimplementing the actor model as seen on Hacker News.
 tags:
+  - elixir
   - erlang
-  - humor
 ---
 
 > This post will make more sense if you first read [Dear Sir, You Have Built a Kubernetes](https://www.macchaffee.com/blog/2024/you-have-built-a-kubernetes/).

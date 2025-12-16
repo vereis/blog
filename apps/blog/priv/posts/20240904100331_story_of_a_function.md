@@ -3,10 +3,16 @@ title: The Story of a Function
 slug: story-of-a-function
 is_draft: true
 reading_time_minutes:
-published_at: 2024-09-04 16:22:16Z
+published_at: 2024-09-04 10:03:31Z
+description: |
+  A simple immunization panel query evolved over years into a sophisticated materialized view system powered by Cinema.
+
+  This is the story of how a small optimization task became a multi-year architectural journey with Oban Pro and distributed workflows.
+
+  Sometimes "simple" problems aren't so simple after all.
 tags:
   - elixir
-  - talk
+  - ecto
 ---
 
 > I gave a talk at [ElixirConf 2024](https://elixirconf.com/2024) about "Building a Framework for Incremental Materialized Views with Ecto".

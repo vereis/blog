@@ -4,6 +4,10 @@ slug: a-nixoswindows-11-dev-env
 is_draft: false
 reading_time_minutes:
 published_at: 2025-08-12 14:21:41.523524Z
+description: |
+  This post covers setting up a NixOS development environment on Windows 11 LTSC using WSL2.
+
+  Get reproducible, declarative configuration with Windows for gaming and NixOS for development.
 tags:
   - nixos
   - windows

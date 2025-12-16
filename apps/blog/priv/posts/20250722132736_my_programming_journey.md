@@ -4,6 +4,8 @@ slug: my-programming-journey
 is_draft: false
 reading_time_minutes:
 published_at: 2025-07-22 13:27:36.650166Z
+description: |
+  This post traces my journey from being just a kid, to who I am today
 tags:
   - ahoy
 ---
