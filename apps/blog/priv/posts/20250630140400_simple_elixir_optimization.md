@@ -3,7 +3,11 @@ title: Simple Elixir Optimization
 slug: simple-elixir-optimization
 is_draft: false
 reading_time_minutes:
-published_at: 2025-06-30 14:04:00.057660Z
+published_at: 2025-06-30 14:04:00Z
+description: |
+  Coming from other languages, especially imperative ones, it's easy to write suboptimal Elixir code.
+
+  This post covers practical optimizations—avoiding `length/1`, leveraging streaming, using ETS—without needing complex profiling tools.
 tags:
   - elixir
 ---

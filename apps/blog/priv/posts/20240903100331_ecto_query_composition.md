@@ -3,10 +3,14 @@ title: Ecto Queryable Pattern
 slug: ecto-queries-are-data
 is_draft: false
 reading_time_minutes:
-published_at: 2024-09-03 14:02:12Z
+published_at: 2024-09-03 10:03:31Z
+description: |
+  Ecto queries are just data! This post goes over how we can abuse that fact to build ergonomic, composable query patterns.
+
+  Using behaviors, callbacks, and metaprogramming, we can create a single source of truth for query logic that works everywhere.
 tags:
   - elixir
-  - patterns
+  - ecto
 ---
 
 In Elixir, [Ecto](https://hexdocs.pm/ecto/Ecto.html) is a fantastic library for doing all sorts of database operations in Elixir and is definitely a superpower of the language and ecosystem.

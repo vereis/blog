@@ -3,9 +3,12 @@ title: My Take On Free Will
 slug: my-take-on-free-will
 is_draft: false
 reading_time_minutes:
-published_at: 2025-06-24 12:20:39.340751Z
+published_at: 2025-06-24 12:20:39Z
+description: |
+  Like my post on consciousness, this is another topic I've held consistent beliefs about for most of my life.
+
+  I don't believe free will exists, quantum mechanics doesn't save us, and this post covers why that's actually liberating.
 tags:
-  - rant
   - philosophy
 ---
 

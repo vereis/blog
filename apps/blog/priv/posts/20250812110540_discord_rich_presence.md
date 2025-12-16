@@ -4,6 +4,10 @@ slug: discord-rich-presence
 is_draft: false
 reading_time_minutes:
 published_at: 2025-08-12 11:05:40.395945Z
+description: |
+  As a WSL-based NixOS user, I make life difficult for myself sometimes.
+
+  This post details setting up Discord Rich Presence to sync my Neovim activity from WSL to this blog in real-time using `npiperelay` and `socat`.
 tags:
   - windows
   - nix

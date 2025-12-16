@@ -4,8 +4,11 @@ slug: my-take-on-consciousness
 is_draft: false
 reading_time_minutes:
 published_at: 2025-05-21 14:43:07Z
+description: |
+  Believe it or not, I've been asked about the topic of "consciousness" sometimes... and I have (maybe one too many) thoughts on the matter.
+
+  This post covers dualism to animism, exploring qualia, the mind-body problem, and why we might never fully understand subjective experience, but why I believe **everything** is conscious.
 tags:
-  - rant
   - philosophy
 ---
 
