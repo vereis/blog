@@ -63,6 +63,7 @@
   }
 
   .tagline-caret {
+    color: var(--color-bg-secondary);
     animation: blink 1s step-end infinite;
   }
 
