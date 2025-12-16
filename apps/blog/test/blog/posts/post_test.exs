@@ -438,6 +438,51 @@ defmodule Blog.Posts.PostTest do
     end
   end
 
+  describe "query/2 - permalink filter" do
+    test "finds post by permalink" do
+      post = insert(:post, slug: "my-post", permalinks: ["uses", "setup"])
+
+      result = Blog.Posts.get_post(permalink: "uses")
+
+      assert result.id == post.id
+      assert result.slug == "my-post"
+    end
+
+    test "finds post by any permalink in array" do
+      post = insert(:post, slug: "my-post", permalinks: ["alias1", "alias2", "alias3"])
+
+      assert Blog.Posts.get_post(permalink: "alias1").id == post.id
+      assert Blog.Posts.get_post(permalink: "alias2").id == post.id
+      assert Blog.Posts.get_post(permalink: "alias3").id == post.id
+    end
+
+    test "returns nil when permalink not found" do
+      insert(:post, slug: "my-post", permalinks: ["exists"])
+
+      assert Blog.Posts.get_post(permalink: "nonexistent") == nil
+    end
+
+    test "returns nil for posts with empty permalinks" do
+      insert(:post, slug: "my-post", permalinks: [])
+
+      assert Blog.Posts.get_post(permalink: "anything") == nil
+    end
+
+    test "does not find draft posts by permalink" do
+      insert(:post, slug: "draft", permalinks: ["draft-link"], is_draft: true)
+
+      assert Blog.Posts.get_post(permalink: "draft-link", is_draft: false) == nil
+    end
+
+    test "finds draft posts when explicitly querying for drafts" do
+      post = insert(:post, slug: "draft", permalinks: ["draft-link"], is_draft: true)
+
+      result = Blog.Posts.get_post(permalink: "draft-link", is_draft: true)
+
+      assert result.id == post.id
+    end
+  end
+
   describe "import/0" do
     test "imports posts from markdown files and inserts into database" do
       assert {:ok, imported} = Post.import()
@@ -558,6 +603,89 @@ defmodule Blog.Posts.PostTest do
       assert is_nil(post.description)
       # Excerpt should still be auto-generated
       assert post.excerpt =~ "first paragraph"
+    end
+
+    test "imports permalinks from YAML frontmatter" do
+      resource = %Blog.Resource{
+        path: "post-with-permalinks.md",
+        content: """
+        ---
+        title: Post with Permalinks
+        slug: post-with-permalinks
+        permalinks:
+          - uses
+          - setup
+          - my-setup
+        ---
+
+        Content here.
+        """
+      }
+
+      attrs = Post.handle_import(resource)
+      assert {:ok, post} = Blog.Posts.create_post(attrs)
+
+      assert post.permalinks == ["uses", "setup", "my-setup"]
+    end
+
+    test "handles missing permalinks field with empty array default" do
+      resource = %Blog.Resource{
+        path: "no-permalinks.md",
+        content: """
+        ---
+        title: No Permalinks
+        slug: no-permalinks
+        ---
+
+        Content here.
+        """
+      }
+
+      attrs = Post.handle_import(resource)
+      assert {:ok, post} = Blog.Posts.create_post(attrs)
+
+      assert post.permalinks == []
+    end
+
+    test "handles empty permalinks array" do
+      resource = %Blog.Resource{
+        path: "empty-permalinks.md",
+        content: """
+        ---
+        title: Empty Permalinks
+        slug: empty-permalinks
+        permalinks: []
+        ---
+
+        Content here.
+        """
+      }
+
+      attrs = Post.handle_import(resource)
+      assert {:ok, post} = Blog.Posts.create_post(attrs)
+
+      assert post.permalinks == []
+    end
+
+    test "handles single permalink" do
+      resource = %Blog.Resource{
+        path: "single-permalink.md",
+        content: """
+        ---
+        title: Single Permalink
+        slug: single-permalink
+        permalinks:
+          - only-one
+        ---
+
+        Content here.
+        """
+      }
+
+      attrs = Post.handle_import(resource)
+      assert {:ok, post} = Blog.Posts.create_post(attrs)
+
+      assert post.permalinks == ["only-one"]
     end
   end
 end

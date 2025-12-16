@@ -31,6 +31,9 @@ defmodule BlogWeb.Router do
 
     get "/assets/images/:name", AssetsController, :show
     get "/rss", RssController, :index
+
+    # Permalinks (catch-all, must be last)
+    get "/:permalink", PermalinkController, :show
   end
 
   # Other scopes may use custom stacks.

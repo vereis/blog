@@ -14,7 +14,7 @@ defmodule Blog.Posts.Post do
   alias Blog.Markdown
   alias Blog.Schema.FTS
 
-  @castable_fields [:title, :raw_body, :slug, :is_draft, :published_at, :raw_description]
+  @castable_fields [:title, :raw_body, :slug, :is_draft, :published_at, :raw_description, :permalinks]
   @slug_format ~r/^[a-z0-9_-]+$/
   @reading_speed_wpm 260
 
@@ -29,6 +29,7 @@ defmodule Blog.Posts.Post do
     field :reading_time_minutes, :integer
     field :is_draft, :boolean, default: false
     field :published_at, :utc_datetime
+    field :permalinks, {:array, :string}, default: []
 
     many_to_many :tags, Blog.Tags.Tag,
       join_through: join_schema("posts_tags", {:post_id, :tag_id}),
@@ -77,6 +78,9 @@ defmodule Blog.Posts.Post do
         normalized_slug = String.replace(slug, "_", "-")
         from post in query, where: post.slug == ^normalized_slug
 
+      {:permalink, permalink}, query when is_binary(permalink) ->
+        from post in query, where: ^permalink in post.permalinks
+
       {:tags, tags}, query when empty?(tags) ->
         query
 
@@ -110,7 +114,11 @@ defmodule Blog.Posts.Post do
       metadata
       |> Map.take(Enum.map(@castable_fields, &Atom.to_string/1))
       |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
-      |> Map.merge(%{raw_body: raw_body, tags: Map.get(metadata, "tags", [])})
+      |> Map.merge(%{
+        raw_body: raw_body,
+        tags: Map.get(metadata, "tags", []),
+        permalinks: Map.get(metadata, "permalinks", [])
+      })
     end
   end
 
