@@ -23,8 +23,7 @@ defmodule BlogWeb.ProjectsLiveTest do
     test "displays empty state when no projects exist", %{conn: conn} do
       {:ok, view, _html} = live(conn, ~p"/projects")
 
-      assert render(view) =~ "No projects found"
-      assert render(view) =~ "Return home"
+      assert render(view) =~ "No Projects Found"
       assert has_element?(view, ".empty-state")
     end
 
@@ -222,7 +221,7 @@ defmodule BlogWeb.ProjectsLiveTest do
 
       html = render(view)
       refute html =~ "Test Project"
-      assert html =~ "No projects found"
+      assert html =~ "No Projects Found"
     end
   end
 end

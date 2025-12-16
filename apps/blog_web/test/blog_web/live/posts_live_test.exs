@@ -23,8 +23,7 @@ defmodule BlogWeb.PostsLiveTest do
     test "displays empty state when no posts exist", %{conn: conn} do
       {:ok, view, _html} = live(conn, ~p"/posts")
 
-      assert render(view) =~ "No posts found"
-      assert render(view) =~ "Return home"
+      assert render(view) =~ "No Posts Found"
       assert has_element?(view, ".empty-state")
     end
 
@@ -330,7 +329,7 @@ defmodule BlogWeb.PostsLiveTest do
 
       html = render(view)
       refute html =~ "Test Post"
-      assert html =~ "No posts found"
+      assert html =~ "No Posts Found"
     end
   end
 end

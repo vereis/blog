@@ -79,7 +79,7 @@ defmodule BlogWeb.Components.Project do
         <%= if @projects == [] do %>
           <p aria-live="polite">No items</p>
           <EmptyState.block>
-            No projects found. <.link navigate="/">Return home</.link> or check back later!
+            No Projects Found
           </EmptyState.block>
         <% else %>
           <p aria-live="polite">{length(@projects)} items</p>

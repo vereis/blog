@@ -102,7 +102,7 @@ defmodule BlogWeb.Components.Post do
         <%= if @posts == [] do %>
           <p aria-live="polite">No items</p>
           <EmptyState.block>
-            No posts found. <.link navigate="/">Return home</.link> or check back later!
+            No Posts Found
           </EmptyState.block>
         <% else %>
           <p aria-live="polite">{length(@posts)} items</p>

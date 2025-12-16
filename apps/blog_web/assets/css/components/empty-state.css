@@ -10,8 +10,8 @@
     background-image: repeating-linear-gradient(
       -60deg,
       var(--color-bg-secondary) 0px,
-      var(--color-bg-secondary) 2px,
-      transparent 2px,
+      var(--color-bg-secondary) 1px,
+      transparent 1px,
       transparent 12px
     );
     background-clip: content-box;
@@ -22,9 +22,10 @@
     position: relative;
     padding: var(--space-line) var(--space-2);
     background-color: var(--color-bg-primary);
-    outline: 1px solid var(--color-fg-secondary);
+    outline: 1px solid var(--color-bg-secondary);
     outline-offset: -1px;
-    color: var(--color-fg-primary);
+    color: var(--color-fg-secondary);
+    font-style: italic;
     text-align: center;
     z-index: 0;
 
@@ -32,9 +33,9 @@
       content: '';
       position: absolute;
       inline-size: calc(100% + 2 * var(--space-1));
-      block-size: calc(100% + 2 * var(--space-line));
+      block-size: calc(100% + 1lh);
       inset-inline-start: calc(-1 * var(--space-1));
-      inset-block-start: calc(-1 * var(--space-line));
+      inset-block-start: calc(-0.5lh);
       background-color: var(--color-bg-primary);
       z-index: -1;
     }

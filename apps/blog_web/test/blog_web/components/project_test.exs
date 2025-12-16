@@ -15,8 +15,7 @@ defmodule BlogWeb.Components.ProjectTest do
           id: "test-projects"
         )
 
-      assert html =~ "No projects found"
-      assert html =~ "Return home"
+      assert html =~ "No Projects Found"
       assert html =~ ~s(class="empty-state")
       assert html =~ ~s(role="status")
       assert html =~ "No items"

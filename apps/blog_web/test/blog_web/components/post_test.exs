@@ -13,8 +13,7 @@ defmodule BlogWeb.Components.PostTest do
 
       assert html =~ ~s(class="empty-state")
       assert html =~ ~s(role="status")
-      assert html =~ "No posts found"
-      assert html =~ "Return home"
+      assert html =~ "No Posts Found"
     end
 
     test "does not render list structure when empty" do

@@ -54,6 +54,7 @@
 
   .flash-message {
     font-style: italic;
+    color: var(--color-fg-secondary);
   }
 
   .flash-close {
