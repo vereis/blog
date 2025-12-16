@@ -52,6 +52,12 @@
     --space-line-4: 4lh;
   }
 
+  @media (max-width: 50ch) {
+    :root {
+      --grid-base: 14px;
+    }
+  }
+
   html {
     font-family: var(--font-mono);
     font-size: var(--font-size-base);
