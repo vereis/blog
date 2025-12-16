@@ -61,7 +61,6 @@
   /* Remove footer background padding on mobile (< 50ch) */
   @media (max-width: 50ch) {
     .page-footer {
-      position: static;
       padding-block-start: 0;
       padding-block-end: 0;
       padding-inline: 0;

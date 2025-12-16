@@ -123,7 +123,6 @@
   /* Mobile adjustments (< 50ch) */
   @media (max-width: 50ch) {
     .page-header {
-      position: static;
       padding-block-start: 0.5lh;
       padding-block-end: 0.5lh;
       padding-inline: var(--space-1);
