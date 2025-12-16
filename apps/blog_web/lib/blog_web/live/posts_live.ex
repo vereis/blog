@@ -33,6 +33,7 @@ defmodule BlogWeb.PostsLive do
       |> assign(:site_viewer_count, Viewers.count())
       |> assign(:page_viewer_count, 0)
       |> assign(:current_page_topic, nil)
+      |> assign(:prev_action, nil)
 
     {:ok, socket}
   end
@@ -41,14 +42,18 @@ defmodule BlogWeb.PostsLive do
   def handle_params(params, _uri, socket) do
     selected_tags = Tag.labels_from_params(params)
     search_query = Search.query_from_params(params)
+    prev_action = socket.assigns[:prev_action]
+    current_action = socket.assigns.live_action
 
     socket =
       socket
       |> assign(:selected_tags, selected_tags)
       |> assign(:search_query, search_query)
-      |> maybe_switch_page_topic(socket.assigns.live_action, params)
+      |> maybe_switch_page_topic(current_action, params)
+      |> maybe_scroll_to_top(prev_action, current_action)
+      |> assign(:prev_action, current_action)
 
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+    {:noreply, apply_action(socket, current_action, params)}
   end
 
   @impl Phoenix.LiveView
@@ -129,6 +134,12 @@ defmodule BlogWeb.PostsLive do
   defp get_count_arg(:index, _params), do: :posts
   defp get_count_arg(:show, %{"slug" => slug}), do: [posts: slug]
 
+  defp maybe_scroll_to_top(socket, prev_action, current_action) when prev_action != current_action do
+    push_event(socket, "scroll-to-top", %{})
+  end
+
+  defp maybe_scroll_to_top(socket, _prev_action, _current_action), do: socket
+
   defp apply_action(socket, :index, _params) do
     socket
     |> assign(:page_title, "Posts")
@@ -179,20 +190,34 @@ defmodule BlogWeb.PostsLive do
         />
       </:aside>
 
-      <%= cond do %>
-        <% @live_action == :index -> %>
-          <Post.list
-            posts={@posts}
-            id="posts"
-            all_tags={@all_tags}
-            selected_tags={@selected_tags}
-            search_query={@search_query}
-          />
-        <% @live_action == :show and is_struct(@post) -> %>
-          <Post.full post={@post} />
-        <% true -> %>
-          <Bluescreen.bluescreen error={:post_not_found} href="/posts" />
-      <% end %>
+      <div id="posts-live-container" phx-hook=".ScrollToTop">
+        <%= cond do %>
+          <% @live_action == :index -> %>
+            <Post.list
+              posts={@posts}
+              id="posts"
+              all_tags={@all_tags}
+              selected_tags={@selected_tags}
+              search_query={@search_query}
+            />
+          <% @live_action == :show and is_struct(@post) -> %>
+            <Post.full post={@post} />
+          <% true -> %>
+            <Bluescreen.bluescreen error={:post_not_found} href="/posts" />
+        <% end %>
+      </div>
+
+      <script :type={Phoenix.LiveView.ColocatedHook} name=".ScrollToTop">
+        export default {
+          mounted() {
+            this.handleEvent("scroll-to-top", () => {
+              setTimeout(() => {
+                window.scrollTo({top: 0, behavior: "smooth"})
+              }, 0)
+            })
+          }
+        }
+      </script>
     </Layouts.app>
     """
   end
