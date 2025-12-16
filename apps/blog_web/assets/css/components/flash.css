@@ -74,4 +74,14 @@
   .flash-close:hover {
     color: var(--color-fg-primary);
   }
+
+  /* Move flash messages to top right on mobile (< 50ch) */
+  @media (max-width: 50ch) {
+    #flash-group {
+      top: 2lh;
+      bottom: auto;
+      left: auto;
+      right: var(--space-1);
+    }
+  }
 }
