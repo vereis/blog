@@ -2,6 +2,11 @@ import Config
 
 config :blog, BlogWeb.Endpoint, http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 
+# Enable server mode if PHX_SERVER is set
+if System.get_env("PHX_SERVER") do
+  config :blog_web, BlogWeb.Endpoint, server: true
+end
+
 # config/runtime.exs is executed for all environments, including
 # during releases. It is executed after compilation and before the
 # system starts, so it is typically used to load production configuration
@@ -36,14 +41,21 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
+  host = System.get_env("PHX_HOST") || "example.com"
+
   config :blog, Blog.Repo,
     database: database_path,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "5"),
+    # Use WAL mode for LiteFS
+    journal_mode: :wal,
+    # Busy timeout for lock contention  
+    busy_timeout: 5000,
     default_transaction_mode: :immediate
 
   config :blog, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
   config :blog_web, BlogWeb.Endpoint,
+    url: [host: host, port: 443, scheme: "https"],
     http: [
       # Enable IPv6 and bind on all interfaces.
       # Set it to  {0, 0, 0, 0, 0, 0, 0, 1} for local network only access.
