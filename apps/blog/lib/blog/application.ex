@@ -9,33 +9,23 @@ defmodule Blog.Application do
       Enum.reject(
         [
           Blog.Repo,
-          {Ecto.Migrator, repos: Application.fetch_env!(:blog, :ecto_repos), skip: skip_migrations?()},
+          {Ecto.Migrator, repos: Application.fetch_env!(:blog, :ecto_repos), skip: System.get_env("RELEASE_NAME") == nil},
           {DNSCluster, query: Application.get_env(:blog, :dns_cluster_query) || :ignore},
           {Phoenix.PubSub, name: Blog.PubSub},
           Blog.env() != :test && Blog.Discord.Presence,
-          Blog.env() == :prod && ecto_litefs_supervisor(),
-          Blog.env() != :test && resource_watcher()
+          Blog.env() == :prod &&
+            {EctoLiteFS.Supervisor,
+             repo: Blog.Repo,
+             primary_file: "/litefs/.primary",
+             poll_interval: 30_000,
+             erpc_timeout: to_timeout(second: 30),
+             event_stream_url: "http://localhost:20202/events"},
+          Blog.env() != :test &&
+            {Blog.Resource.Watcher, schemas: [Blog.Assets.Asset, Blog.Posts.Post, Blog.Projects.Project]}
         ],
         &(!&1)
       )
 
     Supervisor.start_link(children, strategy: :one_for_one, name: Blog.Supervisor)
-  end
-
-  defp ecto_litefs_supervisor do
-    {EctoLiteFS.Supervisor,
-     repo: Blog.Repo,
-     primary_file: "/litefs/.primary",
-     poll_interval: 30_000,
-     erpc_timeout: to_timeout(second: 30),
-     event_stream_url: "http://localhost:20202/events"}
-  end
-
-  defp resource_watcher do
-    {Blog.Resource.Watcher, schemas: [Blog.Assets.Asset, Blog.Posts.Post, Blog.Projects.Project]}
-  end
-
-  defp skip_migrations? do
-    System.get_env("RELEASE_NAME") == nil
   end
 end
