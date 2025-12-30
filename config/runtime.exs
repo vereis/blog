@@ -38,5 +38,6 @@ if config_env() == :prod do
   config :blog_web, BlogWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [ip: {0, 0, 0, 0, 0, 0, 0, 0}],
+    check_origin: ["https://#{host}", "https://www.#{host}"],
     secret_key_base: secret_key_base
 end
