@@ -8,6 +8,7 @@ defmodule Blog.Umbrella.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases(),
+      releases: releases(),
       listeners: [Phoenix.CodeReloader],
       dialyzer: [
         plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
@@ -89,6 +90,15 @@ defmodule Blog.Umbrella.MixProject do
         "sobelow --root apps/blog_web --skip --exit",
         "excellent_migrations.check_safety",
         "test"
+      ]
+    ]
+  end
+
+  defp releases do
+    [
+      blog_web: [
+        include_executables_for: [:unix],
+        applications: [blog: :permanent, blog_web: :permanent]
       ]
     ]
   end

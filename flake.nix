@@ -21,6 +21,7 @@
               elixir
               erlang
               rustToolchain
+              flyctl
             ]
               ++ lib.optionals stdenv.isLinux  ([ inotify-tools ])
               ++ lib.optionals stdenv.isDarwin ([ darwin.apple_sdk.frameworks.CoreFoundation
