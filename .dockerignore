@@ -1,0 +1,8 @@
+.git
+_build
+deps
+node_modules
+.elixir_ls
+.lexical
+*.md
+priv/plts
