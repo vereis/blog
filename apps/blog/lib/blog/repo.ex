@@ -7,6 +7,6 @@ defmodule Blog.Repo do
 
   @impl EctoMiddleware.Repo
   def middleware(_action, _resource) do
-    []
+    [EctoLiteFS.Middleware]
   end
 end

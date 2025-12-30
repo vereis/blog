@@ -52,7 +52,8 @@ defmodule Blog.MixProject do
       {:file_system, "~> 1.0"},
       {:websockex, "~> 0.5"},
       {:ex_machina, "~> 2.8", only: :test},
-      {:html5ever, "~> 0.17.0"}
+      {:html5ever, "~> 0.17.0"},
+      {:ecto_litefs, "~> 1.0"}
     ]
   end
 
