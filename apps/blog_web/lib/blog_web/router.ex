@@ -18,6 +18,10 @@ defmodule BlogWeb.Router do
     plug :accepts, ["json"]
   end
 
+  scope "/health", BlogWeb do
+    get "/", HealthController, :index
+  end
+
   scope "/", BlogWeb do
     pipe_through :browser
 
