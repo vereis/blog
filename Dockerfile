@@ -19,8 +19,7 @@ COPY apps/blog/mix.exs apps/blog/mix.exs
 COPY apps/blog_web/mix.exs apps/blog_web/mix.exs
 COPY config config
 
-RUN mix deps.get --only $MIX_ENV
-RUN mix deps.compile
+RUN mix deps.get --only $MIX_ENV && mix deps.compile
 
 COPY apps/blog/lib apps/blog/lib
 COPY apps/blog/priv apps/blog/priv
