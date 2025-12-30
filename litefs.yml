@@ -1,0 +1,46 @@
+# LiteFS configuration for distributed SQLite
+# Docs: https://fly.io/docs/litefs/
+
+# Where the FUSE filesystem is mounted (app accesses DB here)
+fuse:
+  dir: "/litefs"
+
+# Where LiteFS stores internal data (must be on persistent volume)
+data:
+  dir: "/var/lib/litefs"
+
+# Continue running even if there's a startup issue (for debugging via SSH)
+exit-on-error: false
+
+# Lease configuration for primary election
+lease:
+  type: "consul"
+  
+  # Only machines in the primary region can become primary
+  # This prevents split-brain scenarios in multi-region deployments
+  candidate: ${FLY_REGION == PRIMARY_REGION}
+  
+  # Auto-promote to primary after syncing with cluster
+  promote: true
+  
+  # URL for other nodes to connect to this node
+  # Using HOSTNAME as recommended by official docs
+  advertise-url: "http://${HOSTNAME}.vm.${FLY_APP_NAME}.internal:20202"
+  
+  consul:
+    # Consul URL is set automatically by 'fly consul attach'
+    url: "${FLY_CONSUL_URL}"
+    # Unique key for this cluster's leader election
+    key: "litefs/${FLY_APP_NAME}"
+
+# NOTE: LiteFS proxy disabled because it doesn't support WebSockets
+# We'll handle write forwarding via Ecto middleware using :erpc
+# proxy:
+#   addr: ":8080"
+#   target: "localhost:4000"
+#   db: "blog.db"
+
+# Commands to run (LiteFS as supervisor)
+# Migrations run automatically via Ecto.Migrator in Application.ex
+exec:
+  - cmd: "/app/bin/blog_web start"

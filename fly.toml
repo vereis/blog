@@ -1,0 +1,49 @@
+app = 'vereis-blog'
+primary_region = 'lhr'
+kill_signal = 'SIGTERM'
+kill_timeout = '5s'
+
+[build]
+
+# Volume mount for LiteFS data
+[mounts]
+  source = "litefs"
+  destination = "/var/lib/litefs"
+
+[env]
+  PHX_HOST = 'vereis.com'
+  # Database path MUST use LiteFS FUSE mount for replication to work
+  DATABASE_PATH = '/litefs/blog.db'
+  # Enable Phoenix server
+  PHX_SERVER = 'true'
+  ECTO_IPV6 = 'true'
+  DNS_CLUSTER_QUERY = 'vereis-blog.internal'
+  # Fix Erlang distributed node naming (prevents invalid node name error)
+  RELEASE_NAME = 'blog_web'
+
+# Phoenix runs directly (no LiteFS proxy) to support WebSockets
+# Write forwarding will be handled via Ecto middleware using :erpc
+[http_service]
+  internal_port = 4000
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ['app']
+
+  [http_service.concurrency]
+    type = 'requests'
+    soft_limit = 200
+    hard_limit = 250
+
+  [[http_service.checks]]
+    grace_period = '30s'
+    interval = '30s'
+    method = 'GET'
+    timeout = '5s'
+    path = '/'
+
+[[vm]]
+  memory = '512mb'
+  cpu_kind = 'shared'
+  cpus = 1
