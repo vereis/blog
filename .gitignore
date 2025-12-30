@@ -33,7 +33,7 @@ ehthumbs.db
 erl_crash.dump
 node_modules/
 npm-debug.log*
-rel/
+
 Thumbs.db
 /priv/
 mcp-proxy
