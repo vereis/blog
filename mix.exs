@@ -12,7 +12,8 @@ defmodule Blog.Umbrella.MixProject do
       dialyzer: [
         plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
         plt_add_apps: [:mix, :ex_unit, :file_system],
-        ignore_warnings: "dialyzer_ignore.exs"
+        ignore_warnings: "dialyzer_ignore.exs",
+        paths: ["_build/#{Mix.env()}/lib/blog/ebin", "_build/#{Mix.env()}/lib/blog_web/ebin"]
       ],
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
