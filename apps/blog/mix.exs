@@ -41,6 +41,7 @@ defmodule Blog.MixProject do
       {:phoenix_pubsub, "~> 2.1"},
       {:ecto_sql, "~> 3.13"},
       {:ecto_sqlite3, ">= 0.0.0"},
+      {:ecto_middleware, "~> 2.0"},
       {:jason, "~> 1.2"},
       {:ecto_utils, "~> 0.2"},
       {:mdex, "~> 0.2"},
