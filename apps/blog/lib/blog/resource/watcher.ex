@@ -9,6 +9,9 @@ defmodule Blog.Resource.Watcher do
   Only starts filesystem watchers in development mode; in other environments, only performs
   the initial import.
 
+  In production with LiteFS, imports are only run on the primary node to avoid write
+  conflicts on replicas.
+
   ## Configuration
 
   Pass schemas via start_link options:
@@ -22,11 +25,13 @@ defmodule Blog.Resource.Watcher do
   require Logger
 
   @debounce_time_ms 250
+  @litefs_poll_interval 1_000
 
   @type state :: %{
           schemas: [module()],
           watchers: %{pid() => module()},
-          timers: %{module() => reference()}
+          timers: %{module() => reference()},
+          pending_imports: [module()]
         }
 
   @spec start_link(keyword()) :: GenServer.on_start()
@@ -39,9 +44,13 @@ defmodule Blog.Resource.Watcher do
     schemas = Keyword.get(opts, :schemas, [])
     env = Blog.env()
 
-    for schema <- schemas, env != :test do
-      send(self(), {:do_import, schema})
-    end
+    pending_imports =
+      if env == :test do
+        []
+      else
+        send(self(), :check_litefs_ready)
+        schemas
+      end
 
     watchers =
       if env == :dev do
@@ -53,7 +62,34 @@ defmodule Blog.Resource.Watcher do
         %{}
       end
 
-    {:ok, %{schemas: schemas, watchers: watchers, timers: %{}}}
+    {:ok, %{schemas: schemas, watchers: watchers, timers: %{}, pending_imports: pending_imports}}
+  end
+
+  @impl GenServer
+  def handle_info(:check_litefs_ready, %{pending_imports: []} = state) do
+    {:noreply, state}
+  end
+
+  def handle_info(:check_litefs_ready, state) do
+    cond do
+      Blog.env() == :prod and not EctoLiteFS.tracker_ready?(Blog.Repo) ->
+        Logger.debug("Waiting for LiteFS to be ready...")
+        Process.send_after(self(), :check_litefs_ready, @litefs_poll_interval)
+        {:noreply, state}
+
+      Blog.env() == :prod and not EctoLiteFS.is_primary?(Blog.Repo) ->
+        Logger.info("LiteFS ready but this node is a replica, skipping imports")
+        {:noreply, %{state | pending_imports: []}}
+
+      true ->
+        Logger.info("LiteFS ready and this node is primary, running imports")
+
+        for schema <- state.pending_imports do
+          send(self(), {:do_import, schema})
+        end
+
+        {:noreply, %{state | pending_imports: []}}
+    end
   end
 
   @impl GenServer

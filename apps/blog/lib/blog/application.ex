@@ -13,7 +13,8 @@ defmodule Blog.Application do
           {DNSCluster, query: Application.get_env(:blog, :dns_cluster_query) || :ignore},
           {Phoenix.PubSub, name: Blog.PubSub},
           Blog.env() != :test && Blog.Discord.Presence,
-          Blog.env() == :prod && ecto_litefs_supervisor()
+          Blog.env() == :prod && ecto_litefs_supervisor(),
+          Blog.env() != :test && resource_watcher()
         ],
         &(!&1)
       )
@@ -28,6 +29,10 @@ defmodule Blog.Application do
      poll_interval: 30_000,
      erpc_timeout: to_timeout(second: 30),
      event_stream_url: "http://localhost:20202/events"}
+  end
+
+  defp resource_watcher do
+    {Blog.Resource.Watcher, schemas: [Blog.Assets.Asset, Blog.Posts.Post, Blog.Projects.Project]}
   end
 
   defp skip_migrations? do
