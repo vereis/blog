@@ -1,6 +1,6 @@
 import Config
 
-config :blog, BlogWeb.Endpoint, http: [port: String.to_integer(System.get_env("PORT", "4000"))]
+config :blog_web, BlogWeb.Endpoint, http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 
 if System.get_env("PHX_SERVER") do
   config :blog_web, BlogWeb.Endpoint, server: true
