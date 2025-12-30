@@ -106,7 +106,7 @@ deps:
 	mix deps.get
 
 compile:
-	mix compile
+	mix compile --warnings-as-errors
 
 test:
 	mix test
