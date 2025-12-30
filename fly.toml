@@ -35,7 +35,7 @@ kill_timeout = '5s'
     interval = '30s'
     method = 'GET'
     timeout = '5s'
-    path = '/'
+    path = '/health'
 
 [[vm]]
   memory = '512mb'
