@@ -1,6 +1,4 @@
 defmodule Blog.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   use Application
@@ -16,9 +14,6 @@ defmodule Blog.Application do
           {Phoenix.PubSub, name: Blog.PubSub},
           Blog.env() != :test && Blog.Discord.Presence,
           Blog.env() == :prod && ecto_litefs_supervisor()
-          # TODO: Re-enable after implementing Ecto middleware for write forwarding
-          # Blog.env() != :test &&
-          #   {Blog.Resource.Watcher, schemas: [Blog.Assets.Asset, Blog.Posts.Post, Blog.Projects.Project]}
         ],
         &(!&1)
       )
@@ -36,8 +31,6 @@ defmodule Blog.Application do
   end
 
   defp skip_migrations? do
-    # Skip migrations in development/test, run automatically in releases
-    # SQLite/LiteFS handles concurrent migration attempts via locks
     System.get_env("RELEASE_NAME") == nil
   end
 end
