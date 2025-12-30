@@ -53,7 +53,6 @@ WORKDIR /app
 COPY --from=builder /app/_build/prod/rel/blog_web ./
 COPY litefs.yml /etc/litefs.yml
 
-ENV ECTO_IPV6=true
 ENV ERL_AFLAGS="-proto_dist inet6_tcp"
 
 ENTRYPOINT litefs mount
