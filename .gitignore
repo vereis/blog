@@ -40,3 +40,4 @@ mcp-proxy
 bin/
 .crates.toml
 .crates2.json
+ecto_litefs/

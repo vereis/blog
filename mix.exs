@@ -13,7 +13,11 @@ defmodule Blog.Umbrella.MixProject do
       dialyzer: [
         plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
         plt_add_apps: [:mix, :ex_unit, :file_system],
-        ignore_warnings: "dialyzer_ignore.exs"
+        ignore_warnings: "dialyzer_ignore.exs",
+        # Skip LiteFS middleware - EctoMiddleware v2 generates code that confuses Dialyzer
+        paths: ["_build/#{Mix.env()}/lib/blog/ebin", "_build/#{Mix.env()}/lib/blog_web/ebin"],
+        list_unused_filters: true,
+        remove_defaults: [:unknown]
       ],
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [

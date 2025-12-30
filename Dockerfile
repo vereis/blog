@@ -22,6 +22,9 @@ COPY apps/blog/mix.exs apps/blog/mix.exs
 COPY apps/blog_web/mix.exs apps/blog_web/mix.exs
 COPY config config
 
+# Copy ecto_litefs as local dependency
+COPY ecto_litefs ecto_litefs
+
 RUN mix deps.get --only $MIX_ENV
 RUN mix deps.compile
 

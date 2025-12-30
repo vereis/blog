@@ -41,7 +41,7 @@ defmodule Blog.MixProject do
       {:phoenix_pubsub, "~> 2.1"},
       {:ecto_sql, "~> 3.13"},
       {:ecto_sqlite3, ">= 0.0.0"},
-      {:ecto_middleware, "~> 1.0"},
+      ecto_middleware_dep(),
       {:jason, "~> 1.2"},
       {:ecto_utils, "~> 0.2"},
       {:mdex, "~> 0.2"},
@@ -52,9 +52,42 @@ defmodule Blog.MixProject do
       {:file_system, "~> 1.0"},
       {:websockex, "~> 0.5"},
       {:ex_machina, "~> 2.8", only: :test},
-      {:html5ever, "~> 0.17.0"}
+      {:html5ever, "~> 0.17.0"},
+      ecto_litefs_dep()
     ]
   end
+
+  # Use local path for development, git branch for CI
+  # See ECTO_MIDDLEWARE_V2_DESIGN.md for details
+  defp ecto_middleware_dep do
+    if local_dep_path_exists?("ecto_middleware") do
+      {:ecto_middleware, path: "../../../ecto_middleware", override: true}
+    else
+      {:ecto_middleware, "~> 2.0"}
+    end
+  end
+
+  defp ecto_litefs_dep do
+    cond do
+      # Docker build: ecto_litefs copied to /app/ecto_litefs
+      File.exists?("/app/ecto_litefs/mix.exs") ->
+        {:ecto_litefs, path: "/app/ecto_litefs", override: true}
+
+      # Local dev: ecto_litefs sibling directory
+      local_dep_path_exists?("ecto_litefs") ->
+        {:ecto_litefs, path: "../../../ecto_litefs", override: true}
+
+      # Fallback to GitHub (CI without Docker)
+      true ->
+        {:ecto_litefs, github: "vereis/ecto_litefs", branch: "master"}
+    end
+  end
+
+  defp local_dep_path_exists?(name) do
+    not ci?() and File.exists?(Path.expand("../../../#{name}/mix.exs", __DIR__))
+  end
+
+  defp ci?, do: System.get_env("CI") == "true"
 
   # Aliases are shortcuts or tasks specific to the current project.
   #
