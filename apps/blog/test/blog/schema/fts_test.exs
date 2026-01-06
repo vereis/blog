@@ -186,6 +186,52 @@ defmodule Blog.Schema.FTSTest do
     end
   end
 
+  describe "sanitize_fts_query/2 with prefix option" do
+    test "adds wildcard suffix to single word" do
+      assert FTS.sanitize_fts_query("hello", prefix: true) == "hello*"
+    end
+
+    test "adds wildcard suffix to each word" do
+      assert FTS.sanitize_fts_query("hello world", prefix: true) == "hello* world*"
+    end
+
+    test "preserves AND operator without wildcard" do
+      assert FTS.sanitize_fts_query("hello AND world", prefix: true) == "hello* AND world*"
+    end
+
+    test "preserves OR operator without wildcard" do
+      assert FTS.sanitize_fts_query("foo OR bar", prefix: true) == "foo* OR bar*"
+    end
+
+    test "preserves NOT operator without wildcard" do
+      assert FTS.sanitize_fts_query("hello NOT world", prefix: true) == "hello* NOT world*"
+    end
+
+    test "preserves NEAR operator without wildcard" do
+      assert FTS.sanitize_fts_query("hello NEAR world", prefix: true) == "hello* NEAR world*"
+    end
+
+    test "does not double-add wildcards to words already ending with *" do
+      assert FTS.sanitize_fts_query("hello*", prefix: true) == "hello*"
+      assert FTS.sanitize_fts_query("foo* bar", prefix: true) == "foo* bar*"
+    end
+
+    test "returns nil for empty input with prefix option" do
+      assert FTS.sanitize_fts_query("", prefix: true) == nil
+      assert FTS.sanitize_fts_query(nil, prefix: true) == nil
+    end
+
+    test "handles converted operators with prefix" do
+      # & gets converted to AND first, then prefix applied
+      assert FTS.sanitize_fts_query("foo & bar", prefix: true) == "foo* AND bar*"
+    end
+
+    test "prefix false behaves same as no option" do
+      assert FTS.sanitize_fts_query("hello world", prefix: false) == "hello world"
+      assert FTS.sanitize_fts_query("hello world") == "hello world"
+    end
+  end
+
   describe "fts_error?/1" do
     test "returns true for Exqlite.Error with FTS table and MATCH" do
       error = %Exqlite.Error{

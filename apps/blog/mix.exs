@@ -53,7 +53,8 @@ defmodule Blog.MixProject do
       {:websockex, "~> 0.5"},
       {:ex_machina, "~> 2.8", only: :test},
       {:html5ever, "~> 0.17.0"},
-      {:ecto_litefs, "~> 1.0"}
+      {:ecto_litefs, "~> 1.0"},
+      {:polymorphic_embed, "~> 5.0"}
     ]
   end
 
