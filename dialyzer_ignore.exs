@@ -3,5 +3,6 @@
   ~r/lib\/blog\/assets\/asset\.ex.* Invalid type specification for function.*association/,
   ~r/lib\/blog\/content\/asset\.ex.* Invalid type specification for function.*association/,
   ~r/lib\/blog\/content\/content\.ex.* Invalid type specification for function.*association/,
-  ~r/lib\/blog\/content\/link\.ex.* Invalid type specification for function.*association/
+  ~r/lib\/blog\/content\/link\.ex.* Invalid type specification for function.*association/,
+  ~r/lib\/blog\/content\/permalink\.ex.* Invalid type specification for function.*association/
 ]
