@@ -1,6 +1,8 @@
 defmodule Blog.Content.ImporterTest do
   use Blog.DataCase, async: false
 
+  import ExUnit.CaptureLog
+
   alias Blog.Content.Importer
   alias Blog.Posts.Post
 
@@ -33,9 +35,15 @@ defmodule Blog.Content.ImporterTest do
   end
 
   describe "import_all/0" do
-    @tag :capture_log
-    test "imports all content types in correct order" do
-      assert :ok = Importer.import_all()
+    test "imports all content types and logs errors for invalid assets" do
+      log =
+        capture_log(fn ->
+          assert :ok = Importer.import_all()
+        end)
+
+      assert log =~ "Invalid imports detected for Blog.Assets.Asset"
+      assert log =~ "Asset type handling not implemented"
+      assert log =~ "Failed to load image"
 
       refute Enum.empty?(Blog.Assets.list_assets())
       refute Enum.empty?(Blog.Posts.list_posts())
@@ -44,13 +52,15 @@ defmodule Blog.Content.ImporterTest do
   end
 
   describe "file change detection" do
-    test "handles file change events" do
-      send(Importer, {:file_event, make_ref(), {"test.md", [:modified]}})
+    test "handles file change events and triggers import" do
+      capture_log(fn ->
+        send(Importer, {:file_event, make_ref(), {"test.md", [:modified]}})
 
-      assert eventually(fn ->
-               state = :sys.get_state(Importer)
-               is_nil(state.timer_ref)
-             end)
+        assert eventually(fn ->
+                 state = :sys.get_state(Importer)
+                 is_nil(state.timer_ref)
+               end)
+      end)
     end
 
     test "ignores invalid events" do
@@ -67,31 +77,37 @@ defmodule Blog.Content.ImporterTest do
 
   describe "debouncing" do
     test "debounces rapid file changes and clears timer after execution" do
-      for _ <- 1..5 do
-        send(Importer, {:file_event, make_ref(), {"dummy.md", [:modified]}})
-        Process.sleep(10)
-      end
+      capture_log(fn ->
+        for _ <- 1..5 do
+          send(Importer, {:file_event, make_ref(), {"dummy.md", [:modified]}})
+          Process.sleep(10)
+        end
 
-      assert eventually(fn ->
-               state = :sys.get_state(Importer)
-               is_nil(state.timer_ref)
-             end)
+        assert eventually(fn ->
+                 state = :sys.get_state(Importer)
+                 is_nil(state.timer_ref)
+               end)
+      end)
     end
   end
 
   describe "PubSub broadcasts" do
-    @tag :capture_log
     test "imports trigger PubSub broadcasts for content reloads" do
       Phoenix.PubSub.subscribe(Blog.PubSub, "post:reload")
 
-      {:ok, posts} = Post.import()
+      log =
+        capture_log(fn ->
+          {:ok, posts} = Post.import()
 
-      refute Enum.empty?(posts)
+          refute Enum.empty?(posts)
 
-      for post <- posts do
-        assert_received {:content_reload, Post, post_id}
-        assert post_id == post.id
-      end
+          for post <- posts do
+            assert_received {:content_reload, Post, post_id}
+            assert post_id == post.id
+          end
+        end)
+
+      assert log == ""
     end
   end
 end

@@ -20,8 +20,7 @@ defmodule Blog.Application do
              poll_interval: 30_000,
              erpc_timeout: to_timeout(second: 30),
              event_stream_url: "http://localhost:20202/events"},
-          Blog.env() != :test &&
-            {Blog.Resource.Watcher, schemas: [Blog.Assets.Asset, Blog.Posts.Post, Blog.Projects.Project]}
+          Blog.env() != :test && Blog.Content.Importer
         ],
         &(!&1)
       )
