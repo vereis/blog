@@ -50,7 +50,9 @@ defmodule Blog.Content.Link do
     link
     |> cast(attrs, [:source_slug, :target_slug, :context])
     |> validate_required([:source_slug, :target_slug, :context])
-    |> unique_constraint([:source_slug, :target_slug, :context], name: :content_links_pkey)
+    |> unique_constraint([:source_slug, :target_slug, :context],
+      name: :content_links_source_slug_target_slug_context_index
+    )
   end
 
   @impl EctoUtils.Queryable
