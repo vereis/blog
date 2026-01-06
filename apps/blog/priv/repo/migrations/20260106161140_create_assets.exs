@@ -2,7 +2,7 @@ defmodule Blog.Repo.Migrations.CreateAssets do
   use Ecto.Migration
 
   def change do
-    create table(:assets, primary_key: false) do
+    create table(:content_assets, primary_key: false) do
       add :slug, :string, primary_key: true
       add :content_slug, :string
       add :source_path, :string, null: false
@@ -16,7 +16,8 @@ defmodule Blog.Repo.Migrations.CreateAssets do
       timestamps()
     end
 
-    create index(:assets, [:content_slug])
-    create index(:assets, [:deleted_at])
+    create index(:content_assets, [:content_slug])
+    create index(:content_assets, [:source_path])
+    create index(:content_assets, [:deleted_at])
   end
 end

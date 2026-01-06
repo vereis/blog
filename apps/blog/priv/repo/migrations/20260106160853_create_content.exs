@@ -25,6 +25,7 @@ defmodule Blog.Repo.Migrations.CreateContent do
     create index(:content, [:type])
     create index(:content, [:is_draft])
     create index(:content, [:published_at])
+    create index(:content, [:source_path])
     create index(:content, [:deleted_at])
   end
 end

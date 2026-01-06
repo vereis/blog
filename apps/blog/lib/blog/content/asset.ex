@@ -10,7 +10,7 @@ defmodule Blog.Content.Asset do
 
   @primary_key {:slug, :string, autogenerate: false}
 
-  schema "assets" do
+  schema "content_assets" do
     field :content_slug, :string
     field :source_path, :string
     field :name, :string
