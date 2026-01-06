@@ -3,7 +3,6 @@ defmodule Blog.Projects.Project do
   use Blog.Schema
 
   use Blog.Content,
-    source_dir: "priv/content/projects",
     preprocess: &Blog.Tags.label_to_id/1,
     import: &Blog.Projects.upsert_project/1
 

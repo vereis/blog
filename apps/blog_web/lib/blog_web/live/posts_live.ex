@@ -17,7 +17,7 @@ defmodule BlogWeb.PostsLive do
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     if connected?(socket) do
-      Phoenix.PubSub.subscribe(Blog.PubSub, "post:reload")
+      Phoenix.PubSub.subscribe(Blog.PubSub, Blog.Content.pubsub_topic())
       Phoenix.PubSub.subscribe(Blog.PubSub, "discord:presence")
 
       # Track on site-wide topic
@@ -63,7 +63,7 @@ defmodule BlogWeb.PostsLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_info({:content_reload, Blog.Posts.Post, _id}, socket) do
+  def handle_info({:content_imported}, socket) do
     {:noreply, apply_action(socket, socket.assigns.live_action, %{})}
   end
 

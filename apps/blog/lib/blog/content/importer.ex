@@ -3,10 +3,7 @@ defmodule Blog.Content.Importer do
   GenServer that watches the content directory and triggers imports when files change.
 
   Watches `priv/content/` directory and runs a full reimport of all content types
-  (assets, then posts, then projects) whenever any file changes.
-
-  Only starts filesystem watchers in development mode; in other environments, only
-  performs the initial import on boot.
+  whenever any file changes. Only starts in dev/prod (not test).
 
   In production with LiteFS, imports are only run on the primary node to avoid
   write conflicts on replicas.
@@ -14,9 +11,7 @@ defmodule Blog.Content.Importer do
 
   use GenServer
 
-  alias Blog.Assets.Asset
-  alias Blog.Posts.Post
-  alias Blog.Projects.Project
+  alias Blog.Content
 
   require Logger
 
@@ -25,8 +20,7 @@ defmodule Blog.Content.Importer do
 
   @type state :: %{
           watcher_pid: pid() | nil,
-          timer_ref: reference() | nil,
-          import_pending: boolean()
+          timer_ref: reference() | nil
         }
 
   @spec start_link(keyword()) :: GenServer.on_start()
@@ -34,72 +28,19 @@ defmodule Blog.Content.Importer do
     GenServer.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
-  @doc """
-  Returns the path to the content directory.
-  """
-  @spec content_path() :: Path.t()
-  def content_path do
-    case Blog.env() do
-      :test ->
-        Path.expand("../../test/fixtures/priv/content", __DIR__)
-
-      _other ->
-        :blog
-        |> Application.app_dir()
-        |> Path.join("priv/content")
-    end
-  end
-
-  @doc """
-  Runs a full import of all content types in the correct order.
-
-  Imports assets first (since posts reference them for LQIP), then posts,
-  then projects.
-  """
-  @spec import_all() :: :ok
-  def import_all do
-    Logger.info("Starting full content import...")
-
-    with {:ok, assets} <- Asset.import(),
-         {:ok, posts} <- Post.import(),
-         {:ok, projects} <- Project.import() do
-      Logger.info(
-        "Content import complete: #{length(assets)} assets, #{length(posts)} posts, #{length(projects)} projects"
-      )
-
-      :ok
-    else
-      {:error, reason} ->
-        Logger.error("Content import failed: #{inspect(reason)}")
-        :ok
-    end
-  end
-
   @impl GenServer
   def init(_opts) do
-    env = Blog.env()
-
-    import_pending =
-      if env == :test do
-        false
-      else
-        send(self(), :check_litefs_ready)
-        true
-      end
+    send(self(), :check_litefs_ready)
 
     watcher_pid =
-      if env == :dev do
+      if Blog.env() == :dev do
         init_watcher()
       end
 
-    {:ok, %{watcher_pid: watcher_pid, timer_ref: nil, import_pending: import_pending}}
+    {:ok, %{watcher_pid: watcher_pid, timer_ref: nil}}
   end
 
   @impl GenServer
-  def handle_info(:check_litefs_ready, %{import_pending: false} = state) do
-    {:noreply, state}
-  end
-
   def handle_info(:check_litefs_ready, state) do
     cond do
       Blog.env() == :prod and not EctoLiteFS.tracker_ready?(Blog.Repo) ->
@@ -109,12 +50,12 @@ defmodule Blog.Content.Importer do
 
       Blog.env() == :prod and not EctoLiteFS.is_primary?(Blog.Repo) ->
         Logger.info("LiteFS ready but this node is a replica, skipping imports")
-        {:noreply, %{state | import_pending: false}}
+        {:noreply, state}
 
       true ->
         Logger.info("Running initial content import...")
-        import_all()
-        {:noreply, %{state | import_pending: false}}
+        do_import()
+        {:noreply, state}
     end
   end
 
@@ -136,7 +77,7 @@ defmodule Blog.Content.Importer do
 
   @impl GenServer
   def handle_info(:do_import, state) do
-    import_all()
+    do_import()
     {:noreply, %{state | timer_ref: nil}}
   end
 
@@ -146,8 +87,16 @@ defmodule Blog.Content.Importer do
     {:noreply, state}
   end
 
+  defp do_import do
+    path = Content.content_path()
+
+    {:ok, %{assets: assets, posts: posts, projects: projects}} = Content.import_all(path)
+
+    Logger.info("Content import complete: #{length(assets)} assets, #{length(posts)} posts, #{length(projects)} projects")
+  end
+
   defp init_watcher do
-    path = content_path()
+    path = Content.content_path()
 
     case FileSystem.start_link(dirs: [path], recursive: true) do
       {:ok, watcher_pid} ->

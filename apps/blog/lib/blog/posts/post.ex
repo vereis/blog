@@ -3,7 +3,6 @@ defmodule Blog.Posts.Post do
   use Blog.Schema
 
   use Blog.Content,
-    source_dir: "priv/content/archived",
     preprocess: &Blog.Tags.label_to_id/1,
     import: &Blog.Posts.upsert_post/1
 

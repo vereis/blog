@@ -483,9 +483,10 @@ defmodule Blog.Posts.PostTest do
     end
   end
 
-  describe "import/0" do
+  describe "import_content/2" do
     test "imports posts from markdown files and inserts into database" do
-      assert {:ok, imported} = Post.import()
+      path = Path.join([File.cwd!(), "test/fixtures/priv/content/archived"])
+      assert {:ok, imported} = Blog.Content.import_content(Post, path)
 
       assert length(imported) == 3
 

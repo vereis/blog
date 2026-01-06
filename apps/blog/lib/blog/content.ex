@@ -1,22 +1,23 @@
 defmodule Blog.Content do
   @moduledoc """
-  Behaviour and macro for importable blog content from files.
+  Central module for importing blog content from files.
 
-  Implementing modules must provide:
-  - `handle_import/1` callback to parse a resource and return attrs map(s) or `{:error, reason}`
-    These attrs will be passed to the provided import function for upserting.
+  Provides `import/1` to import all content from a path, and `import/2` to import
+  specific content types. Content types implement `handle_import/1` callback.
 
-  Implementing modules may provide:
-  - `pubsub_topic/0` callback to specify a custom PubSub topic for reload
+  ## Content Types
 
-  Implementing modules get:
-  - `import/0` function to import all valid resources from the source directory.
+  - `Blog.Assets.Asset` - Images and other assets
+  - `Blog.Posts.Post` - Blog posts (markdown files in archived/)
+  - `Blog.Projects.Project` - Projects (YAML file)
 
-  Options:
-  - `:source_dir` (required) - Directory containing resource files
-  - `:import` (required) - Function reference to upsert function (e.g., `&Context.upsert_entity/1`)
-                           This function should accept attrs map and return `{:ok, entity}` or `{:error, changeset}`
+  ## Options for `use Blog.Content`
+
+  - `:import` (required) - Function to upsert parsed content (e.g., `&Blog.Posts.upsert_post/1`)
+  - `:preprocess` - Optional function to transform attrs before import
   """
+
+  require Logger
 
   defstruct [:source, :path, :content, :filename, :extension]
 
@@ -28,98 +29,108 @@ defmodule Blog.Content do
           extension: String.t()
         }
 
-  @callback source() :: Path.t()
-  @callback handle_import(resource :: t()) :: map() | [map()] | {:error, term()}
-  @callback import() :: {:ok, [term()]} | {:error, term()}
-  @callback pubsub_topic() :: String.t()
-  @optional_callbacks pubsub_topic: 0
+  @type content_type :: Blog.Assets.Asset | Blog.Posts.Post | Blog.Projects.Project
 
-  @doc false
-  def identity(x) do
-    x
+  @callback handle_import(resource :: t()) :: map() | [map()] | {:error, term()}
+
+  @pubsub_topic "content:reload"
+
+  @doc """
+  Returns the PubSub topic for content reload broadcasts.
+  """
+  @spec pubsub_topic() :: String.t()
+  def pubsub_topic, do: @pubsub_topic
+
+  @doc """
+  Returns the base path to the content directory.
+  """
+  @spec content_path() :: Path.t()
+  def content_path do
+    :blog
+    |> Application.app_dir()
+    |> Path.join("priv/content")
   end
 
+  @doc """
+  Imports all content from the given path.
+
+  Imports assets, posts, and projects in order and broadcasts a single
+  `:content_imported` message on completion.
+  """
+  @spec import_all(Path.t()) :: {:ok, map()} | {:error, term()}
+  def import_all(path) do
+    alias Blog.Assets.Asset
+    alias Blog.Posts.Post
+    alias Blog.Projects.Project
+
+    with {:ok, assets} <- import_content(Asset, Path.join(path, "assets")),
+         {:ok, posts} <- import_content(Post, Path.join(path, "archived")),
+         {:ok, projects} <- import_content(Project, Path.join(path, "projects")) do
+      Phoenix.PubSub.broadcast(Blog.PubSub, @pubsub_topic, {:content_imported})
+
+      {:ok, %{assets: assets, posts: posts, projects: projects}}
+    end
+  end
+
+  @doc """
+  Imports content of a specific type from the given path.
+  """
+  @spec import_content(content_type(), Path.t()) :: {:ok, [struct()]} | {:error, term()}
+  def import_content(module, path) do
+    import_fn = module.__content_import_fn__()
+    preprocess_fn = module.__content_preprocess_fn__()
+
+    read_and_parse = fn filename ->
+      file_path = Path.join(path, filename)
+      content = File.read!(file_path)
+
+      resource = %__MODULE__{
+        source: path,
+        path: file_path,
+        content: content,
+        filename: filename,
+        extension: Path.extname(filename)
+      }
+
+      module.handle_import(resource)
+    end
+
+    {successes, errors} =
+      path
+      |> File.ls!()
+      |> Enum.reject(&String.starts_with?(&1, "."))
+      |> Task.async_stream(read_and_parse, timeout: :infinity)
+      |> Stream.flat_map(fn {:ok, res} -> List.wrap(res) end)
+      |> Stream.map(preprocess_fn)
+      |> Stream.map(import_fn)
+      |> Enum.split_with(&match?({:ok, _res}, &1))
+
+    if errors != [] do
+      Logger.error("Invalid imports detected for #{inspect(module)}, records skipped:")
+
+      for {:error, error} <- errors do
+        Logger.error(inspect(error))
+      end
+    end
+
+    {:ok, Enum.map(successes, fn {:ok, res} -> res end)}
+  end
+
+  @doc false
+  def identity(x), do: x
+
   defmacro __using__(opts) do
-    source_dir = Keyword.fetch!(opts, :source_dir)
     import_fn = Keyword.fetch!(opts, :import)
     preprocess_fn = Keyword.get(opts, :preprocess, &__MODULE__.identity/1)
 
     quote do
       @behaviour unquote(__MODULE__)
 
-      require Logger
+      @doc false
+      def __content_import_fn__, do: unquote(import_fn)
 
-      @impl unquote(__MODULE__)
-      def source do
-        case Blog.env() do
-          :test ->
-            app_dir = Path.expand("../../..", __DIR__)
-            Path.join([app_dir, "test/fixtures", unquote(source_dir)])
-
-          _other ->
-            :blog
-            |> Application.app_dir()
-            |> Path.join(unquote(source_dir))
-        end
-      end
-
-      @impl unquote(__MODULE__)
-      def import do
-        read_and_parse = fn filename ->
-          source_dir = source()
-          path = Path.join(source_dir, filename)
-          content = File.read!(path)
-
-          resource = %unquote(__MODULE__){
-            source: source_dir,
-            path: path,
-            content: content,
-            filename: filename,
-            extension: Path.extname(filename)
-          }
-
-          handle_import(resource)
-        end
-
-        {successes, errors} =
-          source()
-          |> File.ls!()
-          |> Enum.reject(&String.starts_with?(&1, "."))
-          |> Task.async_stream(read_and_parse, timeout: :infinity)
-          |> Stream.flat_map(fn {:ok, res} -> List.wrap(res) end)
-          |> Stream.map(fn attrs -> unquote(preprocess_fn).(attrs) end)
-          |> Stream.map(unquote(import_fn))
-          |> Enum.split_with(&match?({:ok, _res}, &1))
-
-        if errors != [] do
-          Logger.error("Invalid imports detected for #{inspect(__MODULE__)}, records skipped:")
-
-          for {:error, error} <- errors do
-            Logger.error(inspect(error))
-          end
-        end
-
-        topic = pubsub_topic()
-        imported = Enum.map(successes, fn {:ok, res} -> res end)
-
-        for resource <- imported do
-          message = {:content_reload, __MODULE__, resource.id}
-          Phoenix.PubSub.broadcast(Blog.PubSub, topic, message)
-        end
-
-        {:ok, imported}
-      end
-
-      @impl unquote(__MODULE__)
-      def pubsub_topic do
-        __MODULE__
-        |> Module.split()
-        |> List.last()
-        |> String.downcase()
-        |> Kernel.<>(":reload")
-      end
-
-      defoverridable source: 0, import: 0, pubsub_topic: 0
+      @doc false
+      def __content_preprocess_fn__, do: unquote(preprocess_fn)
     end
   end
 end

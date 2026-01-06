@@ -3,7 +3,6 @@ defmodule Blog.Assets.Asset do
   use Blog.Schema
 
   use Blog.Content,
-    source_dir: "priv/content/assets",
     import: &Blog.Assets.upsert_asset/1
 
   require Blog.Assets.Types, as: Types

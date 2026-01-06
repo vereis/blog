@@ -16,7 +16,7 @@ defmodule BlogWeb.ProjectsLive do
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     if connected?(socket) do
-      Phoenix.PubSub.subscribe(Blog.PubSub, "project:reload")
+      Phoenix.PubSub.subscribe(Blog.PubSub, Blog.Content.pubsub_topic())
       Phoenix.PubSub.subscribe(Blog.PubSub, "discord:presence")
 
       # Track viewer on both site-wide and page-specific topics
@@ -59,7 +59,7 @@ defmodule BlogWeb.ProjectsLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_info({:content_reload, Blog.Projects.Project, _id}, socket) do
+  def handle_info({:content_imported}, socket) do
     {:noreply, apply_action(socket, socket.assigns.live_action, %{})}
   end
 

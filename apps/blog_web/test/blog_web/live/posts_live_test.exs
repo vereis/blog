@@ -224,7 +224,7 @@ defmodule BlogWeb.PostsLiveTest do
   end
 
   describe "PubSub hot reload" do
-    test "reloads posts when content_reload event is received", %{conn: conn} do
+    test "reloads posts when content_imported event is received", %{conn: conn} do
       post = insert(:post, title: "Original Title", slug: "my-post")
 
       {:ok, view, _html} = live(conn, ~p"/posts")
@@ -235,8 +235,8 @@ defmodule BlogWeb.PostsLiveTest do
 
       Phoenix.PubSub.broadcast(
         Blog.PubSub,
-        "post:reload",
-        {:content_reload, Blog.Posts.Post, post.id}
+        Blog.Content.pubsub_topic(),
+        {:content_imported}
       )
 
       _ = :sys.get_state(view.pid)
