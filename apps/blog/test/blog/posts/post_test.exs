@@ -7,7 +7,7 @@ defmodule Blog.Posts.PostTest do
 
   @test_image_path Path.join([
                      File.cwd!(),
-                     "test/fixtures/priv/assets/test_image.jpg"
+                     "test/fixtures/priv/content/assets/test_image.jpg"
                    ])
 
   describe "changeset/2 - validation" do
