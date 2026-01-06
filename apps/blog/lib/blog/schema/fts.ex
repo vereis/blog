@@ -30,10 +30,19 @@ defmodule Blog.Schema.FTS do
   Converts unsupported operators and removes problematic characters while
   preserving valid FTS syntax.
 
+  When `prefix: true` is passed, appends `*` to each word to enable prefix
+  matching (e.g., "hel" matches "hello", "help", etc.).
+
   ## Examples
 
       iex> Blog.Schema.FTS.sanitize_fts_query("hello & world")
       "hello AND world"
+
+      iex> Blog.Schema.FTS.sanitize_fts_query("hel", prefix: true)
+      "hel*"
+
+      iex> Blog.Schema.FTS.sanitize_fts_query("hello world", prefix: true)
+      "hello* world*"
 
       iex> Blog.Schema.FTS.sanitize_fts_query("")
       nil
@@ -42,18 +51,31 @@ defmodule Blog.Schema.FTS do
       nil
 
   """
-  @spec sanitize_fts_query(binary() | any()) :: binary() | nil
-  def sanitize_fts_query(query) when is_binary(query) do
+  @spec sanitize_fts_query(binary() | any(), keyword()) :: binary() | nil
+  def sanitize_fts_query(query, opts \\ [])
+
+  def sanitize_fts_query(query, opts) when is_binary(query) do
     trimmed = String.trim(query)
 
     cond do
-      trimmed == "" -> nil
-      Enum.any?(@incomplete_column_patterns, &String.match?(trimmed, &1)) -> nil
-      true -> do_sanitize(trimmed)
+      trimmed == "" ->
+        nil
+
+      Enum.any?(@incomplete_column_patterns, &String.match?(trimmed, &1)) ->
+        nil
+
+      true ->
+        sanitized = do_sanitize(trimmed)
+
+        if Keyword.get(opts, :prefix, false) do
+          add_prefix_wildcards(sanitized)
+        else
+          sanitized
+        end
     end
   end
 
-  def sanitize_fts_query(_non_binary), do: nil
+  def sanitize_fts_query(_non_binary, _opts), do: nil
 
   defp do_sanitize(query) do
     sanitized =
@@ -74,6 +96,22 @@ defmodule Blog.Schema.FTS do
       |> String.trim()
 
     if sanitized == "", do: nil, else: sanitized
+  end
+
+  # Adds `*` suffix to each word for prefix matching, preserving operators
+  defp add_prefix_wildcards(nil), do: nil
+
+  defp add_prefix_wildcards(query) do
+    query
+    |> String.split(~r/\s+/)
+    |> Enum.map_join(" ", fn word ->
+      # Don't add wildcards to FTS operators or words already ending with *
+      if word in ~w(AND OR NOT NEAR) or String.ends_with?(word, "*") do
+        word
+      else
+        word <> "*"
+      end
+    end)
   end
 
   @doc """
