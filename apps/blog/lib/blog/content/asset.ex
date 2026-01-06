@@ -47,4 +47,24 @@ defmodule Blog.Content.Asset do
   def base_query(queryable \\ __MODULE__) do
     from asset in queryable, where: is_nil(asset.deleted_at)
   end
+
+  @impl EctoUtils.Queryable
+  def query(base_query, filters) do
+    Enum.reduce(filters, base_query, fn
+      {:slug, slug}, query when is_binary(slug) ->
+        from asset in query, where: asset.slug == ^slug
+
+      {:content_slug, slug}, query when is_binary(slug) ->
+        from asset in query, where: asset.content_slug == ^slug
+
+      {:content_type, type}, query when is_binary(type) ->
+        from asset in query, where: asset.content_type == ^type
+
+      {:name, name}, query when is_binary(name) ->
+        from asset in query, where: asset.name == ^name
+
+      {key, value}, query ->
+        EctoUtils.Queryable.apply_filter(query, key, value)
+    end)
+  end
 end

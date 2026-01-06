@@ -38,6 +38,9 @@ defmodule Blog.Content.Link do
   end
 
   @impl EctoUtils.Queryable
+  def base_query(queryable \\ __MODULE__), do: queryable
+
+  @impl EctoUtils.Queryable
   def query(base_query, filters) do
     Enum.reduce(filters, base_query, fn
       {:source_slug, slug}, query when is_binary(slug) ->

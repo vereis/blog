@@ -15,7 +15,7 @@ defmodule Blog.Repo.Migrations.CreateContent do
       add :is_draft, :boolean, default: false, null: false
       add :published_at, :utc_datetime
       add :reading_time_minutes, :integer
-      add :headings, :text, null: false
+      add :headings, :text, null: false, default: "[]"
       add :permalinks, :text
       add :deleted_at, :utc_datetime
 

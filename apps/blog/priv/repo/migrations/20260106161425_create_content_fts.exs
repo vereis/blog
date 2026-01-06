@@ -25,6 +25,7 @@ defmodule Blog.Repo.Migrations.CreateContentFts do
       CREATE TRIGGER insert_content_fts
         AFTER INSERT ON content
       FOR EACH ROW
+      WHEN new.deleted_at IS NULL
       BEGIN
         INSERT INTO content_fts (
           slug,
@@ -55,14 +56,23 @@ defmodule Blog.Repo.Migrations.CreateContentFts do
         AFTER UPDATE ON content
       FOR EACH ROW
       BEGIN
-        UPDATE content_fts
-        SET
-          type = new.type,
-          title = new.title,
-          raw_body = new.raw_body,
-          excerpt = new.excerpt,
-          description = new.description
-        WHERE slug = new.slug;
+        DELETE FROM content_fts WHERE slug = old.slug;
+        INSERT INTO content_fts (
+          slug,
+          type,
+          title,
+          raw_body,
+          excerpt,
+          description
+        )
+        SELECT
+          new.slug,
+          new.type,
+          new.title,
+          new.raw_body,
+          new.excerpt,
+          new.description
+        WHERE new.deleted_at IS NULL;
       END;
       """,
       """
