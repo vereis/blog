@@ -77,10 +77,6 @@ defmodule Blog.Factory do
         ~s(<h1 id="sample-content">Sample Content</h1><p>This is sample content for testing.</p><h2 id="section">Section</h2><p>More content here.</p>),
       excerpt: ~s(<p>This is sample content for testing.</p>),
       reading_time_minutes: 1,
-      headings: [
-        %Content.Heading{level: 1, title: "Sample Content", link: "sample-content"},
-        %Content.Heading{level: 2, title: "Section", link: "section"}
-      ],
       is_draft: false,
       published_at: ~U[2024-01-01 12:00:00Z]
     }
