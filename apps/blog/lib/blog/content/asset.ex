@@ -1,6 +1,12 @@
 defmodule Blog.Content.Asset do
   @moduledoc """
   Schema for content assets stored in the database with binary data and polymorphic metadata.
+
+  ## Slug Structure
+
+  - `slug`: Full asset path serving as the primary key (e.g., `"essays/my-post/hero.webp"` or `"assets/avatar.webp"`)
+  - `content_slug`: Optional reference to parent content for co-located assets (e.g., `"essays/my-post"`). 
+    Null for global assets in the `assets/` directory.
   """
   use Blog.Schema
 
@@ -47,18 +53,6 @@ defmodule Blog.Content.Asset do
   @impl EctoUtils.Queryable
   def query(base_query, filters) do
     Enum.reduce(filters, base_query, fn
-      {:slug, slug}, query when is_binary(slug) ->
-        from asset in query, where: asset.slug == ^slug
-
-      {:content_slug, slug}, query when is_binary(slug) ->
-        from asset in query, where: asset.content_slug == ^slug
-
-      {:content_type, type}, query when is_binary(type) ->
-        from asset in query, where: asset.content_type == ^type
-
-      {:name, name}, query when is_binary(name) ->
-        from asset in query, where: asset.name == ^name
-
       {key, value}, query ->
         EctoUtils.Queryable.apply_filter(query, key, value)
     end)
