@@ -37,7 +37,7 @@ defmodule BlogWeb.HomeLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_info({:resource_reload, Blog.Posts.Post, changed_id}, socket) do
+  def handle_info({:content_reload, Blog.Posts.Post, changed_id}, socket) do
     cond do
       # If for some reason we don't have a post yet and we get a reload, try
       # loading the intended post again.

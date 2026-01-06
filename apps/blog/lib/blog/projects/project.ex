@@ -2,7 +2,7 @@ defmodule Blog.Projects.Project do
   @moduledoc false
   use Blog.Schema
 
-  use Blog.Resource,
+  use Blog.Content,
     source_dir: "priv/content/projects",
     preprocess: &Blog.Tags.label_to_id/1,
     import: &Blog.Projects.upsert_project/1
@@ -65,8 +65,8 @@ defmodule Blog.Projects.Project do
     end)
   end
 
-  @impl Blog.Resource
-  def handle_import(%Blog.Resource{content: content}) do
+  @impl Blog.Content
+  def handle_import(%Blog.Content{content: content}) do
     case YamlElixir.read_from_string(content) do
       {:ok, %{"projects" => projects}} when is_list(projects) ->
         Enum.map(projects, fn project ->

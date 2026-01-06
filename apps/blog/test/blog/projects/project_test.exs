@@ -50,7 +50,7 @@ defmodule Blog.Projects.ProjectTest do
           description: "Second project"
       """
 
-      resource = %Blog.Resource{content: yaml_content}
+      resource = %Blog.Content{content: yaml_content}
       attrs_list = Project.handle_import(resource)
 
       assert is_list(attrs_list)
@@ -65,7 +65,7 @@ defmodule Blog.Projects.ProjectTest do
 
     test "returns error for invalid YAML format" do
       yaml_content = "invalid: yaml"
-      resource = %Blog.Resource{content: yaml_content}
+      resource = %Blog.Content{content: yaml_content}
 
       assert {:error, ~s(YAML content does not contain 'projects' key with a list value, got: %{"invalid" => "yaml"})} =
                Project.handle_import(resource)

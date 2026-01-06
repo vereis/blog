@@ -2,7 +2,7 @@ defmodule Blog.Assets.Asset do
   @moduledoc false
   use Blog.Schema
 
-  use Blog.Resource,
+  use Blog.Content,
     source_dir: "priv/content/assets",
     import: &Blog.Assets.upsert_asset/1
 
@@ -34,8 +34,8 @@ defmodule Blog.Assets.Asset do
     |> Types.handle_type()
   end
 
-  @impl Blog.Resource
-  def handle_import(%Blog.Resource{path: path}) do
+  @impl Blog.Content
+  def handle_import(%Blog.Content{path: path}) do
     %{path: path}
   end
 end

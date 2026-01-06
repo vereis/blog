@@ -524,7 +524,7 @@ defmodule Blog.Posts.PostTest do
     end
 
     test "uses custom description from YAML if provided" do
-      resource = %Blog.Resource{
+      resource = %Blog.Content{
         path: "custom-description-post.md",
         content: """
         ---
@@ -553,7 +553,7 @@ defmodule Blog.Posts.PostTest do
     end
 
     test "description is nil when empty string provided" do
-      resource = %Blog.Resource{
+      resource = %Blog.Content{
         path: "empty-description-post.md",
         content: """
         ---
@@ -580,7 +580,7 @@ defmodule Blog.Posts.PostTest do
     end
 
     test "description is nil when not provided" do
-      resource = %Blog.Resource{
+      resource = %Blog.Content{
         path: "no-description-post.md",
         content: """
         ---
@@ -606,7 +606,7 @@ defmodule Blog.Posts.PostTest do
     end
 
     test "imports permalinks from YAML frontmatter" do
-      resource = %Blog.Resource{
+      resource = %Blog.Content{
         path: "post-with-permalinks.md",
         content: """
         ---
@@ -629,7 +629,7 @@ defmodule Blog.Posts.PostTest do
     end
 
     test "handles missing permalinks field with empty array default" do
-      resource = %Blog.Resource{
+      resource = %Blog.Content{
         path: "no-permalinks.md",
         content: """
         ---
@@ -648,7 +648,7 @@ defmodule Blog.Posts.PostTest do
     end
 
     test "handles empty permalinks array" do
-      resource = %Blog.Resource{
+      resource = %Blog.Content{
         path: "empty-permalinks.md",
         content: """
         ---
@@ -668,7 +668,7 @@ defmodule Blog.Posts.PostTest do
     end
 
     test "handles single permalink" do
-      resource = %Blog.Resource{
+      resource = %Blog.Content{
         path: "single-permalink.md",
         content: """
         ---

@@ -87,7 +87,7 @@ defmodule Blog.Resource.WatcherTest do
       refute Enum.empty?(posts)
 
       for post <- posts do
-        assert_received {:resource_reload, Post, post_id}
+        assert_received {:content_reload, Post, post_id}
         assert post_id == post.id
       end
     end

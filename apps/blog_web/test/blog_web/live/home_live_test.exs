@@ -32,7 +32,7 @@ defmodule BlogWeb.HomeLiveTest do
       assert has_element?(view, "#hello-world", "Original Title")
 
       {:ok, updated_post} = Blog.Posts.update_post(post, %{title: "Updated Title"})
-      Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:resource_reload, Post, updated_post.id})
+      Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:content_reload, Post, updated_post.id})
 
       _ = :sys.get_state(view.pid)
 
@@ -48,7 +48,7 @@ defmodule BlogWeb.HomeLiveTest do
       assert has_element?(view, "#hello-world", "Hello World")
 
       {:ok, updated_other} = Blog.Posts.update_post(other_post, %{title: "Updated Other"})
-      Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:resource_reload, Post, updated_other.id})
+      Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:content_reload, Post, updated_other.id})
 
       _ = :sys.get_state(view.pid)
 
@@ -61,7 +61,7 @@ defmodule BlogWeb.HomeLiveTest do
       assert has_element?(view, ".bluescreen")
 
       post = insert(:post, slug: "hello-world", title: "Newly Created")
-      Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:resource_reload, Post, post.id})
+      Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:content_reload, Post, post.id})
 
       _ = :sys.get_state(view.pid)
 
@@ -75,7 +75,7 @@ defmodule BlogWeb.HomeLiveTest do
       assert has_element?(view, ".bluescreen")
 
       other_post = insert(:post, slug: "other-post", title: "Different Post")
-      Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:resource_reload, Post, other_post.id})
+      Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:content_reload, Post, other_post.id})
 
       _ = :sys.get_state(view.pid)
 

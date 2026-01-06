@@ -63,7 +63,7 @@ defmodule BlogWeb.PostsLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_info({:resource_reload, Blog.Posts.Post, _id}, socket) do
+  def handle_info({:content_reload, Blog.Posts.Post, _id}, socket) do
     {:noreply, apply_action(socket, socket.assigns.live_action, %{})}
   end
 
