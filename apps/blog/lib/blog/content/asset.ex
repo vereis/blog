@@ -21,11 +21,7 @@ defmodule Blog.Content.Asset do
 
     polymorphic_embeds_one(:metadata,
       types: [
-        image: Metadata.Image,
-        document: Metadata.Document,
-        audio: Metadata.Audio,
-        video: Metadata.Video,
-        unknown: Metadata.Unknown
+        image: Metadata.Image
       ],
       on_type_not_found: :changeset_error,
       on_replace: :update

@@ -86,7 +86,7 @@ defmodule Blog.Factory do
     }
   end
 
-  def content_asset_factory do
+  def asset_factory do
     %Asset{
       slug: sequence(:asset_slug, &"assets/sample-image-#{&1}.webp"),
       content_slug: nil,
@@ -95,12 +95,10 @@ defmodule Blog.Factory do
       data: <<137, 80, 78, 71, 13, 10, 26, 10>>,
       data_hash: sequence(:asset_hash, &"abc123#{&1}"),
       content_type: "image/webp",
-      metadata: %{
-        __type__: "image",
+      metadata: %Asset.Metadata.Image{
         width: 800,
         height: 600,
-        format: "webp",
-        has_alpha: false
+        format: "webp"
       }
     }
   end

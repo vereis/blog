@@ -14,13 +14,12 @@ defmodule Blog.Content.Asset.Metadata.Image do
     field :height, :integer
     field :lqip_hash, :integer
     field :format, :string
-    field :has_alpha, :boolean, default: false
   end
 
   @doc false
   def changeset(metadata, attrs) do
     metadata
-    |> cast(attrs, [:width, :height, :lqip_hash, :format, :has_alpha])
+    |> cast(attrs, [:width, :height, :lqip_hash, :format])
     |> validate_required([:width, :height, :format])
     |> validate_number(:width, greater_than: 0)
     |> validate_number(:height, greater_than: 0)
