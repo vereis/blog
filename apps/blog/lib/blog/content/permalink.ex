@@ -25,17 +25,8 @@ defmodule Blog.Content.Permalink do
   end
 
   @impl EctoUtils.Queryable
-  def base_query(queryable \\ __MODULE__), do: queryable
-
-  @impl EctoUtils.Queryable
   def query(base_query, filters) do
     Enum.reduce(filters, base_query, fn
-      {:path, path}, query when is_binary(path) ->
-        from permalink in query, where: permalink.path == ^path
-
-      {:content_slug, slug}, query when is_binary(slug) ->
-        from permalink in query, where: permalink.content_slug == ^slug
-
       {key, value}, query ->
         EctoUtils.Queryable.apply_filter(query, key, value)
     end)
