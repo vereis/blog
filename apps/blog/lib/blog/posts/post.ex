@@ -2,10 +2,9 @@ defmodule Blog.Posts.Post do
   @moduledoc false
   use Blog.Schema
 
-  use Blog.Resource,
-    source_dir: "priv/posts",
-    preprocess: &Blog.Tags.label_to_id/1,
-    import: &Blog.Posts.upsert_post/1
+  use Blog.Content,
+    conflict_target: :slug,
+    preprocess: &Blog.Tags.label_to_id/1
 
   import Blog.Utils.Guards
 
@@ -95,8 +94,8 @@ defmodule Blog.Posts.Post do
     end)
   end
 
-  @impl Blog.Resource
-  def handle_import(%Blog.Resource{content: content}) do
+  @impl Blog.Content
+  def handle_import(%Blog.Content{content: content}) do
     # Split only on the opening --- and the first closing ---
     # This allows --- to be used as horizontal rules in the markdown body
     with [_front, metadata_yaml, raw_body] <- String.split(content, ~r/^---\n/m, parts: 3),

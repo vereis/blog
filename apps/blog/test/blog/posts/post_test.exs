@@ -7,7 +7,7 @@ defmodule Blog.Posts.PostTest do
 
   @test_image_path Path.join([
                      File.cwd!(),
-                     "test/fixtures/priv/assets/test_image.jpg"
+                     "test/fixtures/priv/content/assets/test_image.jpg"
                    ])
 
   describe "changeset/2 - validation" do
@@ -483,9 +483,10 @@ defmodule Blog.Posts.PostTest do
     end
   end
 
-  describe "import/0" do
+  describe "import/2" do
     test "imports posts from markdown files and inserts into database" do
-      assert {:ok, imported} = Post.import()
+      path = Path.join([File.cwd!(), "test/fixtures/priv/content/archived"])
+      assert {:ok, imported} = Blog.Content.import(Post, path)
 
       assert length(imported) == 3
 
@@ -524,7 +525,7 @@ defmodule Blog.Posts.PostTest do
     end
 
     test "uses custom description from YAML if provided" do
-      resource = %Blog.Resource{
+      resource = %Blog.Content{
         path: "custom-description-post.md",
         content: """
         ---
@@ -553,7 +554,7 @@ defmodule Blog.Posts.PostTest do
     end
 
     test "description is nil when empty string provided" do
-      resource = %Blog.Resource{
+      resource = %Blog.Content{
         path: "empty-description-post.md",
         content: """
         ---
@@ -580,7 +581,7 @@ defmodule Blog.Posts.PostTest do
     end
 
     test "description is nil when not provided" do
-      resource = %Blog.Resource{
+      resource = %Blog.Content{
         path: "no-description-post.md",
         content: """
         ---
@@ -606,7 +607,7 @@ defmodule Blog.Posts.PostTest do
     end
 
     test "imports permalinks from YAML frontmatter" do
-      resource = %Blog.Resource{
+      resource = %Blog.Content{
         path: "post-with-permalinks.md",
         content: """
         ---
@@ -629,7 +630,7 @@ defmodule Blog.Posts.PostTest do
     end
 
     test "handles missing permalinks field with empty array default" do
-      resource = %Blog.Resource{
+      resource = %Blog.Content{
         path: "no-permalinks.md",
         content: """
         ---
@@ -648,7 +649,7 @@ defmodule Blog.Posts.PostTest do
     end
 
     test "handles empty permalinks array" do
-      resource = %Blog.Resource{
+      resource = %Blog.Content{
         path: "empty-permalinks.md",
         content: """
         ---
@@ -668,7 +669,7 @@ defmodule Blog.Posts.PostTest do
     end
 
     test "handles single permalink" do
-      resource = %Blog.Resource{
+      resource = %Blog.Content{
         path: "single-permalink.md",
         content: """
         ---

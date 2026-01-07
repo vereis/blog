@@ -116,7 +116,7 @@ defmodule BlogWeb.ProjectsLiveTest do
   end
 
   describe "PubSub hot reload" do
-    test "reloads projects when resource_reload event is received", %{conn: conn} do
+    test "reloads projects when content_imported event is received", %{conn: conn} do
       project = insert(:project, name: "Original Name", url: "https://example.com")
 
       {:ok, view, _html} = live(conn, ~p"/projects")
@@ -125,11 +125,7 @@ defmodule BlogWeb.ProjectsLiveTest do
 
       Blog.Projects.update_project(project, %{name: "Updated Name"})
 
-      Phoenix.PubSub.broadcast(
-        Blog.PubSub,
-        "project:reload",
-        {:resource_reload, Blog.Projects.Project, project.id}
-      )
+      Phoenix.PubSub.broadcast(Blog.PubSub, Blog.Content.pubsub_topic(), {:content_imported})
 
       _ = :sys.get_state(view.pid)
 

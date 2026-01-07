@@ -61,7 +61,7 @@ defmodule Mix.Tasks.Blog.Gen.Post do
 
     content = build_post_content(title, slug, is_draft, published_at)
 
-    posts_dir = Path.join([File.cwd!(), "apps/blog/priv/posts"])
+    posts_dir = Path.join([File.cwd!(), "apps/blog/priv/content/archived"])
     File.mkdir_p!(posts_dir)
 
     timestamp = Calendar.strftime(DateTime.utc_now(), "%Y%m%d%H%M%S")

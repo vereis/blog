@@ -50,7 +50,7 @@ defmodule Blog.Projects.ProjectTest do
           description: "Second project"
       """
 
-      resource = %Blog.Resource{content: yaml_content}
+      resource = %Blog.Content{content: yaml_content}
       attrs_list = Project.handle_import(resource)
 
       assert is_list(attrs_list)
@@ -65,16 +65,17 @@ defmodule Blog.Projects.ProjectTest do
 
     test "returns error for invalid YAML format" do
       yaml_content = "invalid: yaml"
-      resource = %Blog.Resource{content: yaml_content}
+      resource = %Blog.Content{content: yaml_content}
 
       assert {:error, ~s(YAML content does not contain 'projects' key with a list value, got: %{"invalid" => "yaml"})} =
                Project.handle_import(resource)
     end
   end
 
-  describe "import/0 - resource import system" do
+  describe "import/2" do
     test "imports projects from projects.yaml file" do
-      assert {:ok, imported} = Project.import()
+      path = Path.join([File.cwd!(), "test/fixtures/priv/content/projects"])
+      assert {:ok, imported} = Blog.Content.import(Project, path)
 
       assert length(imported) == 2
       assert Enum.any?(imported, &(&1.name == "Test Project"))
@@ -92,12 +93,14 @@ defmodule Blog.Projects.ProjectTest do
     end
 
     test "upserts projects based on name" do
+      path = Path.join([File.cwd!(), "test/fixtures/priv/content/projects"])
+
       # First import
-      assert {:ok, _} = Project.import()
+      assert {:ok, _} = Blog.Content.import(Project, path)
       first_project = Repo.get_by(Project, name: "Test Project")
 
       # Second import should update, not duplicate
-      assert {:ok, _} = Project.import()
+      assert {:ok, _} = Blog.Content.import(Project, path)
       assert Repo.aggregate(Project, :count) == 2
 
       # Project should still have the same ID

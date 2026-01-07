@@ -4,7 +4,7 @@ defmodule BlogWeb.HomeLiveTest do
   import Blog.Factory
   import Phoenix.LiveViewTest
 
-  alias Blog.Posts.Post
+  alias Blog.Content
 
   describe "HomeLive" do
     test "mounts successfully and displays about post", %{conn: conn} do
@@ -31,28 +31,12 @@ defmodule BlogWeb.HomeLiveTest do
 
       assert has_element?(view, "#hello-world", "Original Title")
 
-      {:ok, updated_post} = Blog.Posts.update_post(post, %{title: "Updated Title"})
-      Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:resource_reload, Post, updated_post.id})
+      {:ok, _updated_post} = Blog.Posts.update_post(post, %{title: "Updated Title"})
+      Phoenix.PubSub.broadcast(Blog.PubSub, Content.pubsub_topic(), {:content_imported})
 
       _ = :sys.get_state(view.pid)
 
       assert has_element?(view, "#hello-world", "Updated Title")
-    end
-
-    test "does not reload when a different post changes", %{conn: conn} do
-      insert(:post, slug: "hello-world", title: "Hello World")
-      other_post = insert(:post, slug: "other-post", title: "Other Post")
-
-      {:ok, view, _html} = live(conn, ~p"/")
-
-      assert has_element?(view, "#hello-world", "Hello World")
-
-      {:ok, updated_other} = Blog.Posts.update_post(other_post, %{title: "Updated Other"})
-      Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:resource_reload, Post, updated_other.id})
-
-      _ = :sys.get_state(view.pid)
-
-      assert has_element?(view, "#hello-world", "Hello World")
     end
 
     test "loads post when it gets created after initial mount", %{conn: conn} do
@@ -60,27 +44,13 @@ defmodule BlogWeb.HomeLiveTest do
 
       assert has_element?(view, ".bluescreen")
 
-      post = insert(:post, slug: "hello-world", title: "Newly Created")
-      Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:resource_reload, Post, post.id})
+      insert(:post, slug: "hello-world", title: "Newly Created")
+      Phoenix.PubSub.broadcast(Blog.PubSub, Content.pubsub_topic(), {:content_imported})
 
       _ = :sys.get_state(view.pid)
 
       assert has_element?(view, "#hello-world", "Newly Created")
       refute has_element?(view, ".bluescreen")
-    end
-
-    test "empty state remains when a different post is created", %{conn: conn} do
-      {:ok, view, _html} = live(conn, ~p"/")
-
-      assert has_element?(view, ".bluescreen")
-
-      other_post = insert(:post, slug: "other-post", title: "Different Post")
-      Phoenix.PubSub.broadcast(Blog.PubSub, "post:reload", {:resource_reload, Post, other_post.id})
-
-      _ = :sys.get_state(view.pid)
-
-      assert has_element?(view, ".bluescreen")
-      refute has_element?(view, "article.post")
     end
 
     test "renders navbar with navigation links", %{conn: conn} do

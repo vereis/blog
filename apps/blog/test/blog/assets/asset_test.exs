@@ -6,22 +6,22 @@ defmodule Blog.Assets.AssetTest do
 
   @test_image_path Path.join([
                      File.cwd!(),
-                     "test/fixtures/priv/assets/test_image.jpg"
+                     "test/fixtures/priv/content/assets/test_image.jpg"
                    ])
 
   @test_text_path Path.join([
                     File.cwd!(),
-                    "test/fixtures/priv/assets/test_document.txt"
+                    "test/fixtures/priv/content/assets/test_document.txt"
                   ])
 
   @test_pdf_path Path.join([
                    File.cwd!(),
-                   "test/fixtures/priv/assets/test_document.pdf"
+                   "test/fixtures/priv/content/assets/test_document.pdf"
                  ])
 
   @invalid_image_path Path.join([
                         File.cwd!(),
-                        "test/fixtures/priv/assets/invalid_image.jpg"
+                        "test/fixtures/priv/content/assets/invalid_image.jpg"
                       ])
 
   describe "changeset/2 - validation" do
@@ -119,10 +119,11 @@ defmodule Blog.Assets.AssetTest do
     end
   end
 
-  describe "import/0" do
+  describe "import/2" do
     @tag :capture_log
     test "imports assets from source directory" do
-      assert {:ok, imported} = Asset.import()
+      path = Path.join([File.cwd!(), "test/fixtures/priv/content/assets"])
+      assert {:ok, imported} = Blog.Content.import(Asset, path)
 
       refute Enum.empty?(imported)
       assert Repo.aggregate(Asset, :count) >= 1
