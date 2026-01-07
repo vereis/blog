@@ -13,9 +13,11 @@ defmodule Blog.Content do
 
   ## Options for `use Blog.Content`
 
-  - `:import` (required) - Function to upsert parsed content (e.g., `&Blog.Posts.upsert_post/1`)
+  - `:conflict_target` (required) - Field(s) to use for upsert conflict detection
   - `:preprocess` - Optional function to transform attrs before import
   """
+
+  alias Blog.Repo
 
   require Logger
 
@@ -57,15 +59,15 @@ defmodule Blog.Content do
   Imports assets, posts, and projects in order and broadcasts a single
   `:content_imported` message on completion.
   """
-  @spec import_all(Path.t()) :: {:ok, map()} | {:error, term()}
-  def import_all(path) do
+  @spec import(Path.t()) :: {:ok, map()} | {:error, term()}
+  def import(path) do
     alias Blog.Assets.Asset
     alias Blog.Posts.Post
     alias Blog.Projects.Project
 
-    with {:ok, assets} <- import_content(Asset, Path.join(path, "assets")),
-         {:ok, posts} <- import_content(Post, Path.join(path, "archived")),
-         {:ok, projects} <- import_content(Project, Path.join(path, "projects")) do
+    with {:ok, assets} <- __MODULE__.import(Asset, Path.join(path, "assets")),
+         {:ok, posts} <- __MODULE__.import(Post, Path.join(path, "archived")),
+         {:ok, projects} <- __MODULE__.import(Project, Path.join(path, "projects")) do
       Phoenix.PubSub.broadcast(Blog.PubSub, @pubsub_topic, {:content_imported})
 
       {:ok, %{assets: assets, posts: posts, projects: projects}}
@@ -74,11 +76,14 @@ defmodule Blog.Content do
 
   @doc """
   Imports content of a specific type from the given path.
+
+  Reads all files from `path`, calls the module's `handle_import/1` callback to parse
+  each file into attrs, runs the changeset, and upserts using the configured conflict target.
   """
-  @spec import_content(content_type(), Path.t()) :: {:ok, [struct()]} | {:error, term()}
-  def import_content(module, path) do
-    import_fn = module.__content_import_fn__()
+  @spec import(content_type(), Path.t()) :: {:ok, [struct()]} | {:error, term()}
+  def import(module, path) do
     preprocess_fn = module.__content_preprocess_fn__()
+    conflict_target = module.__content_conflict_target__()
 
     read_and_parse = fn filename ->
       file_path = Path.join(path, filename)
@@ -95,6 +100,22 @@ defmodule Blog.Content do
       module.handle_import(resource)
     end
 
+    upsert = fn attrs ->
+      # Get conflict target value from attrs to find existing record
+      conflict_value = Map.get(attrs, conflict_target)
+
+      existing =
+        if conflict_value do
+          Repo.get_by(module, [{conflict_target, conflict_value}])
+        end
+
+      base = existing || struct(module)
+
+      base
+      |> module.changeset(attrs)
+      |> Repo.insert_or_update()
+    end
+
     {successes, errors} =
       path
       |> File.ls!()
@@ -102,7 +123,7 @@ defmodule Blog.Content do
       |> Task.async_stream(read_and_parse, timeout: :infinity)
       |> Stream.flat_map(fn {:ok, res} -> List.wrap(res) end)
       |> Stream.map(preprocess_fn)
-      |> Stream.map(import_fn)
+      |> Stream.map(upsert)
       |> Enum.split_with(&match?({:ok, _res}, &1))
 
     if errors != [] do
@@ -116,18 +137,15 @@ defmodule Blog.Content do
     {:ok, Enum.map(successes, fn {:ok, res} -> res end)}
   end
 
-  @doc false
-  def identity(x), do: x
-
   defmacro __using__(opts) do
-    import_fn = Keyword.fetch!(opts, :import)
-    preprocess_fn = Keyword.get(opts, :preprocess, &__MODULE__.identity/1)
+    conflict_target = Keyword.fetch!(opts, :conflict_target)
+    preprocess_fn = Keyword.get(opts, :preprocess, &Blog.Utils.identity/1)
 
     quote do
       @behaviour unquote(__MODULE__)
 
       @doc false
-      def __content_import_fn__, do: unquote(import_fn)
+      def __content_conflict_target__, do: unquote(conflict_target)
 
       @doc false
       def __content_preprocess_fn__, do: unquote(preprocess_fn)

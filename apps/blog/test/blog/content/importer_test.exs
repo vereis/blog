@@ -15,14 +15,14 @@ defmodule Blog.Content.ImporterTest do
     end
   end
 
-  describe "import_all/1" do
+  describe "import/1" do
     test "imports all content types and logs errors for invalid assets" do
       path = test_content_path()
 
       log =
         capture_log(fn ->
           assert {:ok, %{assets: assets, posts: posts, projects: projects}} =
-                   Content.import_all(path)
+                   Content.import(path)
 
           refute Enum.empty?(assets)
           refute Enum.empty?(posts)
@@ -39,18 +39,18 @@ defmodule Blog.Content.ImporterTest do
       Phoenix.PubSub.subscribe(Blog.PubSub, Content.pubsub_topic())
 
       capture_log(fn ->
-        {:ok, _} = Content.import_all(path)
+        {:ok, _} = Content.import(path)
       end)
 
       assert_received {:content_imported}
     end
   end
 
-  describe "import_content/2" do
+  describe "import/2" do
     test "imports posts from archived directory" do
       path = Path.join(test_content_path(), "archived")
 
-      {:ok, posts} = Content.import_content(Post, path)
+      {:ok, posts} = Content.import(Post, path)
 
       refute Enum.empty?(posts)
       assert Enum.all?(posts, &is_struct(&1, Post))
@@ -61,7 +61,7 @@ defmodule Blog.Content.ImporterTest do
 
       log =
         capture_log(fn ->
-          {:ok, assets} = Content.import_content(Blog.Assets.Asset, path)
+          {:ok, assets} = Content.import(Blog.Assets.Asset, path)
           refute Enum.empty?(assets)
         end)
 
@@ -71,7 +71,7 @@ defmodule Blog.Content.ImporterTest do
     test "imports projects from projects directory" do
       path = Path.join(test_content_path(), "projects")
 
-      {:ok, projects} = Content.import_content(Project, path)
+      {:ok, projects} = Content.import(Project, path)
 
       refute Enum.empty?(projects)
       assert Enum.all?(projects, &is_struct(&1, Project))

@@ -32,12 +32,7 @@ defmodule Blog.Content.Importer do
   def init(_opts) do
     send(self(), :check_litefs_ready)
 
-    watcher_pid =
-      if Blog.env() == :dev do
-        init_watcher()
-      end
-
-    {:ok, %{watcher_pid: watcher_pid, timer_ref: nil}}
+    {:ok, %{watcher_pid: maybe_start_watcher(), timer_ref: nil}}
   end
 
   @impl GenServer
@@ -90,23 +85,25 @@ defmodule Blog.Content.Importer do
   defp do_import do
     path = Content.content_path()
 
-    {:ok, %{assets: assets, posts: posts, projects: projects}} = Content.import_all(path)
+    {:ok, %{assets: assets, posts: posts, projects: projects}} = Content.import(path)
 
     Logger.info("Content import complete: #{length(assets)} assets, #{length(posts)} posts, #{length(projects)} projects")
   end
 
-  defp init_watcher do
-    path = Content.content_path()
+  defp maybe_start_watcher do
+    if Blog.env() == :dev do
+      path = Content.content_path()
 
-    case FileSystem.start_link(dirs: [path], recursive: true) do
-      {:ok, watcher_pid} ->
-        FileSystem.subscribe(watcher_pid)
-        Logger.info("Started content watcher on #{path}")
-        watcher_pid
+      case FileSystem.start_link(dirs: [path], recursive: true) do
+        {:ok, watcher_pid} ->
+          FileSystem.subscribe(watcher_pid)
+          Logger.info("Started content watcher on #{path}")
+          watcher_pid
 
-      {:error, reason} ->
-        Logger.warning("Failed to start content watcher: #{inspect(reason)}")
-        nil
+        {:error, reason} ->
+          Logger.warning("Failed to start content watcher: #{inspect(reason)}")
+          nil
+      end
     end
   end
 

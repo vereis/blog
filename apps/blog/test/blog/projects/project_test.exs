@@ -72,10 +72,10 @@ defmodule Blog.Projects.ProjectTest do
     end
   end
 
-  describe "import_content/2" do
+  describe "import/2" do
     test "imports projects from projects.yaml file" do
       path = Path.join([File.cwd!(), "test/fixtures/priv/content/projects"])
-      assert {:ok, imported} = Blog.Content.import_content(Project, path)
+      assert {:ok, imported} = Blog.Content.import(Project, path)
 
       assert length(imported) == 2
       assert Enum.any?(imported, &(&1.name == "Test Project"))
@@ -96,11 +96,11 @@ defmodule Blog.Projects.ProjectTest do
       path = Path.join([File.cwd!(), "test/fixtures/priv/content/projects"])
 
       # First import
-      assert {:ok, _} = Blog.Content.import_content(Project, path)
+      assert {:ok, _} = Blog.Content.import(Project, path)
       first_project = Repo.get_by(Project, name: "Test Project")
 
       # Second import should update, not duplicate
-      assert {:ok, _} = Blog.Content.import_content(Project, path)
+      assert {:ok, _} = Blog.Content.import(Project, path)
       assert Repo.aggregate(Project, :count) == 2
 
       # Project should still have the same ID

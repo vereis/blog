@@ -3,7 +3,7 @@ defmodule Blog.Assets.Asset do
   use Blog.Schema
 
   use Blog.Content,
-    import: &Blog.Assets.upsert_asset/1
+    conflict_target: :path
 
   require Blog.Assets.Types, as: Types
 

@@ -3,8 +3,8 @@ defmodule Blog.Projects.Project do
   use Blog.Schema
 
   use Blog.Content,
-    preprocess: &Blog.Tags.label_to_id/1,
-    import: &Blog.Projects.upsert_project/1
+    conflict_target: :name,
+    preprocess: &Blog.Tags.label_to_id/1
 
   import Blog.Utils.Guards
 

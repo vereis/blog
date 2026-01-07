@@ -119,11 +119,11 @@ defmodule Blog.Assets.AssetTest do
     end
   end
 
-  describe "import_content/2" do
+  describe "import/2" do
     @tag :capture_log
     test "imports assets from source directory" do
       path = Path.join([File.cwd!(), "test/fixtures/priv/content/assets"])
-      assert {:ok, imported} = Blog.Content.import_content(Asset, path)
+      assert {:ok, imported} = Blog.Content.import(Asset, path)
 
       refute Enum.empty?(imported)
       assert Repo.aggregate(Asset, :count) >= 1
